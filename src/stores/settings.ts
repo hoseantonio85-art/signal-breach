@@ -1,10 +1,9 @@
-import type { Language } from '../i18n'
+import type { Language } from '../game/types'
 
 const LANGUAGE_KEY = 'signal_breach_language'
 
 export function loadLanguage(): Language {
-  const stored = localStorage.getItem(LANGUAGE_KEY)
-  return stored === 'en' ? 'en' : 'ru'
+  return localStorage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'ru'
 }
 
 export function saveLanguage(language: Language) {

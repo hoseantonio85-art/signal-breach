@@ -1,3 +1,5 @@
+export type Language = 'ru' | 'en'
+
 export type Cell = {
   row: number
   col: number
@@ -5,6 +7,7 @@ export type Cell = {
   revealed: boolean
   quarantined: boolean
   adjacent: number
+  exploded?: boolean
 }
 
 export type Board = {
@@ -22,4 +25,19 @@ export type Mission = {
   cols: number
   mines: number
   parSeconds: number
+  location: Record<Language, string>
+  briefing: Record<Language, string>
+  debrief: Record<Language, string>
 }
+
+export type GameSession = {
+  kind: 'campaign' | 'free'
+  label: string
+  rows: number
+  cols: number
+  mines: number
+  mission?: Mission
+}
+
+export type GamePhase = 'idle' | 'running' | 'won' | 'lost' | 'review'
+export type InteractionMode = 'scan' | 'quarantine'

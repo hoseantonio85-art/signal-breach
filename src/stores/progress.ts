@@ -1,22 +1,28 @@
-export type Progress = {
-  unlockedMission: number
-  scores: Record<number, number>
+export type MissionResult = {
+  bestScore: number
+  bestTime: number
+  bestRank: string
 }
 
-const PROGRESS_KEY = 'signal_breach_progress_v2'
-const fallback: Progress = { unlockedMission: 1, scores: {} }
+export type Progress = {
+  unlockedMission: number
+  completed: Record<number, MissionResult>
+}
+
+const PROGRESS_KEY = 'signal_breach_progress_v3'
+const fallback: Progress = { unlockedMission: 1, completed: {} }
 
 export function loadProgress(): Progress {
   try {
     const raw = localStorage.getItem(PROGRESS_KEY)
-    if (!raw) return fallback
+    if (!raw) return { ...fallback, completed: {} }
     const parsed = JSON.parse(raw) as Partial<Progress>
     return {
       unlockedMission: Math.max(1, Math.min(10, Number(parsed.unlockedMission) || 1)),
-      scores: parsed.scores && typeof parsed.scores === 'object' ? parsed.scores : {},
+      completed: parsed.completed && typeof parsed.completed === 'object' ? parsed.completed : {},
     }
   } catch {
-    return fallback
+    return { ...fallback, completed: {} }
   }
 }
 
