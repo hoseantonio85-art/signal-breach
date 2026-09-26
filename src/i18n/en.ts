@@ -1,0 +1,17 @@
+export const en = {
+  language: 'Language',
+  systemReady: 'SYSTEM READY',
+  title: 'The relay is waiting for an operator',
+  subtitle: 'Restore corrupted nodes, isolate anomalies, and follow the NULL CHOIR signature.',
+  campaign: 'CAMPAIGN',
+  campaignDescription: 'A connected chain of operations, Voss briefings, and steadily rising difficulty.',
+  freeRun: 'FREE RUN',
+  freeDescription: 'Classic play without the story layer. Choose a density and start tracing.',
+  operationsUnlocked: 'operations unlocked',
+  operations: 'OPERATIONS',
+  globalIncident: 'GLOBAL RELAY INCIDENT',
+  corruption: 'corruptions',
+  ready: 'READY',
+  locked: 'LOCKED',
+  migrationNote: 'The playable board moves in next. This commit establishes navigation, localization, and the application architecture.',
+} as const
