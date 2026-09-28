@@ -69,6 +69,7 @@ export function GameScreen({
   onNextMission,
   onCampaignWin,
 }: Props) {
+  void onLanguageChange
   const [board, setBoard] = useState<Board>(() => createBoard(session.rows, session.cols, session.mines))
   const [phase, setPhase] = useState<GamePhase>('idle')
   const [interactionMode, setInteractionMode] = useState<InteractionMode>('scan')
@@ -179,7 +180,7 @@ export function GameScreen({
 
     const opened = revealResult.board.cells[row * revealResult.board.cols + col]
     if (opened?.revealed) setLog(opened.adjacent === 0 ? t.cleanZero : t.cleanNear)
-    audioEngine.ui('reveal')
+    audioEngine.ui(revealResult.revealedDelta > 1 ? 'cascade' : 'reveal', revealResult.revealedDelta)
   }
 
   function quarantineCell(row: number, col: number) {
@@ -270,9 +271,6 @@ export function GameScreen({
           {session.kind === 'campaign' && session.mission && (
             <button className="chip-btn operation-chip" onClick={onOperations}><span className="dot active-dot" />OP {String(session.mission.id).padStart(2, '0')} / 10</button>
           )}
-          <select className="select lang-select" value={language} onChange={(event: { target: { value: string } }) => onLanguageChange(event.target.value as Language)} aria-label={t.language}>
-            <option value="ru">RU</option><option value="en">EN</option>
-          </select>
           <button className={`chip-btn audio-chip ${audioOn ? 'active' : ''}`} onClick={onAudioToggle}><span className="dot" /><span className="audio-label">{audioOn ? t.audioOn : t.audioOff}</span></button>
           <button className="chip-btn restart-chip" onClick={resetGame} aria-label={t.newSession}><span className="restart-icon">↻</span><span className="restart-label">{t.newSession}</span></button>
           <button className="chip-btn menu-chip" onClick={onMenu}><span>⌂</span><span className="menu-label">{t.menu}</span></button>
