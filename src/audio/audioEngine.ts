@@ -24,12 +24,12 @@ class SignalAudioEngine {
     if (!this.context) {
       this.context = new AudioContext()
       this.master = this.context.createGain()
-      this.master.gain.value = 0.22
+      this.master.gain.value = 0.42
       this.master.connect(this.context.destination)
     }
 
     if (this.context.state === 'suspended') await this.context.resume()
-    this.master?.gain.setTargetAtTime(0.22, this.context.currentTime, 0.04)
+    this.master?.gain.setTargetAtTime(0.42, this.context.currentTime, 0.04)
     this.startAmbient()
     this.ui('tick')
   }
@@ -58,8 +58,8 @@ class SignalAudioEngine {
     if (!this.enabled) return
 
     if (type === 'reveal') {
-      this.tone(640, 0.05, 'sine', 0.025)
-      this.tone(960, 0.04, 'triangle', 0.015, 5)
+      this.tone(640, 0.055, 'sine', 0.058)
+      this.tone(960, 0.045, 'triangle', 0.038, 5)
       return
     }
 
@@ -72,38 +72,38 @@ class SignalAudioEngine {
         const base = notes[index % notes.length]
         const detune = ((index % 3) - 1) * 5
         window.setTimeout(() => {
-          this.tone(base, 0.055 + (index % 2) * 0.01, index % 2 ? 'triangle' : 'sine', Math.max(0.009, 0.021 - index * 0.0008), detune)
+          this.tone(base, 0.06 + (index % 2) * 0.012, index % 2 ? 'triangle' : 'sine', Math.max(0.022, 0.047 - index * 0.0016), detune)
         }, delay)
       }
-      window.setTimeout(() => this.tone(1568, 0.11, 'sine', 0.012, 3), steps * 18 - 4)
+      window.setTimeout(() => this.tone(1568, 0.12, 'sine', 0.03, 3), steps * 18 - 4)
       return
     }
 
     if (type === 'flag') {
-      this.tone(280, 0.07, 'square', 0.022)
-      window.setTimeout(() => this.tone(420, 0.08, 'triangle', 0.022), 45)
+      this.tone(280, 0.075, 'square', 0.055)
+      window.setTimeout(() => this.tone(420, 0.085, 'triangle', 0.05), 45)
       return
     }
 
     if (type === 'tick') {
-      this.tone(520, 0.045, 'sine', 0.018)
+      this.tone(520, 0.05, 'sine', 0.04)
       return
     }
 
     if (type === 'start') {
-      this.tone(220, 0.10, 'sine', 0.025)
-      window.setTimeout(() => this.tone(330, 0.12, 'triangle', 0.02), 80)
+      this.tone(220, 0.11, 'sine', 0.055)
+      window.setTimeout(() => this.tone(330, 0.13, 'triangle', 0.045), 80)
       return
     }
 
     if (type === 'loss') {
-      this.tone(170, 0.35, 'sawtooth', 0.045)
-      window.setTimeout(() => this.tone(115, 0.5, 'square', 0.028), 120)
+      this.tone(170, 0.38, 'sawtooth', 0.085)
+      window.setTimeout(() => this.tone(115, 0.52, 'square', 0.052), 120)
       return
     }
 
     ;[262, 330, 392, 523].forEach((frequency, index) => {
-      window.setTimeout(() => this.tone(frequency, 0.24, 'sine', 0.032), index * 90)
+      window.setTimeout(() => this.tone(frequency, 0.25, 'sine', 0.062), index * 90)
     })
   }
 
@@ -114,8 +114,8 @@ class SignalAudioEngine {
       if (!this.enabled) return
       const roots = [55, 65.41, 73.42]
       const root = roots[Math.floor(Math.random() * roots.length)]
-      this.tone(root, 0.72, 'sine', 0.012)
-      this.tone(root * 2, 0.9, 'triangle', 0.006, Math.random() * 8 - 4)
+      this.tone(root, 0.72, 'sine', 0.014)
+      this.tone(root * 2, 0.9, 'triangle', 0.007, Math.random() * 8 - 4)
     }
 
     pulse()
