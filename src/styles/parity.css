@@ -1,0 +1,92 @@
+/* Visual parity overrides copied from the approved standalone HTML prototype. */
+
+/* Main-menu sigil: cyan diamond + small filled magenta square. */
+.menu-sigil{
+  width:48px;
+  height:48px;
+  margin:0 auto 18px;
+  position:relative;
+  display:grid;
+  place-items:center;
+}
+.menu-sigil::before,
+.menu-sigil::after{
+  content:"";
+  position:absolute;
+  inset:auto;
+  border:1px solid var(--cyan);
+  box-shadow:0 0 15px rgba(113,241,255,.12);
+}
+.menu-sigil::before{
+  width:31px;
+  height:31px;
+  transform:rotate(45deg);
+}
+.menu-sigil::after{
+  width:9px;
+  height:9px;
+  background:var(--pink);
+  border-color:var(--pink);
+  transform:none;
+  box-shadow:0 0 13px rgba(255,79,216,.7);
+}
+
+/* Compact brand mark used inside the game HUD. */
+.brand-mark{
+  width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  position:relative;
+  border:0;
+  transform:none;
+  box-shadow:none;
+}
+.brand-mark::before,
+.brand-mark::after{
+  content:"";
+  position:absolute;
+  border:1px solid var(--cyan);
+}
+.brand-mark::before{
+  width:12px;
+  height:12px;
+  transform:rotate(45deg);
+}
+.brand-mark::after{
+  width:4px;
+  height:4px;
+  background:var(--pink);
+  border-color:var(--pink);
+  box-shadow:0 0 10px var(--pink);
+}
+
+/* Quarantine markers: target-like lock marker from the HTML prototype. */
+.cell{
+  display:grid;
+  place-items:center;
+}
+.cell.flagged::before{
+  content:"";
+  width:10px;
+  height:10px;
+  border:1.5px solid var(--pink);
+  transform:rotate(45deg);
+  box-shadow:0 0 10px rgba(255,79,216,.55), inset 0 0 5px rgba(255,79,216,.12);
+}
+.cell.flagged::after{
+  content:"";
+  position:absolute;
+  width:3px;
+  height:3px;
+  background:var(--cyan);
+  box-shadow:0 0 7px var(--cyan);
+}
+.flag-core{
+  display:none;
+}
+
+/* Language is chosen once on the main screen; the game inherits that choice. */
+.game-app .lang-select{
+  display:none !important;
+}
