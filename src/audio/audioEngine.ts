@@ -1,8 +1,10 @@
+type UiSound = 'start' | 'reveal' | 'cascade' | 'flag' | 'tick' | 'loss' | 'win'
+
 class SignalAudioEngine {
   private context: AudioContext | null = null
   private master: GainNode | null = null
-  private drone: OscillatorNode | null = null
   private enabled = false
+  private ambientTimer: number | null = null
 
   isEnabled() {
     return this.enabled
@@ -10,49 +12,114 @@ class SignalAudioEngine {
 
   async setEnabled(enabled: boolean) {
     this.enabled = enabled
+
     if (!enabled) {
-      if (this.master) this.master.gain.setTargetAtTime(0, this.context?.currentTime ?? 0, 0.08)
+      if (this.ambientTimer != null) window.clearInterval(this.ambientTimer)
+      this.ambientTimer = null
+      if (this.master && this.context) this.master.gain.setTargetAtTime(0, this.context.currentTime, 0.05)
+      if (this.context?.state === 'running') await this.context.suspend()
       return
     }
 
     if (!this.context) {
       this.context = new AudioContext()
       this.master = this.context.createGain()
-      this.master.gain.value = 0.055
+      this.master.gain.value = 0.22
       this.master.connect(this.context.destination)
-
-      const droneGain = this.context.createGain()
-      droneGain.gain.value = 0.08
-      droneGain.connect(this.master)
-      this.drone = this.context.createOscillator()
-      this.drone.type = 'sine'
-      this.drone.frequency.value = 55
-      this.drone.connect(droneGain)
-      this.drone.start()
     }
 
-    await this.context.resume()
-    this.master?.gain.setTargetAtTime(0.055, this.context.currentTime, 0.08)
-    this.ui('start')
+    if (this.context.state === 'suspended') await this.context.resume()
+    this.master?.gain.setTargetAtTime(0.22, this.context.currentTime, 0.04)
+    this.startAmbient()
+    this.ui('tick')
   }
 
-  ui(type: 'start' | 'reveal' | 'flag' | 'tick' | 'loss' | 'win') {
+  private tone(freq: number, duration = 0.08, type: OscillatorType = 'sine', volume = 0.05, detune = 0) {
     if (!this.enabled || !this.context || !this.master) return
+
     const now = this.context.currentTime
     const osc = this.context.createOscillator()
     const gain = this.context.createGain()
-    const frequencies = { start: 220, reveal: 390, flag: 185, tick: 120, loss: 82, win: 520 }
-    const durations = { start: .12, reveal: .045, flag: .08, tick: .05, loss: .34, win: .28 }
-    osc.type = type === 'loss' ? 'sawtooth' : 'triangle'
-    osc.frequency.setValueAtTime(frequencies[type], now)
-    if (type === 'win') osc.frequency.exponentialRampToValueAtTime(780, now + durations[type])
-    if (type === 'loss') osc.frequency.exponentialRampToValueAtTime(48, now + durations[type])
-    gain.gain.setValueAtTime(type === 'loss' ? .12 : .07, now)
-    gain.gain.exponentialRampToValueAtTime(.0001, now + durations[type])
+
+    osc.type = type
+    osc.frequency.value = freq
+    osc.detune.value = detune
+    gain.gain.setValueAtTime(0.0001, now)
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.01)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration)
+
     osc.connect(gain)
     gain.connect(this.master)
     osc.start(now)
-    osc.stop(now + durations[type] + .02)
+    osc.stop(now + duration + 0.02)
+  }
+
+  ui(type: UiSound, intensity = 1) {
+    if (!this.enabled) return
+
+    if (type === 'reveal') {
+      this.tone(640, 0.05, 'sine', 0.025)
+      this.tone(960, 0.04, 'triangle', 0.015, 5)
+      return
+    }
+
+    if (type === 'cascade') {
+      // A soft digital scatter for flood-fill reveals: several tiny notes fan out quickly.
+      const notes = [523, 659, 784, 988, 1175, 1319]
+      const steps = Math.max(5, Math.min(12, Math.round(4 + intensity * 0.65)))
+      for (let index = 0; index < steps; index += 1) {
+        const delay = index * 18
+        const base = notes[index % notes.length]
+        const detune = ((index % 3) - 1) * 5
+        window.setTimeout(() => {
+          this.tone(base, 0.055 + (index % 2) * 0.01, index % 2 ? 'triangle' : 'sine', Math.max(0.009, 0.021 - index * 0.0008), detune)
+        }, delay)
+      }
+      window.setTimeout(() => this.tone(1568, 0.11, 'sine', 0.012, 3), steps * 18 - 4)
+      return
+    }
+
+    if (type === 'flag') {
+      this.tone(280, 0.07, 'square', 0.022)
+      window.setTimeout(() => this.tone(420, 0.08, 'triangle', 0.022), 45)
+      return
+    }
+
+    if (type === 'tick') {
+      this.tone(520, 0.045, 'sine', 0.018)
+      return
+    }
+
+    if (type === 'start') {
+      this.tone(220, 0.10, 'sine', 0.025)
+      window.setTimeout(() => this.tone(330, 0.12, 'triangle', 0.02), 80)
+      return
+    }
+
+    if (type === 'loss') {
+      this.tone(170, 0.35, 'sawtooth', 0.045)
+      window.setTimeout(() => this.tone(115, 0.5, 'square', 0.028), 120)
+      return
+    }
+
+    ;[262, 330, 392, 523].forEach((frequency, index) => {
+      window.setTimeout(() => this.tone(frequency, 0.24, 'sine', 0.032), index * 90)
+    })
+  }
+
+  private startAmbient() {
+    if (this.ambientTimer != null) window.clearInterval(this.ambientTimer)
+
+    const pulse = () => {
+      if (!this.enabled) return
+      const roots = [55, 65.41, 73.42]
+      const root = roots[Math.floor(Math.random() * roots.length)]
+      this.tone(root, 0.72, 'sine', 0.012)
+      this.tone(root * 2, 0.9, 'triangle', 0.006, Math.random() * 8 - 4)
+    }
+
+    pulse()
+    this.ambientTimer = window.setInterval(pulse, 1350)
   }
 }
 
