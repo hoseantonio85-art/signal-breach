@@ -61,7 +61,7 @@
   box-shadow:0 0 10px var(--pink);
 }
 
-/* Quarantine markers: target-like lock marker from the HTML prototype. */
+/* Quarantine marker from the HTML prototype: magenta diamond + cyan lock point. */
 .cell{
   display:grid;
   place-items:center;
@@ -84,6 +84,37 @@
 }
 .flag-core{
   display:none;
+}
+
+/* Revealed corruption / mine: exact pulsing reticle from the HTML prototype. */
+.mine-core{
+  position:relative;
+  inset:auto;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  border:2px solid var(--danger);
+  background:transparent;
+  box-shadow:0 0 12px rgba(255,75,115,.72);
+  animation:dangerPulse .9s ease-in-out infinite alternate;
+}
+.mine-core::before,
+.mine-core::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:22px;
+  height:1px;
+  background:rgba(255,75,115,.6);
+  transform:translate(-50%,-50%);
+}
+.mine-core::after{
+  transform:translate(-50%,-50%) rotate(90deg);
+}
+@keyframes dangerPulse{
+  from{transform:scale(.92);filter:brightness(.9)}
+  to{transform:scale(1.08);filter:brightness(1.35)}
 }
 
 /* Language is chosen once on the main screen; the game inherits that choice. */
