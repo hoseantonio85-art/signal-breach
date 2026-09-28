@@ -145,6 +145,11 @@
   display:none !important;
 }
 
+/* Large mission maps retain usable cells and become a native pan surface. */
+.pan-hints{
+  display:none;
+}
+
 @media(max-width:760px){
   .campaign-panel .panel-head .eyebrow,
   .campaign-panel .panel-head h2{
@@ -173,5 +178,67 @@
     height:36px !important;
     padding:0 !important;
     justify-content:center;
+  }
+
+  .pannable-map{
+    padding-left:8px;
+    padding-right:8px;
+  }
+  .pannable-map .board-shell{
+    justify-content:flex-start;
+    align-items:flex-start;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    touch-action:pan-x pan-y;
+    overscroll-behavior:contain;
+  }
+  .pannable-map .board-shell::-webkit-scrollbar{
+    display:none;
+  }
+  .pannable-map .board-wrap{
+    width:max-content;
+    min-width:100%;
+    margin:0;
+  }
+  .pannable-map .board{
+    width:max-content;
+    min-width:100%;
+    margin:0;
+    touch-action:pan-x pan-y;
+  }
+  .pannable-map .cell{
+    touch-action:pan-x pan-y;
+  }
+
+  .pannable-map .pan-hints{
+    display:block;
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:3;
+  }
+  .pan-hint{
+    position:absolute;
+    width:28px;
+    height:28px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(113,241,255,.14);
+    border-radius:9px;
+    background:rgba(5,10,22,.58);
+    color:rgba(113,241,255,.7);
+    font:500 22px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+    box-shadow:0 0 18px rgba(113,241,255,.06);
+    backdrop-filter:blur(5px);
+    animation:panHintPulse 1.8s ease-in-out infinite alternate;
+  }
+  .pan-top{top:7px;left:50%;transform:translateX(-50%)}
+  .pan-bottom{bottom:7px;left:50%;transform:translateX(-50%)}
+  .pan-left{left:7px;top:50%;transform:translateY(-50%)}
+  .pan-right{right:7px;top:50%;transform:translateY(-50%)}
+  @keyframes panHintPulse{
+    from{opacity:.34;filter:brightness(.9)}
+    to{opacity:.7;filter:brightness(1.18)}
   }
 }
