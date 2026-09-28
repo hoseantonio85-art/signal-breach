@@ -216,6 +216,7 @@ export function GameScreen({
     if (!press || event.pointerType !== 'touch') return
     if (Math.hypot(event.clientX - press.x, event.clientY - press.y) > 12) {
       window.clearTimeout(press.timer)
+      suppressClick.current = press.key
       longPress.current = null
     }
   }
@@ -258,6 +259,8 @@ export function GameScreen({
 
   const campaignTitle = session.mission ? `OP ${String(session.mission.id).padStart(2, '0')} // ${session.mission.code}` : session.label
   const resultCopy = session.kind === 'campaign' && session.mission ? session.mission.debrief[language] : t.freeWin
+  const cellMin = session.cols <= 9 ? 38 : session.cols <= 12 ? 42 : 44
+  const boardScrollable = session.rows > 9 || session.cols > 9
 
   return (
     <main className={`game-app ${phase === 'lost' || phase === 'review' ? 'glitch-ready' : ''}`}>
@@ -292,11 +295,11 @@ export function GameScreen({
           <div className="metric"><div className="metric-label">{t.integrity}</div><div className="metric-value"><span>{phase === 'won' ? 100 : integrity}%</span></div><div className="integrity-bar"><i style={{ width: `${phase === 'won' ? 100 : integrity}%` }} /></div></div>
         </div>
 
-        <div className="game-content">
+        <div className={`game-content ${boardScrollable ? 'pannable-map' : ''}`}>
           <div className="board-shell">
             <div className="board-wrap">
               <div className="coords-top"><span>{t.nodeMap} / X:{String(revealedSafe).padStart(2, '0')}</span><span>GRID {String(session.rows).padStart(2, '0')}×{String(session.cols).padStart(2, '0')}</span></div>
-              <div className="board" role="grid" aria-label={t.nodeMap} style={{ gridTemplateColumns: `repeat(${session.cols}, minmax(0, 1fr))` }}>
+              <div className="board" role="grid" aria-label={t.nodeMap} style={{ gridTemplateColumns: `repeat(${session.cols}, minmax(${cellMin}px, 1fr))` }}>
                 {board.cells.map((cell) => {
                   const classes = ['cell']
                   if (cell.revealed) classes.push('revealed')
@@ -326,6 +329,15 @@ export function GameScreen({
               </div>
             </div>
           </div>
+
+          {boardScrollable && (
+            <div className="pan-hints" aria-hidden="true">
+              <span className="pan-hint pan-top">⌃</span>
+              <span className="pan-hint pan-right">›</span>
+              <span className="pan-hint pan-bottom">⌄</span>
+              <span className="pan-hint pan-left">‹</span>
+            </div>
+          )}
 
           {(phase === 'lost' || phase === 'won') && (
             <div className="state-overlay show">
