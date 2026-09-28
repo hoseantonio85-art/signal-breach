@@ -61,6 +61,29 @@
   box-shadow:0 0 10px var(--pink);
 }
 
+/* Campaign description gets the full panel width instead of sharing it with score/actions. */
+.campaign-panel .panel-head{
+  position:relative;
+  display:block;
+}
+.campaign-panel .panel-head > div:first-child{
+  width:100%;
+}
+.campaign-panel .panel-head-actions{
+  position:absolute;
+  top:0;
+  right:0;
+}
+.campaign-panel .panel-head .eyebrow,
+.campaign-panel .panel-head h2{
+  padding-right:165px;
+}
+.campaign-panel .panel-copy{
+  width:100%;
+  max-width:none;
+  margin-right:0;
+}
+
 /* Quarantine marker from the HTML prototype: magenta diamond + cyan lock point. */
 .cell{
   display:grid;
@@ -120,4 +143,35 @@
 /* Language is chosen once on the main screen; the game inherits that choice. */
 .game-app .lang-select{
   display:none !important;
+}
+
+@media(max-width:760px){
+  .campaign-panel .panel-head .eyebrow,
+  .campaign-panel .panel-head h2{
+    padding-right:150px;
+  }
+
+  /* After removing language selection, all three utility buttons are the same square and use one consistent gap. */
+  .game-top-actions{
+    display:flex !important;
+    grid-template-columns:none !important;
+    gap:5px !important;
+    width:100%;
+    align-items:center;
+  }
+  .operation-chip{
+    flex:1 1 auto;
+    width:auto;
+    min-width:0;
+    height:36px;
+  }
+  .audio-chip,
+  .restart-chip,
+  .menu-chip{
+    flex:0 0 36px;
+    width:36px !important;
+    height:36px !important;
+    padding:0 !important;
+    justify-content:center;
+  }
 }
