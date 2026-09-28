@@ -135,9 +135,11 @@ export function App() {
       <header className="topbar">
         <button className="wordmark" onClick={() => setScreen('menu')}>SIGNAL//BREACH</button>
         <div className="top-actions">
-          <select value={language} onChange={(event: { target: { value: string } }) => setLanguage(event.target.value as Language)} aria-label={t.language}>
-            <option value="ru">RU</option><option value="en">EN</option>
-          </select>
+          {screen === 'menu' && (
+            <select value={language} onChange={(event: { target: { value: string } }) => setLanguage(event.target.value as Language)} aria-label={t.language}>
+              <option value="ru">RU</option><option value="en">EN</option>
+            </select>
+          )}
           <button className={`chip-btn ${audioOn ? 'active' : ''}`} onClick={toggleAudio}><span className="dot" />{audioOn ? t.audioOn : t.audioOff}</button>
         </div>
       </header>
