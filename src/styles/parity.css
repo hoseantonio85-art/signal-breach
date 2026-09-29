@@ -150,10 +150,72 @@
   display:none;
 }
 
+/* Campaign and Free Run use the same compact header composition.
+   Meta/actions own the first row; the title gets the full second row. */
+.content-panel .panel-head{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:
+    "eyebrow actions"
+    "title title"
+    "copy copy";
+  column-gap:12px;
+  row-gap:0;
+  align-items:start;
+}
+.content-panel .panel-head > div:first-child{
+  display:contents;
+}
+.content-panel .panel-head .eyebrow{
+  grid-area:eyebrow;
+  padding-right:0;
+  align-self:center;
+}
+.content-panel .panel-head h2{
+  grid-area:title;
+  padding-right:0;
+  margin:14px 0 0;
+  white-space:nowrap;
+  line-height:1.08;
+}
+.content-panel .panel-head .panel-copy{
+  grid-area:copy;
+  width:100%;
+  max-width:none;
+  margin:14px 0 0;
+}
+.campaign-panel .panel-head-actions{
+  grid-area:actions;
+  position:static;
+  top:auto;
+  right:auto;
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+.content-panel.compact .panel-head > .ghost{
+  grid-area:actions;
+}
+.content-panel .panel-head .ghost{
+  flex:0 0 auto;
+}
+
 @media(max-width:760px){
   .campaign-panel .panel-head .eyebrow,
   .campaign-panel .panel-head h2{
-    padding-right:150px;
+    padding-right:0;
+  }
+
+  .content-panel .panel-head h2{
+    font-size:clamp(20px,6vw,24px);
+    letter-spacing:-.015em;
+  }
+  .content-panel .panel-head .panel-copy{
+    margin-top:13px;
+  }
+  .panel-head-actions{
+    gap:8px;
   }
 
   /* After removing language selection, all three utility buttons are the same square and use one consistent gap. */
@@ -246,9 +308,10 @@
     visibility:visible;
   }
 
-  /* Broad edge sits against the viewport edge; the point faces inward into the map. */
+  /* Broad edge sits against the map edge; the point faces inward.
+     Insets keep the triangles visually on the cell boundary instead of hanging outside it. */
   .pan-top{
-    top:2px;
+    top:18px;
     left:50%;
     transform:translateX(-50%);
   }
@@ -258,7 +321,7 @@
     clip-path:polygon(0 0,100% 0,50% 100%);
   }
   .pan-bottom{
-    bottom:2px;
+    bottom:6px;
     left:50%;
     transform:translateX(-50%);
   }
@@ -268,7 +331,7 @@
     clip-path:polygon(50% 0,100% 100%,0 100%);
   }
   .pan-left{
-    left:2px;
+    left:6px;
     top:50%;
     transform:translateY(-50%);
   }
@@ -278,7 +341,7 @@
     clip-path:polygon(0 0,100% 50%,0 100%);
   }
   .pan-right{
-    right:2px;
+    right:6px;
     top:50%;
     transform:translateY(-50%);
   }
