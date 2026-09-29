@@ -211,34 +211,84 @@
     touch-action:pan-x pan-y;
   }
 
+  /* Scroll affordances only exist for directions that currently have more map. */
   .pannable-map .pan-hints{
     display:block;
     position:absolute;
-    inset:0;
+    inset:8px;
     pointer-events:none;
     z-index:3;
   }
   .pan-hint{
     position:absolute;
-    width:28px;
-    height:28px;
+    width:16px;
+    height:16px;
     display:grid;
     place-items:center;
-    border:1px solid rgba(113,241,255,.14);
-    border-radius:9px;
-    background:rgba(5,10,22,.58);
-    color:rgba(113,241,255,.7);
-    font:500 22px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
-    box-shadow:0 0 18px rgba(113,241,255,.06);
-    backdrop-filter:blur(5px);
-    animation:panHintPulse 1.8s ease-in-out infinite alternate;
+    color:transparent;
+    font-size:0;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .16s ease, visibility .16s ease;
   }
-  .pan-top{top:7px;left:50%;transform:translateX(-50%)}
-  .pan-bottom{bottom:7px;left:50%;transform:translateX(-50%)}
-  .pan-left{left:7px;top:50%;transform:translateY(-50%)}
-  .pan-right{right:7px;top:50%;transform:translateY(-50%)}
-  @keyframes panHintPulse{
-    from{opacity:.34;filter:brightness(.9)}
-    to{opacity:.7;filter:brightness(1.18)}
+  .pan-hint::before{
+    content:"";
+    display:block;
+    background:rgba(113,241,255,.64);
+    filter:drop-shadow(0 0 5px rgba(113,241,255,.34));
+    animation:panTrianglePulse 1.8s ease-in-out infinite alternate;
+  }
+  .pan-hints.can-pan-top .pan-top,
+  .pan-hints.can-pan-right .pan-right,
+  .pan-hints.can-pan-bottom .pan-bottom,
+  .pan-hints.can-pan-left .pan-left{
+    opacity:1;
+    visibility:visible;
+  }
+
+  /* Broad edge sits against the viewport edge; the point faces inward into the map. */
+  .pan-top{
+    top:2px;
+    left:50%;
+    transform:translateX(-50%);
+  }
+  .pan-top::before{
+    width:12px;
+    height:9px;
+    clip-path:polygon(0 0,100% 0,50% 100%);
+  }
+  .pan-bottom{
+    bottom:2px;
+    left:50%;
+    transform:translateX(-50%);
+  }
+  .pan-bottom::before{
+    width:12px;
+    height:9px;
+    clip-path:polygon(50% 0,100% 100%,0 100%);
+  }
+  .pan-left{
+    left:2px;
+    top:50%;
+    transform:translateY(-50%);
+  }
+  .pan-left::before{
+    width:9px;
+    height:12px;
+    clip-path:polygon(0 0,100% 50%,0 100%);
+  }
+  .pan-right{
+    right:2px;
+    top:50%;
+    transform:translateY(-50%);
+  }
+  .pan-right::before{
+    width:9px;
+    height:12px;
+    clip-path:polygon(100% 0,0 50%,100% 100%);
+  }
+  @keyframes panTrianglePulse{
+    from{opacity:.42;filter:drop-shadow(0 0 3px rgba(113,241,255,.22)) brightness(.92)}
+    to{opacity:.78;filter:drop-shadow(0 0 6px rgba(113,241,255,.38)) brightness(1.14)}
   }
 }
