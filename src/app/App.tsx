@@ -54,6 +54,10 @@ export function App() {
     () => Object.values(progress.completed).reduce((sum, result) => sum + (result?.bestScore ?? 0), 0),
     [progress],
   )
+  const storyDepth = useMemo(
+    () => Math.max(0, ...Object.keys(progress.completed).map((missionId) => Number(missionId))),
+    [progress],
+  )
 
   useEffect(() => {
     document.documentElement.lang = language
@@ -215,7 +219,7 @@ export function App() {
             </div>
           </div>
           {experience === 'story' && (
-            <LatestTransmission language={language} unlockedMission={progress.unlockedMission} onArchive={() => setStoryOverlay('archive')} />
+            <LatestTransmission language={language} unlockedMission={storyDepth} onArchive={() => setStoryOverlay('archive')} />
           )}
           <div className="mission-grid">
             {missions.map((mission) => {
@@ -269,7 +273,7 @@ export function App() {
       )}
 
       {experience === 'story' && storyOverlay === 'context' && <StoryContextModal language={language} onClose={() => setStoryOverlay(null)} />}
-      {experience === 'story' && storyOverlay === 'archive' && <StoryArchiveModal language={language} unlockedMission={progress.unlockedMission} onClose={() => setStoryOverlay(null)} />}
+      {experience === 'story' && storyOverlay === 'archive' && <StoryArchiveModal language={language} unlockedMission={storyDepth} onClose={() => setStoryOverlay(null)} />}
     </main>
   )
 }
