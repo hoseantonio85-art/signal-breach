@@ -6,8 +6,18 @@ import { dictionaries } from '../i18n'
 import { GameScreen, type CampaignResult } from '../screens/GameScreen'
 import { loadProgress, saveProgress, type Progress } from '../stores/progress'
 import { loadLanguage, saveLanguage } from '../stores/settings'
+import {
+  ExperienceSwitch,
+  LatestTransmission,
+  StoryArchiveModal,
+  StoryContextModal,
+  StoryContextTeaser,
+  StoryDialogue,
+} from '../story/StoryUi'
+import { storyMission, storyUi, type ExperienceMode } from '../story/story'
 
 type Screen = 'boot' | 'menu' | 'campaign' | 'free' | 'briefing' | 'game'
+type StoryOverlay = 'context' | 'archive' | null
 
 type FreePreset = {
   key: string
@@ -24,6 +34,10 @@ const freePresets: FreePreset[] = [
   { key: 'blackice', label: 'BLACK ICE', rows: 16, cols: 30, mines: 99, description: 'highDensity' },
 ]
 
+function loadExperience(): ExperienceMode {
+  return window.localStorage.getItem('signal-breach-experience') === 'classic' ? 'classic' : 'story'
+}
+
 export function App() {
   const [screen, setScreen] = useState<Screen>('boot')
   const [language, setLanguage] = useState<Language>(() => loadLanguage())
@@ -31,7 +45,10 @@ export function App() {
   const [selectedMission, setSelectedMission] = useState<Mission>(missions[0])
   const [session, setSession] = useState<GameSession | null>(null)
   const [audioOn, setAudioOn] = useState(false)
+  const [experience, setExperience] = useState<ExperienceMode>(() => loadExperience())
+  const [storyOverlay, setStoryOverlay] = useState<StoryOverlay>(null)
   const t = dictionaries[language]
+  const storyCopy = storyUi[language]
 
   const totalScore = useMemo(
     () => Object.values(progress.completed).reduce((sum, result) => sum + (result?.bestScore ?? 0), 0),
@@ -42,6 +59,11 @@ export function App() {
     document.documentElement.lang = language
     saveLanguage(language)
   }, [language])
+
+  useEffect(() => {
+    window.localStorage.setItem('signal-breach-experience', experience)
+    if (experience === 'classic') setStoryOverlay(null)
+  }, [experience])
 
   useEffect(() => {
     if (screen !== 'boot') return
@@ -63,13 +85,14 @@ export function App() {
   }
 
   function startMission(mission: Mission) {
+    const playableMission = experience === 'story' ? storyMission(mission) : mission
     setSession({
       kind: 'campaign',
       label: `OP ${String(mission.id).padStart(2, '0')}`,
       rows: mission.rows,
       cols: mission.cols,
       mines: mission.mines,
-      mission,
+      mission: playableMission,
     })
     setScreen('game')
   }
@@ -135,6 +158,10 @@ export function App() {
       <header className="topbar">
         <button className="wordmark" onClick={() => setScreen('menu')}>SIGNAL//BREACH</button>
         <div className="top-actions">
+          <ExperienceSwitch language={language} mode={experience} onChange={setExperience} />
+          {experience === 'story' && (
+            <button className="story-top-action" onClick={() => setStoryOverlay('archive')}>{storyCopy.archive}</button>
+          )}
           {screen === 'menu' && (
             <select value={language} onChange={(event: { target: { value: string } }) => setLanguage(event.target.value as Language)} aria-label={t.language}>
               <option value="ru">RU</option><option value="en">EN</option>
@@ -151,6 +178,7 @@ export function App() {
             <div className="eyebrow">SIGNAL COMMAND // {t.systemReady}</div>
             <h1>SIGNAL//BREACH</h1>
             <p className="lead">{t.globalIncidentCopy}</p>
+            {experience === 'story' && <StoryContextTeaser language={language} onOpen={() => setStoryOverlay('context')} />}
           </div>
           <div className="menu-body-page">
             <div className="mode-grid">
@@ -186,6 +214,9 @@ export function App() {
               <button className="ghost" onClick={() => setScreen('menu')}>×</button>
             </div>
           </div>
+          {experience === 'story' && (
+            <LatestTransmission language={language} unlockedMission={progress.unlockedMission} onArchive={() => setStoryOverlay('archive')} />
+          )}
           <div className="mission-grid">
             {missions.map((mission) => {
               const unlocked = mission.id <= progress.unlockedMission
@@ -226,12 +257,19 @@ export function App() {
             <div className="briefing-op">OP {String(selectedMission.id).padStart(2, '0')} / 10</div>
             <h2>{selectedMission.code}</h2>
             <div className="briefing-location">{selectedMission.location[language]}</div>
-            <div className="voss-line"><span className="voss-sigil">V</span><div><b>{t.colonelVoss}</b><p>{selectedMission.briefing[language]}</p></div></div>
+            {experience === 'story' ? (
+              <StoryDialogue language={language} missionId={selectedMission.id} />
+            ) : (
+              <div className="voss-line"><span className="voss-sigil">V</span><div><b>{t.colonelVoss}</b><p>{selectedMission.briefing[language]}</p></div></div>
+            )}
             <div className="briefing-grid"><span>{selectedMission.rows}×{selectedMission.cols}</span><span>{selectedMission.mines} {t.corruption}</span><span>PAR {formatPar(selectedMission.parSeconds)}</span></div>
             <div className="briefing-actions"><button className="secondary" onClick={() => setScreen('campaign')}>{t.back}</button><button className="primary" onClick={() => startMission(selectedMission)}>{t.startOperation}</button></div>
           </section>
         </div>
       )}
+
+      {experience === 'story' && storyOverlay === 'context' && <StoryContextModal language={language} onClose={() => setStoryOverlay(null)} />}
+      {experience === 'story' && storyOverlay === 'archive' && <StoryArchiveModal language={language} unlockedMission={progress.unlockedMission} onClose={() => setStoryOverlay(null)} />}
     </main>
   )
 }
