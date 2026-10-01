@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { App } from './app/App'
 import './styles/global.css'
 import './styles/parity.css'
+import './styles/story.css'
 import './ui/panHints'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
