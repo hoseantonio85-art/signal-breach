@@ -3,6 +3,8 @@ name: Story branch build
 on:
   push:
     branches: [story-layer]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
