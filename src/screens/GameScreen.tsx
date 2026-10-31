@@ -330,7 +330,7 @@ export function GameScreen({
         <div className={`game-content ${boardScrollable ? 'pannable-map' : ''}`}>
           <div className="board-shell">
             <div className="board-wrap">
-              <div className="coords-top"><span>{t.nodeMap} / X:{String(revealedSafe).padStart(2, '0')}</span><span>GRID {String(session.rows).padStart(2, '0')}×{String(session.cols).padStart(2, '0')}</span></div>
+              <div className="coords-top"><span>{t.nodeMap} / X:{String(revealedSafe).padStart(2, '0')}</span><span>{t.gridLabel} {String(session.rows).padStart(2, '0')}×{String(session.cols).padStart(2, '0')}</span></div>
               <div className="board" role="grid" aria-label={t.nodeMap} style={{ gridTemplateColumns: `repeat(${session.cols}, minmax(${cellMin}px, 1fr))` }}>
                 {board.cells.map((cell) => {
                   const classes = ['cell']
