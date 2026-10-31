@@ -1,0 +1,76 @@
+/*
+ * Localized grid-size and corruption-count labels shared between Campaign,
+ * Free Run and briefing. Values never precede the label or detach from it.
+ */
+
+/* Campaign: strictly two lines in the fixed-bottom footer. */
+.campaign-panel .mission-card .mission-metrics-card {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.8em;
+  margin: 0;
+  font: 700 9px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0;
+  color: #768aa0;
+}
+
+.campaign-panel .mission-card .mission-metrics-card > span {
+  display: block;
+  flex: 0 0 auto;
+  max-width: 100%;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: inherit;
+  white-space: nowrap;
+}
+
+/* Free Run: also stack the two labeled values within the density tile. */
+.difficulty-card .mission-metrics-free {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 13px 0;
+  font: 700 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0;
+  color: var(--cyan);
+}
+.difficulty-card .mission-metrics-free > span {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  white-space: nowrap;
+}
+
+/* Briefing: reuse the same two metrics as separate cells of the existing
+ * three-column information grid, keeping PAR in the third cell. */
+.briefing-grid .mission-metrics-briefing {
+  display: contents;
+}
+.briefing-grid .mission-metrics-briefing > span {
+  white-space: nowrap;
+}
+
+/* At 320px the Russian labels fit in the narrow three-column briefing
+ * without changing the modal height or its existing grid composition. */
+@media (max-width: 420px) {
+  .briefing-grid .mission-metrics-briefing > span {
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 7.5px;
+    letter-spacing: -.01em;
+  }
+}
