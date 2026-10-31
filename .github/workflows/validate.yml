@@ -3,8 +3,6 @@ name: Validate web build
 on:
   pull_request:
     branches: [main]
-  push:
-    branches: [feature/release-interactions-icons]
 
 permissions:
   contents: read
