@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { House, RotateCcw, Volume2, VolumeX } from 'lucide-react'
+import { House, RotateCcw } from 'lucide-react'
+import { AudioToggle } from '../components/AudioToggle'
 import { audioEngine } from '../audio/audioEngine'
 import {
   chord,
@@ -309,7 +310,7 @@ export function GameScreen({
           {session.kind === 'campaign' && session.mission && (
             <button className="chip-btn operation-chip" onClick={onOperations}><span className="dot active-dot" />OP {String(session.mission.id).padStart(2, '0')} / 10</button>
           )}
-          <button type="button" className={`chip-btn audio-chip audio-toggle ${audioOn ? 'active' : ''}`} onClick={onAudioToggle} aria-label={audioOn ? t.audioOn : t.audioOff} title={audioOn ? t.audioOn : t.audioOff} aria-pressed={audioOn}>{audioOn ? <Volume2 size={17} strokeWidth={1.8} aria-hidden="true" /> : <VolumeX size={17} strokeWidth={1.8} aria-hidden="true" />}<span className="audio-label">{audioOn ? t.audioOn : t.audioOff}</span></button>
+          <AudioToggle enabled={audioOn} onToggle={onAudioToggle} t={t} variant="game" />
           <button type="button" className="chip-btn restart-chip" onClick={resetGame} aria-label={t.newSession}><RotateCcw size={17} strokeWidth={1.8} aria-hidden="true" /><span className="restart-label">{t.newSession}</span></button>
           <button type="button" className="chip-btn menu-chip" onClick={onMenu} aria-label={t.menu}><House size={17} strokeWidth={1.8} aria-hidden="true" /><span className="menu-label">{t.menu}</span></button>
         </div>
