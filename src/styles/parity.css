@@ -497,3 +497,66 @@ html[data-display-font] .state-title {
     padding-right: 12px;
   }
 }
+
+
+/* Campaign mission states: ready (cyan), completed (green), locked (slate).
+   The Lucide CircleCheck replaces the previous diagonal RESTORED ribbon. */
+.campaign-panel .mission-card {
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+.campaign-panel .mission-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 19px;
+}
+.campaign-panel .mission-complete-icon {
+  flex: 0 0 auto;
+  display: block;
+  color: #7dffb2;
+  filter: drop-shadow(0 0 5px rgba(125,255,178,.22));
+}
+.campaign-panel .mission-card strong {
+  margin-top: 10px;
+  margin-bottom: 7px;
+}
+.campaign-panel .mission-card small {
+  margin-top: 12px;
+}
+.campaign-panel .mission-card .mission-status {
+  display: block;
+  margin-top: 14px;
+  font-style: normal;
+  line-height: 1.5;
+}
+.campaign-panel .mission-card.status-ready {
+  border-color: rgba(113,241,255,.48);
+  background: linear-gradient(180deg,rgba(17,34,50,.89),rgba(8,17,31,.95));
+}
+.campaign-panel .mission-card.status-ready .mission-status,
+.campaign-panel .mission-card.status-ready .mission-card-top > span {
+  color: #71f1ff;
+}
+.campaign-panel .mission-card.status-completed {
+  border-color: rgba(125,255,178,.27);
+  background: linear-gradient(180deg,rgba(13,37,36,.73),rgba(8,21,27,.94));
+}
+.campaign-panel .mission-card.status-completed .mission-status,
+.campaign-panel .mission-card.status-completed .mission-card-top > span {
+  color: #7dffb2;
+}
+.campaign-panel .mission-card.status-completed:not(:disabled):hover {
+  border-color: rgba(125,255,178,.65);
+  box-shadow: 0 12px 30px rgba(0,0,0,.22), 0 0 19px rgba(125,255,178,.06);
+}
+.campaign-panel .mission-card.status-locked,
+.campaign-panel .mission-card.status-locked:disabled {
+  border-color: rgba(127,145,168,.13);
+  background: linear-gradient(180deg,rgba(15,20,34,.64),rgba(8,12,24,.81));
+  opacity: .6;
+}
+.campaign-panel .mission-card.status-locked .mission-status,
+.campaign-panel .mission-card.status-locked .mission-card-top > span {
+  color: #8c9caf;
+}
