@@ -403,6 +403,20 @@
 }
 
 
+/* Boot wordmark uses the same approved Unbounded display face as the
+   main title. Keep the loading bar and small terminal labels monospaced. */
+html[data-display-font] .boot-screen .brand {
+  font-family: var(--signal-display-font), ui-sans-serif, sans-serif;
+  font-weight: 700;
+  font-synthesis: none;
+  font-size: clamp(16px, 4.3vw, 23px);
+  line-height: 1.3;
+  letter-spacing: .01em;
+  word-spacing: .13em;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
 /* Approved Unbounded display typography; alternatives remain in ?font= preview. */
 html[data-display-font] :is(
   h1, h2,
