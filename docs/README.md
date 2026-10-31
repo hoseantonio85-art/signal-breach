@@ -31,3 +31,11 @@
 
 ## Журнал изменений
 - **2026-10-31:** создана рабочая ветка `feature/release-interactions-icons` и черновик [PR #2](https://github.com/hoseantonio85-art/signal-breach/pull/2). Перенесено срабатывание долгого тапа и правой кнопки мыши на отпускание; кнопки звука, рестарта и дома используют Lucide. Проверка TypeScript/Vite через GitHub Actions прошла успешно. **Ручной QA и слияние в main ещё не выполнены.**
+
+## Как смотреть изменения до merge
+
+GitHub Pages теперь собирает две версии одним workflow `.github/workflows/pages.yml`:
+- Стабильная `main`: https://hoseantonio85-art.github.io/signal-breach/
+- Тестовая `feature/release-interactions-icons`: https://hoseantonio85-art.github.io/signal-breach/preview/
+
+Preview — публичная тестовая страница; **она не означает merge**. Сайт `main` по-прежнему собирается из `main` и находится в корне Pages. При успешном завершении `Validate web build` для feature-ветки workflow `Deploy web preview` запускается с контекстом `main` и заново публикует обе версии, не переписывая исходники игры в `main`. Кроме этого, workflow можно запускать вручную из GitHub Actions (`Run workflow` на `main`). В случае ошибки сборки preview не публикуется; см. Actions.
