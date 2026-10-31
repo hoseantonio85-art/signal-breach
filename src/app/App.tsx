@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CircleCheck, Volume2, VolumeX } from 'lucide-react'
+import { Volume2, VolumeX } from 'lucide-react'
 import { audioEngine } from '../audio/audioEngine'
 import { missions } from '../campaign/missions'
+import { MissionCard } from '../components/MissionCard'
 import type { GameSession, Language, Mission } from '../game/types'
 import { dictionaries } from '../i18n'
 import { GameScreen, type CampaignResult } from '../screens/GameScreen'
@@ -203,32 +204,15 @@ export function App() {
             </div>
           </div>
           <div className="mission-grid">
-            {missions.map((mission) => {
-              const unlocked = mission.id <= progress.unlockedMission
-              const completed = progress.completed[mission.id]
-              const status = !unlocked ? 'locked' : completed ? 'completed' : 'ready'
-              return (
-                <button
-                  className={`mission-card status-${status}`}
-                  disabled={!unlocked}
-                  key={mission.id}
-                  onClick={() => openMission(mission.id)}
-                >
-                  <div className="mission-card-top">
-                    <span>OP {String(mission.id).padStart(2, '0')}</span>
-                    {status === 'completed' && (
-                      <CircleCheck className="mission-complete-icon" size={19} strokeWidth={1.8} aria-hidden="true" />
-                    )}
-                  </div>
-                  <strong>{mission.code}</strong>
-                  <small>{mission.rows}×{mission.cols} / {mission.mines} {t.corruption}</small>
-                  <em className="mission-status">
-                    {status === 'locked' ? t.locked : status === 'completed' ? `${t.completed} / ${completed!.bestRank}` : t.ready}
-                  </em>
-                </button>
-              )
-            })}
-          </div>
+            {missions.map((mission) => (
+              <MissionCard
+                key={mission.id}
+                mission={mission}
+                progress={progress}
+                t={t}
+                onSelect={openMission}
+              />
+            ))}          </div>
         </section>
       )}
 
