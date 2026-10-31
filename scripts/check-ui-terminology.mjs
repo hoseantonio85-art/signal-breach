@@ -21,7 +21,7 @@ assert.match(en, /corruptNodes:\s*bugCountLabel/)
 
 assert.match(ru, /const corruptionCountLabel = 'ЗАРАЖЕНИЕ'/)
 assert.match(ru, /gridLabel: 'СЕТКА'/)
-assert.match(ru, /gridSeparator: ' на '/)
+assert.match(ru, /gridSeparator: '×'/)
 assert.match(ru, /corruption:\s*corruptionCountLabel/)
 assert.match(ru, /corruptNodes:\s*corruptionCountLabel/)
 
