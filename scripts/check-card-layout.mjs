@@ -9,6 +9,8 @@ const file = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf
 const app = file('src/app/App.tsx')
 const card = file('src/components/MissionCard.tsx')
 const css = file('src/components/MissionCard.css')
+const metricCss = file('src/components/MissionMetrics.css')
+const metricComponent = file('src/components/MissionMetrics.tsx')
 const otherCards = file('src/styles/card-layout.css')
 const globalCss = file('src/styles/global.css')
 
@@ -18,12 +20,12 @@ assert.doesNotMatch(app, /className=["'`].*mission-card/,
   'Keep mission card markup out of the App screen')
 assert.match(card, /<div className="mission-card-top">[\s\S]*?<strong className="mission-card-title">[\s\S]*?<div className="mission-card-footer">/,
   'Card layout must have explicit header, title and footer zones')
-assert.match(card, /className="mission-card-details"/,
-  'Metric belongs inside the card footer')
-assert.match(card, /className="mission-card-grid-size">\{mission\.rows\}×\{mission\.cols\}<\/span>/,
-  'The first mission metadata line must always be just the grid size')
-assert.match(card, /className="mission-card-bug-count">\{mission\.mines\}&nbsp;\{t\.corruption\}<\/span>/,
-  'The second line must hold the bug number and label with a non-breaking space')
+assert.match(card, /<MissionMetrics[^>]*rows=\{mission\.rows\}[^>]*cols=\{mission\.cols\}[^>]*mines=\{mission\.mines\}/,
+  'Mission card must use the shared localized metrics component')
+assert.match(metricComponent, /className="mission-metrics-grid"/,
+  'Metrics component must have one grid row')
+assert.match(metricComponent, /className="mission-metrics-corruption"/,
+  'Metrics component must have one corruption row')
 
 assert.match(card, /className="mission-status"/,
   'Status belongs inside the card footer')
@@ -55,14 +57,16 @@ assert.doesNotMatch(css, /#7dffb2|125,255,178/,
   'Do not reintroduce the old green palette into mission cards')
 assert.match(block(css, '.campaign-panel .mission-card-footer'), /margin-top:\s*auto/,
   'Footer must be anchored to card bottom')
-assert.match(block(css, '.campaign-panel .mission-card .mission-card-details'), /min-height:\s*2\.8em/,
-  'Reserve same two-line metric slot on all cards')
-assert.match(block(css, '.campaign-panel .mission-card .mission-card-details'), /display:\s*flex/,
-  'Mission metadata must use a deliberate two-line layout, never natural wrapping')
-assert.match(block(css, '.campaign-panel .mission-card .mission-card-details'), /flex-direction:\s*column/,
-  'Both metadata lines must always be stacked vertically')
-assert.match(block(css, '.campaign-panel .mission-card .mission-card-details > span'), /white-space:\s*nowrap/,
-  'Bug count and label must never separate on narrow screens')
+assert.match(block(metricCss, '.campaign-panel .mission-card .mission-metrics-card'), /min-height:\s*2\.8em/,
+  'Reserve exactly two metric rows in Campaign cards')
+assert.match(block(metricCss, '.campaign-panel .mission-card .mission-metrics-card'), /display:\s*flex/,
+  'Use a deterministic layout for metric rows')
+assert.match(block(metricCss, '.campaign-panel .mission-card .mission-metrics-card'), /flex-direction:\s*column/,
+  'The two labeled metric rows must always be stacked')
+assert.match(block(metricCss, '.campaign-panel .mission-card .mission-metrics-card > span'), /white-space:\s*nowrap/,
+  'Labeled values must never wrap internally')
+assert.match(block(metricCss, '.briefing-grid .mission-metrics-briefing'), /display:\s*contents/,
+  'Briefing keeps separate metric pills and the existing PAR item')
 
 assert.match(block(otherCards, '.mode-grid > .mode-card'), /display:\s*flex/,
   'Menu mode cards must allow bottom-aligned footers')
