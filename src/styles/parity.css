@@ -367,3 +367,9 @@
     to{opacity:.78;filter:drop-shadow(0 0 6px rgba(113,241,255,.38)) brightness(1.14)}
   }
 }
+
+/* Library SVG actions retain a stable 17px outline in compact controls. */
+.chip-btn > svg {
+  flex: 0 0 auto;
+  display: block;
+}
