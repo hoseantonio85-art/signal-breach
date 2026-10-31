@@ -1,0 +1,143 @@
+/*
+ * Mission cards are three-zone components.
+ * The grid stretches each card in a row to one height; margin-top:auto
+ * pins the whole footer to the bottom regardless of title wrapping.
+ */
+.campaign-panel .mission-grid {
+  align-items: stretch;
+}
+
+.campaign-panel .mission-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  min-height: 174px;
+  height: 100%;
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.campaign-panel .mission-card-top {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 19px;
+  gap: 8px;
+}
+
+.campaign-panel .mission-complete-icon {
+  flex: 0 0 auto;
+  display: block;
+  color: #7dffb2;
+  filter: drop-shadow(0 0 5px rgba(125,255,178,.22));
+}
+
+/* Only the title is allowed to grow. Do not break PROTOCOL or SIGNATURE. */
+html[data-display-font] .campaign-panel .mission-card-title {
+  margin: 10px 0 0;
+  font-size: 16px;
+  line-height: 1.3;
+  letter-spacing: 0;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+  text-wrap: balance;
+}
+
+/* The details and status share one bottom-aligned region.
+ * Reserve two lines for details so both rows align even when RU wraps. */
+.campaign-panel .mission-card-footer {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.campaign-panel .mission-card .mission-card-details {
+  display: block;
+  width: 100%;
+  min-height: 2.8em;
+  margin: 0;
+  line-height: 1.4;
+  color: #768aa0;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.campaign-panel .mission-card .mission-status {
+  display: block;
+  min-height: 12px;
+  margin: 0;
+  font: 700 8px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-style: normal;
+  letter-spacing: .1em;
+}
+
+.campaign-panel .mission-card.status-ready {
+  border-color: rgba(113,241,255,.48);
+  background: linear-gradient(180deg,rgba(17,34,50,.89),rgba(8,17,31,.95));
+}
+
+.campaign-panel .mission-card.status-ready .mission-status,
+.campaign-panel .mission-card.status-ready .mission-card-top > span {
+  color: #71f1ff;
+}
+
+.campaign-panel .mission-card.status-completed {
+  border-color: rgba(125,255,178,.27);
+  background: linear-gradient(180deg,rgba(13,37,36,.73),rgba(8,21,27,.94));
+}
+
+.campaign-panel .mission-card.status-completed .mission-status,
+.campaign-panel .mission-card.status-completed .mission-card-top > span {
+  color: #7dffb2;
+}
+
+.campaign-panel .mission-card.status-completed:not(:disabled):hover {
+  border-color: rgba(125,255,178,.65);
+  box-shadow: 0 12px 30px rgba(0,0,0,.22), 0 0 19px rgba(125,255,178,.06);
+}
+
+.campaign-panel .mission-card.status-locked,
+.campaign-panel .mission-card.status-locked:disabled {
+  border-color: rgba(127,145,168,.13);
+  background: linear-gradient(180deg,rgba(15,20,34,.64),rgba(8,12,24,.81));
+  opacity: .6;
+}
+
+.campaign-panel .mission-card.status-locked .mission-status,
+.campaign-panel .mission-card.status-locked .mission-card-top > span {
+  color: #8c9caf;
+}
+
+/* Preserve space for long words with fewer columns on tablet sizes. */
+@media (min-width: 761px) and (max-width: 960px) {
+  .campaign-panel .mission-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .campaign-panel .mission-card {
+    min-height: 154px;
+  }
+  html[data-display-font] .campaign-panel .mission-card-title {
+    font-size: clamp(12px, 3.6vw, 14.5px);
+  }
+}
+
+@media (max-width: 390px) {
+  .campaign-panel .mission-card {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
