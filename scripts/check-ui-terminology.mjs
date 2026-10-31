@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs'
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 const en = read('src/i18n/en.ts')
 const app = read('src/app/App.tsx')
+const missionCard = read('src/components/MissionCard.tsx')
 const game = read('src/screens/GameScreen.tsx')
 
 assert.match(en, /const bugCountLabel = 'BUGS'/,
@@ -18,7 +19,7 @@ assert.match(en, /corruption:\s*bugCountLabel/,
 assert.match(en, /corruptNodes:\s*bugCountLabel/,
   'Game HUD must use the same shared bug count label')
 
-assert.match(app, /mission\.mines\}\s*\{t\.corruption\}/,
+assert.match(missionCard, /mission\.mines\}\s*\{t\.corruption\}/,
   'Campaign cards must use the localized count label')
 assert.match(app, /selectedMission\.mines\}\s*\{t\.corruption\}/,
   'Mission briefing must use the localized count label')
@@ -27,7 +28,7 @@ assert.match(app, /preset\.mines\}\s*\{t\.corruption\}/,
 assert.match(game, /\{t\.corruptNodes\}/,
   'Active game HUD must use the localized count label')
 
-assert.doesNotMatch(app, /language\s*===\s*'en'\s*\?\s*['"]BUGS['"]/,
+assert.doesNotMatch(app + missionCard, /language\s*===\s*'en'\s*\?\s*['"]BUGS['"]/,
   'Do not hard-code English translations in JSX')
 assert.doesNotMatch(en, /\bcorruptions\b|\bCORRUPT NODES\b/,
   'Old competing count label is not allowed in English localization')
