@@ -4,7 +4,7 @@
 
 ## Источники истины
 - **GitHub `main`** — утверждённая исходная версия игры и источник GitHub Pages.
-- **GitHub `feature/release-interactions-icons`** — изолированные правки управления и трёх иконок; сливать только после проверки.
+- **GitHub `feature/release-interactions-icons`** — завершённая UX-ветка, объединена с `main` через [PR #2](https://github.com/hoseantonio85-art/signal-breach/pull/2) 2026-10-31. Оставлена как источник предыдущего preview.
 - **GitHub `release/android-rustore-v1`** — планируемая ветка Android-адаптации от утверждённой версии `main`; Android-специфичные изменения не должны ломать Pages.
 - **TickTick / SIGNAL//BREACH · Android / RuStore** — личный список действий, не техническая спецификация.
 - **Google Drive** — использовать позже только для внешних материалов: скриншоты магазина, экспортированные графические файлы, тексты публикации и документы, которые не должны жить в коде. Не дублировать Markdown без необходимости.
@@ -31,12 +31,12 @@
 - Вторая UX-правка: заменить аудио, перезапуск и переход домой на иконки из библиотеки Lucide.
 
 ## Журнал изменений
-- **2026-10-31:** создана рабочая ветка `feature/release-interactions-icons` и черновик [PR #2](https://github.com/hoseantonio85-art/signal-breach/pull/2). Перенесено срабатывание долгого тапа и правой кнопки мыши на отпускание; кнопки звука, рестарта и дома используют Lucide. Проверка TypeScript/Vite через GitHub Actions прошла успешно. **Ручной QA и слияние в main ещё не выполнены.**
+- **2026-10-31:** [PR #2](https://github.com/hoseantonio85-art/signal-breach/pull/2) успешно объединён с `main` через squash merge ([коммит `9fa436e`](https://github.com/hoseantonio85-art/signal-breach/commit/9fa436e2306a041e274353fd7b13ecf3098609eb)). Объединены согласованные изменения управления, адаптивных карточек, локализованных метрик, шрифта Unbounded и индикации звука; GitHub Actions `Validate web build` прошёл успешно. Полный ручной регрессионный QA и Android QA по чек-листу остаются отдельными задачами.
 
-## Как смотреть изменения до merge
+## Доступ к игре после merge
 
 GitHub Pages теперь собирает две версии одним workflow `.github/workflows/pages.yml`:
 - Стабильная `main`: https://hoseantonio85-art.github.io/signal-breach/
-- Тестовая `feature/release-interactions-icons`: https://hoseantonio85-art.github.io/signal-breach/preview/
+- Исторический UX-предпросмотр (продолжает собираться из ветки feature): https://hoseantonio85-art.github.io/signal-breach/preview/
 
-Preview — публичная тестовая страница; **она не означает merge**. Сайт `main` по-прежнему собирается из `main` и находится в корне Pages. При успешном завершении `Validate web build` для feature-ветки workflow `Deploy web preview` запускается с контекстом `main` и заново публикует обе версии, не переписывая исходники игры в `main`. Кроме этого, workflow можно запускать вручную из GitHub Actions (`Run workflow` на `main`). В случае ошибки сборки preview не публикуется; см. Actions.
+После merge **основная версия игры находится по корневому URL** и содержит все правки PR #2. Preview остаётся вспомогательной страницей; его наличие не является индикатором актуального состояния основного сайта. Сайт `main` собирается из `main` и находится в корне Pages. При успешном завершении `Validate web build` для feature-ветки workflow `Deploy web preview` запускается с контекстом `main` и заново публикует обе версии, не переписывая исходники игры в `main`. Кроме этого, workflow можно запускать вручную из GitHub Actions (`Run workflow` на `main`). В случае ошибки сборки preview не публикуется; см. Actions.
