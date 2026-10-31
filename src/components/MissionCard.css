@@ -17,20 +17,28 @@
   transition: border-color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease;
 }
 
+/* Stable top row: reserve the same space whether the check icon exists or not.
+   Its position depends only on the card padding, never on title/footer height. */
 .campaign-panel .mission-card-top {
-  flex: 0 0 auto;
   display: flex;
+  flex: 0 0 20px;
   align-items: center;
   justify-content: space-between;
-  min-height: 19px;
+  height: 20px;
+  min-height: 20px;
   gap: 8px;
+}
+
+/* OP XX has one original cyan color in all states, independent of status. */
+.campaign-panel .mission-card .mission-card-top > span {
+  color: var(--cyan);
 }
 
 .campaign-panel .mission-complete-icon {
   flex: 0 0 auto;
   display: block;
-  color: #7dffb2;
-  filter: drop-shadow(0 0 5px rgba(125,255,178,.22));
+  color: var(--cyan);
+  filter: drop-shadow(0 0 5px rgba(113,241,255,.26));
 }
 
 /* Only the title is allowed to grow. Do not break PROTOCOL or SIGNATURE. */
@@ -82,41 +90,40 @@ html[data-display-font] .campaign-panel .mission-card-title {
   letter-spacing: .1em;
 }
 
+/* The color hierarchy applies to status and card accents, not to OP numbers.
+   Completed = established cyan, ready = synthwave pink, locked = slate. */
 .campaign-panel .mission-card.status-ready {
-  border-color: rgba(113,241,255,.48);
-  background: linear-gradient(180deg,rgba(17,34,50,.89),rgba(8,17,31,.95));
-}
-
-.campaign-panel .mission-card.status-ready .mission-status,
-.campaign-panel .mission-card.status-ready .mission-card-top > span {
-  color: #71f1ff;
+  --mission-status-color: var(--pink);
+  border-color: rgba(255,79,216,.47);
+  background: linear-gradient(180deg,rgba(41,20,51,.77),rgba(20,11,33,.93));
 }
 
 .campaign-panel .mission-card.status-completed {
-  border-color: rgba(125,255,178,.27);
-  background: linear-gradient(180deg,rgba(13,37,36,.73),rgba(8,21,27,.94));
-}
-
-.campaign-panel .mission-card.status-completed .mission-status,
-.campaign-panel .mission-card.status-completed .mission-card-top > span {
-  color: #7dffb2;
-}
-
-.campaign-panel .mission-card.status-completed:not(:disabled):hover {
-  border-color: rgba(125,255,178,.65);
-  box-shadow: 0 12px 30px rgba(0,0,0,.22), 0 0 19px rgba(125,255,178,.06);
+  --mission-status-color: var(--cyan);
+  border-color: rgba(113,241,255,.30);
+  background: linear-gradient(180deg,rgba(17,34,50,.83),rgba(8,17,31,.95));
 }
 
 .campaign-panel .mission-card.status-locked,
 .campaign-panel .mission-card.status-locked:disabled {
+  --mission-status-color: #8c9caf;
   border-color: rgba(127,145,168,.13);
   background: linear-gradient(180deg,rgba(15,20,34,.64),rgba(8,12,24,.81));
   opacity: .6;
 }
 
-.campaign-panel .mission-card.status-locked .mission-status,
-.campaign-panel .mission-card.status-locked .mission-card-top > span {
-  color: #8c9caf;
+.campaign-panel .mission-card .mission-status {
+  color: var(--mission-status-color, #8c9caf);
+}
+
+.campaign-panel .mission-card.status-ready:not(:disabled):hover {
+  border-color: rgba(255,79,216,.73);
+  box-shadow: 0 12px 30px rgba(0,0,0,.22), 0 0 19px rgba(255,79,216,.09);
+}
+
+.campaign-panel .mission-card.status-completed:not(:disabled):hover {
+  border-color: rgba(113,241,255,.65);
+  box-shadow: 0 12px 30px rgba(0,0,0,.22), 0 0 19px rgba(113,241,255,.07);
 }
 
 /* Preserve space for long words with fewer columns on tablet sizes. */
