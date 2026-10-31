@@ -14,7 +14,7 @@ export const ru = {
   globalIncident: 'ГЛОБАЛЬНЫЙ ИНЦИДЕНТ',
   globalIncidentCopy: 'Связанное заражение распространяется по глобальной сети ретрансляторов.',
   gridLabel: 'СЕТКА',
-  gridSeparator: ' на ',
+  gridSeparator: '×',
   corruption: corruptionCountLabel,
   ready: 'ГОТОВО',
   locked: 'ЗАКРЫТО',
