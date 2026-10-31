@@ -47,7 +47,8 @@ export function MissionCard({ mission, progress, t, onSelect }: MissionCardProps
 
       <div className="mission-card-footer">
         <small className="mission-card-details">
-          {mission.rows}×{mission.cols} / {mission.mines} {t.corruption}
+          <span className="mission-card-grid-size">{mission.rows}×{mission.cols}</span>
+          <span className="mission-card-bug-count">{mission.mines}&nbsp;{t.corruption}</span>
         </small>
         <span className="mission-status">{statusLabel}</span>
       </div>
