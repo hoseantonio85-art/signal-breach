@@ -401,3 +401,74 @@
 @media (max-width: 360px) {
   .topbar .wordmark { font-size: 12px; }
 }
+
+
+/* Typography lab only. No default game typography changes until chosen. */
+html[data-display-font] :is(
+  h1, h2,
+  .mode-card strong,
+  .mission-card strong,
+  .difficulty-card b,
+  .state-title,
+  .title-code
+) {
+  font-family: var(--signal-display-font), ui-sans-serif, sans-serif;
+  font-weight: 700;
+  font-synthesis: none;
+}
+
+html[data-display-font] .menu-hero-page h1 {
+  font-size: clamp(21px, 5.5vw, 58px);
+  line-height: 1.18;
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+}
+
+html[data-display-font] .content-panel .panel-head h2 {
+  font-size: clamp(19px, 3.25vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+html[data-display-font] .briefing-card-page h2 {
+  font-size: clamp(20px, 4vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+html[data-display-font] .mode-card strong {
+  font-size: clamp(15px, 1.7vw, 18px);
+  letter-spacing: -0.035em;
+}
+
+html[data-display-font] .mission-card strong {
+  font-size: 13px;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+html[data-display-font] .difficulty-card b {
+  font-size: 14px;
+  letter-spacing: -0.025em;
+}
+
+html[data-display-font] .state-title {
+  font-size: clamp(22px, 4vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+@media(max-width:760px) {
+  html[data-display-font] .menu-hero-page h1 {
+    font-size: clamp(19px, 6.2vw, 42px);
+  }
+  html[data-display-font] .content-panel .panel-head h2 {
+    font-size: clamp(17px, 4.8vw, 24px);
+  }
+  html[data-display-font] .mission-card strong {
+    font-size: 11px;
+  }
+}
