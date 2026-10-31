@@ -42,6 +42,10 @@ jobs:
       - name: Build stable main
         working-directory: stable
         run: |
+          # The upstream registry may advertise an unpublished Rollup tarball.
+          # Pin the last available build version only in this CI workspace,
+          # without modifying the stable main application's dependencies.
+          npm pkg set overrides.rollup=4.67.2
           npm install --no-audit --no-fund
           npm run build
 
