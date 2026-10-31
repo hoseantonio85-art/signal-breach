@@ -136,7 +136,7 @@ export function App() {
       <header className="topbar">
         <button className="wordmark" onClick={() => setScreen('menu')}>SIGNAL // BREACH</button>
         <div className="top-actions">
-          {screen === 'menu' && (
+          {(screen === 'menu' || screen === 'campaign' || screen === 'free') && (
             <button
               type="button"
               className="chip-btn menu-utility-btn menu-language-btn"
