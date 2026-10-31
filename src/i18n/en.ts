@@ -1,3 +1,6 @@
+// One English term for all quantitative corrupted-node counters (cards, briefing, HUD).
+const bugCountLabel = 'BUGS'
+
 export const en = {
   language: 'Language',
   systemReady: 'SYSTEM READY',
@@ -11,7 +14,7 @@ export const en = {
   operations: 'OPERATIONS',
   globalIncident: 'GLOBAL RELAY INCIDENT',
   globalIncidentCopy: 'A connected corruption event is spreading through the global relay mesh.',
-  corruption: 'corruptions',
+  corruption: bugCountLabel,
   ready: 'READY',
   locked: 'LOCKED',
   restored: 'RESTORED',
@@ -34,7 +37,7 @@ export const en = {
   linkActive: 'LINK ACTIVE',
   signalLost: 'SIGNAL LOST',
   signalStable: 'SIGNAL STABLE',
-  corruptNodes: 'CORRUPT NODES',
+  corruptNodes: bugCountLabel,
   estimated: 'EST.',
   traceTime: 'TRACE TIME',
   integrity: 'INTEGRITY',
