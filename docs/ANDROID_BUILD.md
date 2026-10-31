@@ -1,6 +1,6 @@
 # R1 — Android debug build (Capacitor 8)
 
-**Status:** Android offline bundle and APK workflow prepared on `release/android-rustore-v1`. No APK / device QA is claimed until Actions publishes the artifact and a phone is tested.
+**Status (2026-11-01):** First debug APK **built and uploaded successfully** in [Actions run 41243617194](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194); artifact `signal-breach-android-debug` (ZIP with `app-debug.apk`, expires 2026-11-14). **Real Android device QA has not yet been performed.**
 
 ## What is implemented
 - The ordinary Vite build keeps `/signal-breach/` for GitHub Pages.
@@ -29,9 +29,9 @@ npm run android:sync          # after modifying web code; then assemble again
 3. Under a successful workflow's **Artifacts**, download `signal-breach-android-debug`, unpack its ZIP and install `app-debug.apk` on Android.
 
 ## R1 exit criteria (not yet met)
-- Actual APK artifact in Actions.
-- Offline launch on real Android, not only a successful web build.
-- RU/EN, Unbounded, sound, gameplay, 16×30 map, status bar and safe areas checked on device.
-- Pages remains unaffected (it builds only from stable `main`).
+- [x] Actual APK artifact in [GitHub Actions run 41243617194](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194).
+- [ ] Offline launch on real Android, not only a successful web build.
+- [ ] RU/EN, Unbounded, sound, gameplay, 16×30 map, status bar and safe areas checked on device.
+- [x] Pages source unchanged (`main`); [ ] perform post-install web visual smoke test.
 
 The `android/` directory is deliberately regenerated in CI at this preparation stage; review and version native customizations once the package ID is approved. R2 still includes Android Back, save/resume, background pausing and session protection.

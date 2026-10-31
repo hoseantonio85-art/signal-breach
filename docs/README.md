@@ -34,7 +34,7 @@
 - Вторая UX-правка: заменить аудио, перезапуск и переход домой на иконки из библиотеки Lucide.
 
 ## Журнал изменений
-- **2026-11-01:** открыт [draft PR #4](https://github.com/hoseantonio85-art/signal-breach/pull/4) по R1: автономный Android bundle, локальный Unbounded, Capacitor 8 и CI APK. До утверждения `applicationId` нативная job пропускается. Merge не выполнялся.
+- **2026-11-01:** открыт [draft PR #4](https://github.com/hoseantonio85-art/signal-breach/pull/4) по R1. Утверждён `com.hoseantonio85.signalbreach`; локальный Unbounded и Capacitor 8. [Первый debug APK собран в Actions](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194) (artifact `signal-breach-android-debug`). QA на телефоне ещё не сделан, merge не выполнялся.
 - **2026-10-31:** [PR #3](https://github.com/hoseantonio85-art/signal-breach/pull/3) объединён с `main` ([`560120a`](https://github.com/hoseantonio85-art/signal-breach/commit/560120af932d0dbb7f2175628385acdb9144b80b)): исправлена координата мины при chord, добавлены 6 тестов движка, кнопка звука вынесена в общий `AudioToggle`. Следующее — **R1: Android-каркас + первый офлайн debug APK**; отдельная ветка `release/android-rustore-v1` ещё не создана.
 - **2026-10-31:** [PR #2](https://github.com/hoseantonio85-art/signal-breach/pull/2) успешно объединён с `main` через squash merge ([коммит `9fa436e`](https://github.com/hoseantonio85-art/signal-breach/commit/9fa436e2306a041e274353fd7b13ecf3098609eb)). Объединены согласованные изменения управления, адаптивных карточек, локализованных метрик, шрифта Unbounded и индикации звука; GitHub Actions `Validate web build` прошёл успешно. Полный ручной регрессионный QA и Android QA по чек-листу остаются отдельными задачами.
 

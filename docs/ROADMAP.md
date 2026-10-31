@@ -1,6 +1,6 @@
 # Android / RuStore v1 — дорожная карта
 
-**Обновлено: 2026-11-01. Текущий этап: R1 — Android-каркас в работе, первый APK ещё не получен.**  
+**Обновлено: 2026-11-01. Текущий этап: R1 — APK собран, ожидает установки и реального Android QA.**  
 Основа: опубликованная ветка `main` после [PR #2](https://github.com/hoseantonio85-art/signal-breach/pull/2) и [PR #3](https://github.com/hoseantonio85-art/signal-breach/pull/3). Цель: бесплатная, полностью офлайн-игра без регистрации, рекламы, сервера и покупок.
 
 **Для продолжения из нового чата:** [START_HERE.md](START_HERE.md) — статус, следующая задача, правила веток и ссылки.  
@@ -20,10 +20,11 @@
 - [x] Подключить Capacitor-зависимости и отдельный Android bundle с относительным `base: './'` и `webDir: 'dist'`; Pages сохраняет `/signal-breach/`. Нативный shell пока генерируется в CI, без коммита `android/`.
 - [x] Подключить локальный Unbounded WOFF2 с лицензией и исключить удалённые Google Fonts из Android HTML. [ ] Подтвердить офлайн на Android-девайсе.
 - [x] Утвердить и зафиксировать Android `applicationId = com.hoseantonio85.signalbreach` (2026-11-01); отдельная Actions variable не требуется.
-- [x] Добавить Actions workflow для проверки offline bundle и автоматической сборки debug APK с утверждённым ID. [ ] Проверить результат native CI, скачать APK и протестировать на телефоне.
+- [x] Android Actions: offline bundle, native `assembleDebug`, artifact [signal-breach-android-debug](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194) — всё успешно 2026-11-01. [ ] Скачать и протестировать APK на телефоне.
 - [ ] Установить APK на телефон и проверить загрузку в airplane mode, шрифты, основные экраны и поля.
 - [ ] На этапе первого APK проверить status bar, safe areas, вырезы и жестовую навигацию; полноценное поведение Back и защиту партии завершить в R2.
 
+**Готовый APK:** [Actions run 41243617194 → Artifacts → signal-breach-android-debug](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194), срок хранения до 2026-11-14.  
 **Рабочий PR:** [#4 — Android / Capacitor (draft)](https://github.com/hoseantonio85-art/signal-breach/pull/4), без merge.  
 **Инструкция по сборке:** [ANDROID_BUILD.md](ANDROID_BUILD.md).
 

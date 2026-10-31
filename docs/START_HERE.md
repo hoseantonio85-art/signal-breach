@@ -12,15 +12,15 @@
 - [PR #3](https://github.com/hoseantonio85-art/signal-breach/pull/3) **объединён**: исправление проигрыша при chord, 6 поведенческих тестов движка, общий `AudioToggle`, аудит Android.
 - Последний проверенный merge PR #3: [`560120a`](https://github.com/hoseantonio85-art/signal-breach/commit/560120af932d0dbb7f2175628385acdb9144b80b). Позже в `main` могли появиться коммиты документации или другие изменения — не использовать SHA как постоянную базу.
 - Основная игра: https://hoseantonio85-art.github.io/signal-breach/ . Путь `/preview/` — исторический UX preview, **не** новый Android-прототип.
-- **R1 начат** в [draft PR #4](https://github.com/hoseantonio85-art/signal-breach/pull/4), ветка `release/android-rustore-v1`: есть Capacitor-зависимости, режим Android с относительными URL, локальный Unbounded и GitHub Actions. Утверждён `applicationId = com.hoseantonio85.signalbreach` (2026-11-01); нативный shell автоматически генерируется в CI. Проверить первый debug APK и устройство. См. [ANDROID_BUILD.md](ANDROID_BUILD.md).
-- `npm run build` запускает статические проверки терминологии/карточек/звука, 6 тестов движка, TypeScript и Vite. Последняя проверка PR #3 была успешной.
+- **R1 начат** в [draft PR #4](https://github.com/hoseantonio85-art/signal-breach/pull/4), ветка `release/android-rustore-v1`: есть Capacitor-зависимости, режим Android с относительными URL, локальный Unbounded и GitHub Actions. Утверждён `applicationId = com.hoseantonio85.signalbreach` (2026-11-01). **Первый Android debug APK собран успешно:** [Actions run 41243617194](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194), artifact `signal-breach-android-debug` (ZIP с `app-debug.apk`, до 2026-11-14). Реальный телефон и офлайн-режим ещё не протестированы. См. [ANDROID_BUILD.md](ANDROID_BUILD.md).
+- `npm run build` и `npm run build:android` прошли в PR #4; Android Gradle `assembleDebug` и выгрузка APK прошли в [run 41243617194](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194).
 - Важное ограничение: настоящий Android WebView и визуальный QA на устройстве **ещё не выполнены**.
 
 ## Следующее конкретное действие (R1 — в работе)
 1. **Выполнено:** создана `release/android-rustore-v1` от `main` (`625b5f0` на старте).
 2. **Подготовлено:** Capacitor 8, отдельный `vite build --mode android` с `base: './'`; нативный проект генерируется в CI после утверждения ID. Веб-base `/signal-breach/` сохраняется.
 3. **Выполнено в коде:** локальный Unbounded WOFF2 через Fontsource, лицензия OFL; Android исключает удалённые Tektur/Russo. Офлайн ещё проверить на телефоне.
-4. **Выполнено:** утверждён и зафиксирован `applicationId = com.hoseantonio85.signalbreach`, workflow настроен на автоматическую сборку debug APK. **Следующий шаг:** дождаться результата Actions, скачать APK и проверить на телефоне.
+4. **Выполнено:** утверждён `applicationId = com.hoseantonio85.signalbreach`, настроен workflow, первый APK собран. [Скачать в разделе Artifacts](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194) — `signal-breach-android-debug`. **Следующий шаг:** установить APK и проверить офлайн на телефоне.
 5. Проверить установку и работу офлайн, RU/EN, звук, старт операции, большие карты, safe areas. **Не считать** отсутствие Android-девайсного QA подтверждением качества.
 6. Оформить отдельный PR. Сливать Android-код в `main` только после успешных проверок и согласования владельца.
 
