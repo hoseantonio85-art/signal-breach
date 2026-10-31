@@ -42,7 +42,7 @@
     .actions {padding:14px 18px 18px;border-top:1px solid var(--line);}
     .try {display:flex;justify-content:center;align-items:center;text-align:center;text-decoration:none;min-height:42px;padding:10px;border:1px solid rgba(113,241,255,.35);border-radius:9px;color:#dffaff;background:rgba(34,81,101,.22);font:700 11px ui-monospace,monospace;letter-spacing:.02em;}
     .try:hover,.try:focus-visible {background:rgba(44,127,145,.3);border-color:var(--cyan);outline:none;}
-    .family-unbounded {font-family:'Unbounded',sans-serif;}
+     .family-unbounded {font-family:'Unbounded',sans-serif;letter-spacing:0.005em;word-spacing:0.13em;}
     .family-tektur {font-family:'Tektur',sans-serif;}
     .family-russo {font-family:'Russo One',sans-serif;font-weight:400;}
     .notes {margin-top:25px;padding:17px 20px;border:1px solid rgba(127,145,168,.17);border-radius:12px;color:#9dafc1;font-size:12px;line-height:1.65;}
@@ -56,21 +56,21 @@
 <body>
   <main class="shell">
     <header class="top">
-      <div class="mark"><span class="sigil" aria-hidden="true"></span>SIGNAL//BREACH / TYPE LAB</div>
+      <div class="mark"><span class="sigil" aria-hidden="true"></span>SIGNAL // BREACH / TYPE LAB</div>
       <a class="back" href="./">← К игре</a>
     </header>
     <section class="intro">
       <div class="eyebrow">DISPLAY TYPOGRAPHY // 01</div>
       <h1>Ищем характер заголовков</h1>
-      <p>Три гарнитуры из Google Fonts. Каждая поддерживает русский и английский. Сравни заголовки, а затем открой ту же игру с выбранным шрифтом — изменения применяются только к заголовкам, основной текст и фирменный знак остаются прежними.</p>
+      <p>Три гарнитуры из Google Fonts. Каждая поддерживает русский и английский. Unbounded выбран основным шрифтом заголовков. Увеличены межбуквенные интервалы и добавлены пробелы вокруг // в видимом названии. Другие варианты остались для сравнения.</p>
     </section>
     <section class="board" aria-label="Сравнение шрифтов">
       <article class="item featured">
-        <div class="item-head"><span class="font-name">Unbounded</span><span class="tag">01 / ШИРОКИЙ</span></div>
+        <div class="item-head"><span class="font-name">Unbounded</span><span class="tag">01 / ВЫБРАН</span></div>
         <div class="sample">
           <div class="op">OP 01 / SIGNAL RESTORED</div>
           <h2 class="title family-unbounded">ГЛОБАЛЬНЫЙ<br/>ИНЦИДЕНТ</h2>
-          <div class="latin family-unbounded">SIGNAL//BREACH</div>
+          <div class="latin family-unbounded">SIGNAL // BREACH</div>
           <div class="divider"></div>
           <div class="secondary family-unbounded">НУЛЕВОЙ СИГНАЛ</div>
           <p class="description">Графичный, уверенный и очень широкий. Самый современный, но на узком экране требует аккуратного кегля.</p>
@@ -82,7 +82,7 @@
         <div class="sample">
           <div class="op">OP 02 / SIGNAL RESTORED</div>
           <h2 class="title family-tektur">ГЛОБАЛЬНЫЙ<br/>ИНЦИДЕНТ</h2>
-          <div class="latin family-tektur">SIGNAL//BREACH</div>
+          <div class="latin family-tektur">SIGNAL // BREACH</div>
           <div class="divider"></div>
           <div class="secondary family-tektur">НУЛЕВОЙ СИГНАЛ</div>
           <p class="description">Индустриальная геометрия, прямые сегменты, ощущение интерфейса терминала. Ближе всего к эстетике самой игры.</p>
@@ -94,7 +94,7 @@
         <div class="sample">
           <div class="op">OP 03 / SIGNAL RESTORED</div>
           <h2 class="title family-russo">ГЛОБАЛЬНЫЙ<br/>ИНЦИДЕНТ</h2>
-          <div class="latin family-russo">SIGNAL//BREACH</div>
+          <div class="latin family-russo">SIGNAL // BREACH</div>
           <div class="divider"></div>
           <div class="secondary family-russo">НУЛЕВОЙ СИГНАЛ</div>
           <p class="description">Ретрофутуризм и выразительные прямоугольные формы. Более игровой характер, одна доступная насыщенность.</p>
@@ -103,7 +103,7 @@
       </article>
     </section>
     <aside class="notes">
-      <strong>Что сравниваем:</strong> только крупные названия экранов, миссий и карточек. Логотип, HUD, числа, кнопки и описания пока не меняем. На этой тестовой странице шрифты загружаются с Google Fonts; для будущего Android APK выбранный шрифт положим внутрь приложения, чтобы он работал без сети.
+      <strong>Что сравниваем:</strong> только крупные названия экранов, миссий и карточек. Логотип, HUD, числа, кнопки и описания пока не меняем. В текущей веб-версии шрифт загружается с Google Fonts; для будущего Android APK Unbounded нужно включить в офлайн-ресурсы, чтобы игра работала без сети.
       <div class="links">
         <a href="https://fonts.google.com/specimen/Unbounded" target="_blank" rel="noopener noreferrer">Unbounded · Google Fonts</a>
         <a href="https://fonts.google.com/specimen/Tektur" target="_blank" rel="noopener noreferrer">Tektur · Google Fonts</a>
