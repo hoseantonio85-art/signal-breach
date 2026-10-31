@@ -19,7 +19,7 @@ assert.match(en, /corruption:\s*bugCountLabel/,
 assert.match(en, /corruptNodes:\s*bugCountLabel/,
   'Game HUD must use the same shared bug count label')
 
-assert.match(missionCard, /mission\.mines\}\s*\{t\.corruption\}/,
+assert.match(missionCard, /mission\.mines\}\s*&nbsp;\s*\{t\.corruption\}/,
   'Campaign cards must use the localized count label')
 assert.match(app, /selectedMission\.mines\}\s*\{t\.corruption\}/,
   'Mission briefing must use the localized count label')
