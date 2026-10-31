@@ -12,6 +12,7 @@
 ## Содержимое
 - **[Начать здесь / продолжить в новом чате](START_HERE.md)** — состояние проекта, следующий шаг, правила веток и готовый промпт.
 - [План и этапы](ROADMAP.md)
+- [Android debug APK: сборка и package ID](ANDROID_BUILD.md)
 - [Технический Android-аудит](ANDROID_READINESS_AUDIT.md)
 - [Решения по продукту и взаимодействиям](DECISIONS.md)
 - [Проверки и чек-лист релиза](RELEASE_CHECKLIST.md)
