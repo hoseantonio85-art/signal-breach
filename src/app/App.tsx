@@ -151,7 +151,7 @@ export function App() {
           )}
           <button
             type="button"
-            className={`chip-btn menu-utility-btn menu-audio-btn ${audioOn ? 'active' : ''}`}
+            className={`chip-btn menu-utility-btn menu-audio-btn audio-toggle ${audioOn ? 'active' : ''}`}
             onClick={toggleAudio}
             aria-label={audioOn ? t.audioOn : t.audioOff}
             title={audioOn ? t.audioOn : t.audioOff}
