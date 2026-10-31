@@ -55,7 +55,8 @@ html[data-display-font] .campaign-panel .mission-card-title {
 }
 
 /* The details and status share one bottom-aligned region.
- * Reserve two lines for details so both rows align even when RU wraps. */
+ * Metadata always has exactly two lines: dimensions, then count + label.
+ * The whole count stays together regardless of available card width. */
 .campaign-panel .mission-card-footer {
   display: flex;
   flex: 0 0 auto;
@@ -70,15 +71,29 @@ html[data-display-font] .campaign-panel .mission-card-title {
 }
 
 .campaign-panel .mission-card .mission-card-details {
-  display: block;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
   width: 100%;
   min-height: 2.8em;
   margin: 0;
-  line-height: 1.4;
+  font: 700 9px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0;
   color: #768aa0;
-  white-space: normal;
-  overflow-wrap: normal;
-  word-break: normal;
+}
+
+.campaign-panel .mission-card .mission-card-details > span {
+  display: block;
+  flex: 0 0 auto;
+  max-width: 100%;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: inherit;
+  white-space: nowrap;
 }
 
 .campaign-panel .mission-card .mission-status {
