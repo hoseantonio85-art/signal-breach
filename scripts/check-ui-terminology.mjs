@@ -35,8 +35,8 @@ assert.match(app, /<MissionMetrics[^>]*rows=\{preset\.rows\}[^>]*variant="free"/
   'Free Run uses shared labeled metrics')
 assert.match(app, /<MissionMetrics[^>]*rows=\{selectedMission\.rows\}[^>]*variant="briefing"/,
   'Briefing uses shared labeled metrics')
-assert.match(game, /\{t\.gridLabel\} \{String\(session\.rows\)/,
-  'Active board grid label is localized too')
+assert.match(game, /\{t\.gridLabel\} \{String\(session\.rows\)[^\n]*\{t\.gridSeparator\}/,
+  'Active board uses the shared terminal-style dimension separator')
 assert.match(game, /\{t\.corruptNodes\}/,
   'Active HUD uses the same localized corruption label')
 
