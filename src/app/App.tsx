@@ -103,7 +103,7 @@ export function App() {
     return (
       <main className="boot-screen">
         <div className="boot-copy">
-          <div className="brand">SIGNAL//BREACH</div>
+          <div className="brand">SIGNAL // BREACH</div>
           <div className="boot-sub">RELAY RECOVERY TERMINAL</div>
           <div className="boot-track"><i /></div>
           <div className="micro">HANDSHAKE / NODE MAP / INTEGRITY CHECK / READY</div>
@@ -134,7 +134,7 @@ export function App() {
     <main className="shell">
       <div className="scanlines" />
       <header className="topbar">
-        <button className="wordmark" onClick={() => setScreen('menu')}>SIGNAL//BREACH</button>
+        <button className="wordmark" onClick={() => setScreen('menu')}>SIGNAL // BREACH</button>
         <div className="top-actions">
           {screen === 'menu' && (
             <button
@@ -165,7 +165,7 @@ export function App() {
           <div className="menu-hero-page">
             <div className="menu-sigil" />
             <div className="eyebrow">SIGNAL COMMAND // {t.systemReady}</div>
-            <h1>SIGNAL//BREACH</h1>
+            <h1>SIGNAL // BREACH</h1>
             <p className="lead">{t.globalIncidentCopy}</p>
           </div>
           <div className="menu-body-page">
@@ -222,7 +222,7 @@ export function App() {
       {screen === 'free' && (
         <section className="content-panel compact">
           <div className="panel-head">
-            <div><div className="eyebrow">SIGNAL//BREACH // {t.diagnosticMode}</div><h2>{t.freeRun}</h2><p className="panel-copy">{t.chooseDensity}</p></div>
+            <div><div className="eyebrow">SIGNAL // BREACH // {t.diagnosticMode}</div><h2>{t.freeRun}</h2><p className="panel-copy">{t.chooseDensity}</p></div>
             <button className="ghost" onClick={() => setScreen('menu')}>×</button>
           </div>
           <div className="difficulty-cards">
