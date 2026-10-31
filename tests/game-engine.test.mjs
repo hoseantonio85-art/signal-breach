@@ -51,7 +51,6 @@ test('chord with the wrong flag records the ACTUAL exploded mine', () => {
   const actual = findExplodedCell(result.board)
   assert.ok(actual)
   assert.deepEqual([actual.row, actual.col], [0, 0])
-  assert.deepEqual([actual.row, actual.col], [0, 0])
   const postLoss = revealMines(result.board, actual.row, actual.col)
   assert.equal(postLoss.cells.filter(c => c.exploded).length, 1)
   assert.equal(postLoss.cells[0].exploded, true)
