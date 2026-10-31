@@ -2,7 +2,6 @@ import { CircleCheck } from 'lucide-react'
 import type { Mission } from '../game/types'
 import type { Dictionary } from '../i18n'
 import type { Progress } from '../stores/progress'
-import './MissionCard.css'
 
 type MissionStatus = 'ready' | 'completed' | 'locked'
 
