@@ -17,7 +17,7 @@ export const en = {
   corruption: bugCountLabel,
   ready: 'READY',
   locked: 'LOCKED',
-  restored: 'RESTORED',
+  completed: 'COMPLETED',
   signalScore: 'SIGNAL SCORE',
   storyProtocol: 'STORY PROTOCOL',
   diagnosticMode: 'DIAGNOSTIC MODE',
