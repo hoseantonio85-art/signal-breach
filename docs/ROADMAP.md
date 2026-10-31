@@ -23,6 +23,7 @@
 - [x] Android Actions: offline bundle, native `assembleDebug`, artifact [signal-breach-android-debug](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194) — всё успешно 2026-11-01. [ ] Скачать и протестировать APK на телефоне.
 - [ ] Установить APK на телефон и проверить загрузку в airplane mode, шрифты, основные экраны и поля.
 - [ ] На этапе первого APK проверить status bar, safe areas, вырезы и жестовую навигацию; полноценное поведение Back и защиту партии завершить в R2.
+- [x] Добавлен генератор фирменной Android launcher-иконки (cyan diamond + filled magenta square), включает adaptive/round/monochrome; [ ] проверить на рабочем столе телефона в новом APK.
 
 **Готовый APK:** [Actions run 41243617194 → Artifacts → signal-breach-android-debug](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194), срок хранения до 2026-11-14.  
 **Рабочий PR:** [#4 — Android / Capacitor (draft)](https://github.com/hoseantonio85-art/signal-breach/pull/4), без merge.  

@@ -50,6 +50,11 @@ jobs:
         run: npm run build:android
       - name: Generate and sync native Android project
         run: npm run android:init
+      - name: Generate branded Android launcher icons
+        run: |
+          python3 scripts/generate-android-icons.py android
+          test -s android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          test -s android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
       - name: Assemble debug APK
         working-directory: android
         run: |

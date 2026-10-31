@@ -35,3 +35,13 @@ npm run android:sync          # after modifying web code; then assemble again
 - [x] Pages source unchanged (`main`); [ ] perform post-install web visual smoke test.
 
 The `android/` directory is deliberately regenerated in CI at this preparation stage; review and version native customizations once the package ID is approved. R2 still includes Android Back, save/resume, background pausing and session protection.
+
+## Branded launcher icon
+The default Capacitor icon is overridden **after** `npm run android:init` and **before** `assembleDebug` by `python3 scripts/generate-android-icons.py android`. The source uses the already approved main-menu sigil (cyan diamond + solid magenta square, dark background), **not** a new logo.
+
+The Python 3 script needs no pip packages and deterministically writes:
+- legacy `ic_launcher.png`, `ic_launcher_round.png` at mdpi–xxxhdpi;
+- adaptive foreground at mdpi–xxxhdpi, dark XML background and adaptive icon XML;
+- a monochrome mask for Android 13+ themed icons.
+
+The native directory is regenerated in CI, so the generator is part of the release build and must be kept in the repository. Verify the resulting launcher icon on real devices and in the RuStore icon upload before release.
