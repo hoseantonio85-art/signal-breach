@@ -3,6 +3,7 @@ import { Volume2, VolumeX } from 'lucide-react'
 import { audioEngine } from '../audio/audioEngine'
 import { missions } from '../campaign/missions'
 import { MissionCard } from '../components/MissionCard'
+import { MissionMetrics } from '../components/MissionMetrics'
 import type { GameSession, Language, Mission } from '../game/types'
 import { dictionaries } from '../i18n'
 import { GameScreen, type CampaignResult } from '../screens/GameScreen'
@@ -225,7 +226,9 @@ export function App() {
           <div className="difficulty-cards">
             {freePresets.map((preset) => (
               <button className="difficulty-card" key={preset.key} onClick={() => startFree(preset)}>
-                <b>{preset.label}</b><span>{preset.rows}×{preset.cols} / {preset.mines} {t.corruption}</span><em>{t[preset.description]}</em>
+                <b>{preset.label}</b>
+                <MissionMetrics rows={preset.rows} cols={preset.cols} mines={preset.mines} t={t} variant="free" />
+                <em>{t[preset.description]}</em>
               </button>
             ))}
           </div>
@@ -240,7 +243,10 @@ export function App() {
             <h2>{selectedMission.code}</h2>
             <div className="briefing-location">{selectedMission.location[language]}</div>
             <div className="voss-line"><span className="voss-sigil">V</span><div><b>{t.colonelVoss}</b><p>{selectedMission.briefing[language]}</p></div></div>
-            <div className="briefing-grid"><span>{selectedMission.rows}×{selectedMission.cols}</span><span>{selectedMission.mines} {t.corruption}</span><span>PAR {formatPar(selectedMission.parSeconds)}</span></div>
+            <div className="briefing-grid">
+              <MissionMetrics rows={selectedMission.rows} cols={selectedMission.cols} mines={selectedMission.mines} t={t} variant="briefing" />
+              <span>PAR {formatPar(selectedMission.parSeconds)}</span>
+            </div>
             <div className="briefing-actions"><button className="secondary" onClick={() => setScreen('campaign')}>{t.back}</button><button className="primary" onClick={() => startMission(selectedMission)}>{t.startOperation}</button></div>
           </section>
         </div>
