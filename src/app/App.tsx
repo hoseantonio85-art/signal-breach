@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Volume2, VolumeX } from 'lucide-react'
+import { CircleCheck, Volume2, VolumeX } from 'lucide-react'
 import { audioEngine } from '../audio/audioEngine'
 import { missions } from '../campaign/missions'
 import type { GameSession, Language, Mission } from '../game/types'
@@ -206,12 +206,25 @@ export function App() {
             {missions.map((mission) => {
               const unlocked = mission.id <= progress.unlockedMission
               const completed = progress.completed[mission.id]
+              const status = !unlocked ? 'locked' : completed ? 'completed' : 'ready'
               return (
-                <button className={`mission-card ${completed ? 'completed' : ''} ${mission.id === progress.unlockedMission ? 'current' : ''}`} disabled={!unlocked} key={mission.id} onClick={() => openMission(mission.id)}>
-                  <span>OP {String(mission.id).padStart(2, '0')}</span>
+                <button
+                  className={`mission-card status-${status}`}
+                  disabled={!unlocked}
+                  key={mission.id}
+                  onClick={() => openMission(mission.id)}
+                >
+                  <div className="mission-card-top">
+                    <span>OP {String(mission.id).padStart(2, '0')}</span>
+                    {status === 'completed' && (
+                      <CircleCheck className="mission-complete-icon" size={19} strokeWidth={1.8} aria-hidden="true" />
+                    )}
+                  </div>
                   <strong>{mission.code}</strong>
                   <small>{mission.rows}×{mission.cols} / {mission.mines} {t.corruption}</small>
-                  <em>{!unlocked ? t.locked : completed ? `${t.restored} / ${completed.bestRank}` : t.ready}</em>
+                  <em className="mission-status">
+                    {status === 'locked' ? t.locked : status === 'completed' ? `${t.completed} / ${completed!.bestRank}` : t.ready}
+                  </em>
                 </button>
               )
             })}
