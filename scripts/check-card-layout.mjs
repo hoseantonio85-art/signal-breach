@@ -32,6 +32,22 @@ assert.match(block(css, '.campaign-panel .mission-card'), /display:\s*flex/,
   'Mission card must be a flex column')
 assert.match(block(css, '.campaign-panel .mission-card'), /flex-direction:\s*column/,
   'Mission card must stack its three zones')
+assert.match(block(css, '.campaign-panel .mission-card-top'), /flex:\s*0 0 20px/,
+  'Every card header must occupy the same fixed height, with or without a completion icon')
+assert.match(block(css, '.campaign-panel .mission-card-top'), /height:\s*20px/,
+  'Header must be aligned to the top with a stable height')
+assert.match(block(css, '.campaign-panel .mission-card .mission-card-top > span'), /color:\s*var\(--cyan\)/,
+  'OP numbers must retain the original cyan regardless of mission status')
+for (const status of ['ready', 'completed', 'locked']) {
+  assert.doesNotMatch(css, new RegExp('mission-card\\.status-' + status + '[^\\{]*mission-card-top\\s*>\\s*span'),
+    'Do not recolor operation numbers for individual statuses')
+}
+assert.match(block(css, '.campaign-panel .mission-card.status-ready'), /--mission-status-color:\s*var\(--pink\)/,
+  'READY must use the synthwave pink accent')
+assert.match(block(css, '.campaign-panel .mission-card.status-completed'), /--mission-status-color:\s*var\(--cyan\)/,
+  'COMPLETED must use cyan')
+assert.doesNotMatch(css, /#7dffb2|125,255,178/,
+  'Do not reintroduce the old green palette into mission cards')
 assert.match(block(css, '.campaign-panel .mission-card-footer'), /margin-top:\s*auto/,
   'Footer must be anchored to card bottom')
 assert.match(block(css, '.campaign-panel .mission-card .mission-card-details'), /min-height:\s*2\.8em/,
