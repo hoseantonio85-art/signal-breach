@@ -299,7 +299,7 @@ export function GameScreen({
       <div className="scanlines" />
       <header className="game-topbar">
         <div className="game-brand">
-          <div className="brand-line"><span className="brand-mark" />SIGNAL//BREACH</div>
+          <div className="brand-line"><span className="brand-mark" />SIGNAL // BREACH</div>
           <div className="brand-sub">relay recovery / anomaly isolation protocol</div>
         </div>
         <div className="game-top-actions">
