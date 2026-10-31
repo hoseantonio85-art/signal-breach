@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Volume2, VolumeX } from 'lucide-react'
 import { audioEngine } from '../audio/audioEngine'
 import { missions } from '../campaign/missions'
 import type { GameSession, Language, Mission } from '../game/types'
@@ -140,7 +141,7 @@ export function App() {
               <option value="ru">RU</option><option value="en">EN</option>
             </select>
           )}
-          <button className={`chip-btn ${audioOn ? 'active' : ''}`} onClick={toggleAudio}><span className="dot" />{audioOn ? t.audioOn : t.audioOff}</button>
+          <button type="button" className={`chip-btn ${audioOn ? 'active' : ''}`} onClick={toggleAudio}>{audioOn ? <Volume2 size={17} strokeWidth={1.8} aria-hidden="true" /> : <VolumeX size={17} strokeWidth={1.8} aria-hidden="true" />}{audioOn ? t.audioOn : t.audioOff}</button>
         </div>
       </header>
 
