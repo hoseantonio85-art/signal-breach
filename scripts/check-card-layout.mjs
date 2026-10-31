@@ -20,6 +20,11 @@ assert.match(card, /<div className="mission-card-top">[\s\S]*?<strong className=
   'Card layout must have explicit header, title and footer zones')
 assert.match(card, /className="mission-card-details"/,
   'Metric belongs inside the card footer')
+assert.match(card, /className="mission-card-grid-size"\}>\{mission\.rows\}×\{mission\.cols\}<\/span>/,
+  'The first mission metadata line must always be just the grid size')
+assert.match(card, /className="mission-card-bug-count"\}>\{mission\.mines\}&nbsp;\{t\.corruption\}<\/span>/,
+  'The second line must hold the bug number and label with a non-breaking space')
+
 assert.match(card, /className="mission-status"/,
   'Status belongs inside the card footer')
 
@@ -52,6 +57,13 @@ assert.match(block(css, '.campaign-panel .mission-card-footer'), /margin-top:\s*
   'Footer must be anchored to card bottom')
 assert.match(block(css, '.campaign-panel .mission-card .mission-card-details'), /min-height:\s*2\.8em/,
   'Reserve same two-line metric slot on all cards')
+assert.match(block(css, '.campaign-panel .mission-card .mission-card-details'), /display:\s*flex/,
+  'Mission metadata must use a deliberate two-line layout, never natural wrapping')
+assert.match(block(css, '.campaign-panel .mission-card .mission-card-details'), /flex-direction:\s*column/,
+  'Both metadata lines must always be stacked vertically')
+assert.match(block(css, '.campaign-panel .mission-card .mission-card-details > span'), /white-space:\s*nowrap/,
+  'Bug count and label must never separate on narrow screens')
+
 assert.match(block(otherCards, '.mode-grid > .mode-card'), /display:\s*flex/,
   'Menu mode cards must allow bottom-aligned footers')
 assert.match(block(otherCards, '.difficulty-cards > .difficulty-card > em'), /margin-top:\s*auto/,
