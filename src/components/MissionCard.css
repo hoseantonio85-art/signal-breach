@@ -70,32 +70,6 @@ html[data-display-font] .campaign-panel .mission-card-title {
   padding-top: 12px;
 }
 
-.campaign-panel .mission-card .mission-card-details {
-  display: flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 100%;
-  min-height: 2.8em;
-  margin: 0;
-  font: 700 9px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-  letter-spacing: 0;
-  color: #768aa0;
-}
-
-.campaign-panel .mission-card .mission-card-details > span {
-  display: block;
-  flex: 0 0 auto;
-  max-width: 100%;
-  margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
-  line-height: inherit;
-  color: inherit;
-  white-space: nowrap;
-}
-
 .campaign-panel .mission-card .mission-status {
   display: block;
   min-height: 12px;
