@@ -483,7 +483,7 @@ html[data-display-font] .state-title {
 
 /* Between desktop and mobile, five columns make long operation codes too
    narrow. Three columns let the larger font retain whole words. */
-@media (min-width: 761px) and (max-width: 930px) {
+@media (min-width: 761px) and (max-width: 960px) {
   .campaign-panel .mission-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
