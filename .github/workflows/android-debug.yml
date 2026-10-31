@@ -24,12 +24,8 @@ jobs:
         run: npm run build:android
 
   debug-apk:
-    # Do not guess or publish a package ID. Set the approved ID in repo vars.
-    if: ${{ vars.SIGNAL_ANDROID_APP_ID != '' }}
     needs: offline-web-bundle
     runs-on: ubuntu-latest
-    env:
-      SIGNAL_ANDROID_APP_ID: ${{ vars.SIGNAL_ANDROID_APP_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

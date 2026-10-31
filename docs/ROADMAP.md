@@ -19,8 +19,8 @@
 - [x] Создать `release/android-rustore-v1` от актуального `main` (`625b5f0` на старте), не менять стабильный Pages.
 - [x] Подключить Capacitor-зависимости и отдельный Android bundle с относительным `base: './'` и `webDir: 'dist'`; Pages сохраняет `/signal-breach/`. Нативный shell пока генерируется в CI, без коммита `android/`.
 - [x] Подключить локальный Unbounded WOFF2 с лицензией и исключить удалённые Google Fonts из Android HTML. [ ] Подтвердить офлайн на Android-девайсе.
-- [ ] Утвердить Android `applicationId` и задать Actions variable `SIGNAL_ANDROID_APP_ID`; не подставлять придуманный ID.
-- [x] Добавить Actions workflow для проверки offline bundle и debug APK (нативная job зависит от `SIGNAL_ANDROID_APP_ID`). [ ] Получить APK artifact и проверить его на телефоне.
+- [x] Утвердить и зафиксировать Android `applicationId = com.hoseantonio85.signalbreach` (2026-11-01); отдельная Actions variable не требуется.
+- [x] Добавить Actions workflow для проверки offline bundle и автоматической сборки debug APK с утверждённым ID. [ ] Проверить результат native CI, скачать APK и протестировать на телефоне.
 - [ ] Установить APK на телефон и проверить загрузку в airplane mode, шрифты, основные экраны и поля.
 - [ ] На этапе первого APK проверить status bar, safe areas, вырезы и жестовую навигацию; полноценное поведение Back и защиту партии завершить в R2.
 
