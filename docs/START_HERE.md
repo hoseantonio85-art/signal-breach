@@ -12,7 +12,7 @@
 - [PR #3](https://github.com/hoseantonio85-art/signal-breach/pull/3) **объединён**: исправление проигрыша при chord, 6 поведенческих тестов движка, общий `AudioToggle`, аудит Android.
 - Последний проверенный merge PR #3: [`560120a`](https://github.com/hoseantonio85-art/signal-breach/commit/560120af932d0dbb7f2175628385acdb9144b80b). Позже в `main` могли появиться коммиты документации или другие изменения — не использовать SHA как постоянную базу.
 - Основная игра: https://hoseantonio85-art.github.io/signal-breach/ . Путь `/preview/` — исторический UX preview, **не** новый Android-прототип.
-- **R1 начат** в `release/android-rustore-v1`: есть Capacitor-зависимости, режим Android с относительными URL, локальный Unbounded и GitHub Actions. Нативный shell пока генерируется только при наличии утверждённого package ID, debug APK ещё не подтверждён. См. [ANDROID_BUILD.md](ANDROID_BUILD.md).
+- **R1 начат** в [draft PR #4](https://github.com/hoseantonio85-art/signal-breach/pull/4), ветка `release/android-rustore-v1`: есть Capacitor-зависимости, режим Android с относительными URL, локальный Unbounded и GitHub Actions. Нативный shell пока генерируется только при наличии утверждённого package ID, debug APK ещё не подтверждён. См. [ANDROID_BUILD.md](ANDROID_BUILD.md).
 - `npm run build` запускает статические проверки терминологии/карточек/звука, 6 тестов движка, TypeScript и Vite. Последняя проверка PR #3 была успешной.
 - Важное ограничение: настоящий Android WebView и визуальный QA на устройстве **ещё не выполнены**.
 
