@@ -3,6 +3,10 @@ name: Deploy web preview
 on:
   push:
     branches: [main]
+  workflow_run:
+    workflows: [Validate web build]
+    types: [completed]
+    branches: [feature/release-interactions-icons]
   workflow_dispatch:
 
 permissions:
@@ -16,20 +20,49 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out stable site
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: stable
+
+      - name: Check out UX preview
+        uses: actions/checkout@v4
+        with:
+          ref: feature/release-interactions-icons
+          path: preview-src
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
-      - run: npm run build
+
+      - name: Build stable main
+        working-directory: stable
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+
+      - name: Build preview with its own asset base path
+        working-directory: preview-src
+        run: |
+          npm install --no-audit --no-fund
+          npm run build -- --base=/signal-breach/preview/
+
+      - name: Combine both sites into one Pages artifact
+        run: |
+          mkdir -p stable/dist/preview
+          cp -a preview-src/dist/. stable/dist/preview/
+
       - uses: actions/configure-pages@v5
         with:
           enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./stable/dist
+
   deploy:
     environment:
       name: github-pages
