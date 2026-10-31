@@ -115,9 +115,11 @@ export function GameScreen({
 
   function finishLoss(nextBoard: Board, row: number, col: number) {
     const seconds = startedAt.current == null ? elapsed : Math.floor((performance.now() - startedAt.current) / 1000)
+    // Chording can detonate a neighboring mine rather than the tapped number.
+    const hitCell = findExplodedCell(nextBoard) ?? { row, col }
     setElapsed(seconds)
-    setLossCoord(coord(row, col))
-    setBoard(revealMines(nextBoard, row, col))
+    setLossCoord(coord(hitCell.row, hitCell.col))
+    setBoard(revealMines(nextBoard, hitCell.row, hitCell.col))
     setPhase('lost')
     setLog(t.signalLost)
     audioEngine.ui('loss')
