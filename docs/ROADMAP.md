@@ -24,6 +24,7 @@
 - [ ] Установить APK на телефон и проверить загрузку в airplane mode, шрифты, основные экраны и поля.
 - [ ] На этапе первого APK проверить status bar, safe areas, вырезы и жестовую навигацию; полноценное поведение Back и защиту партии завершить в R2.
 
+**Рабочий PR:** [#4 — Android / Capacitor (draft)](https://github.com/hoseantonio85-art/signal-breach/pull/4), без merge.  
 **Инструкция по сборке:** [ANDROID_BUILD.md](ANDROID_BUILD.md).
 
 **Определение готовности R1:** debug APK скачивается из Actions, устанавливается, запускается без сети; игра открывает карту, шрифты и ассеты локальны; GitHub Pages продолжает работать.
