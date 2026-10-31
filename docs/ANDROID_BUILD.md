@@ -44,4 +44,6 @@ The Python 3 script needs no pip packages and deterministically writes:
 - adaptive foreground at mdpi–xxxhdpi, dark XML background and adaptive icon XML;
 - a monochrome mask for Android 13+ themed icons.
 
-The native directory is regenerated in CI, so the generator is part of the release build and must be kept in the repository. Verify the resulting launcher icon on real devices and in the RuStore icon upload before release.
+The native directory is regenerated in CI, so the generator is part of the release build and must be kept in the repository. **First successful branded-icon APK:** [Actions run 41247085110](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41247085110), artifact `signal-breach-android-debug`. Verify the resulting launcher icon on a real device and in the RuStore icon upload before release.
+
+**IMPORTANT: Existing player data.** The initial installed debug APK may use a different auto-generated debug signing certificate. Updating it in-place can fail; uninstalling can wipe campaign progress. Do not ask the tester to uninstall or overwrite their OP 07/08 progress until an export/import or verified recovery path exists. Track in [issue #7](https://github.com/hoseantonio85-art/signal-breach/issues/7).

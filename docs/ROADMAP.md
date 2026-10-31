@@ -23,13 +23,17 @@
 - [x] Android Actions: offline bundle, native `assembleDebug`, artifact [signal-breach-android-debug](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194) — всё успешно 2026-11-01. [ ] Скачать и протестировать APK на телефоне.
 - [ ] Установить APK на телефон и проверить загрузку в airplane mode, шрифты, основные экраны и поля.
 - [ ] На этапе первого APK проверить status bar, safe areas, вырезы и жестовую навигацию; полноценное поведение Back и защиту партии завершить в R2.
-- [x] Добавлен генератор фирменной Android launcher-иконки (cyan diamond + filled magenta square), включает adaptive/round/monochrome; [ ] проверить на рабочем столе телефона в новом APK.
+- [x] Генератор фирменной Android launcher-иконки (cyan diamond + filled magenta square) с adaptive/round/monochrome; [x] APK собран с иконкой в [Actions run 41247085110](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41247085110); [ ] визуально проверить на телефоне **без удаления старого APK с прогрессом**.
 
 **Готовый APK:** [Actions run 41243617194 → Artifacts → signal-breach-android-debug](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194), срок хранения до 2026-11-14.  
 **Рабочий PR:** [#4 — Android / Capacitor (draft)](https://github.com/hoseantonio85-art/signal-breach/pull/4), без merge.  
 **Инструкция по сборке:** [ANDROID_BUILD.md](ANDROID_BUILD.md).
 
 **Определение готовности R1:** debug APK скачивается из Actions, устанавливается, запускается без сети; игра открывает карту, шрифты и ассеты локальны; GitHub Pages продолжает работать.
+
+**Риск обновления debug APK:** разные CI debug-подписи могут блокировать установку поверх старого APK. [ ] Подготовить безопасный перенос прогресса/стабильную подпись **до тестовой переустановки**; см. [issue #7](https://github.com/hoseantonio85-art/signal-breach/issues/7).
+
+**Gameplay QA:** [issue #8](https://github.com/hoseantonio85-art/signal-breach/issues/8) — случайные поля OP 07–08 и вынужденное угадывание; исправлять после измерений.
 
 ## R2. Мобильное качество
 - [ ] Проверить и при необходимости исправить малые экраны, панорамирование больших карт и жесты.

@@ -16,6 +16,11 @@
 - `npm run build` и `npm run build:android` прошли в PR #4; Android Gradle `assembleDebug` и выгрузка APK прошли в [run 41243617194](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194).
 - Важное ограничение: настоящий Android WebView и визуальный QA на устройстве **ещё не выполнены**.
 
+## Обновление 2026-11-01: фирменная Android-иконка и QA операций
+- В [draft PR #4](https://github.com/hoseantonio85-art/signal-breach/pull/4) добавлен генератор фирменной Android launcher-иконки (точный мотив меню: бирюзовый ромб и заполненный розовый квадрат) для legacy/round/adaptive/monochrome. **[Actions run 41247085110](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41247085110) успешно собрал APK** с новой иконкой; визуальный QA на устройстве остаётся.
+- **Не удалять установленный первый тестовый APK при наличии ценного прогресса** (игрок дошёл до OP 08): CI debug keystore может отличаться между сборками, установка поверх может не сработать, а удаление очистит локальные сохранения. Перед обновлением нужна защищённая миграция/экспорт прогресса и стабильная тестовая подпись. См. [#7](https://github.com/hoseantonio85-art/signal-breach/issues/7).
+- По обратной связи игрока с OP 07 появляются ситуации угадывания; OP 08 пока ни разу не завершена. **Генератор не гарантирует решаемость без угадывания.** Завели [#8](https://github.com/hoseantonio85-art/signal-breach/issues/8) на измерение и тесты перед изменением сложности; сканер остаётся отдельной гипотезой [#6](https://github.com/hoseantonio85-art/signal-breach/issues/6).
+
 ## Следующее конкретное действие (R1 — в работе)
 1. **Выполнено:** создана `release/android-rustore-v1` от `main` (`625b5f0` на старте).
 2. **Подготовлено:** Capacitor 8, отдельный `vite build --mode android` с `base: './'`; нативный проект генерируется в CI после утверждения ID. Веб-base `/signal-breach/` сохраняется.
