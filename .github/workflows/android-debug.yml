@@ -35,7 +35,15 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
+      # Hosted Ubuntu runners already include Android command-line tools.
+      # setup-android@v3 currently requests the removed legacy 'tools' SDK package.
+      - name: Install required Android SDK packages
+        shell: bash
+        run: |
+          : "${ANDROID_HOME:?Android SDK not installed on GitHub runner}"
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          test -n "$sdkmanager"
+          "$sdkmanager" --install "platforms;android-36" "build-tools;36.0.0"
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Build verified offline assets
