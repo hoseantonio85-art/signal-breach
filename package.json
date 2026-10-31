@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run check:terminology && npm run check:card-layout && tsc --noEmit -p tsconfig.json && vite build",
+    "build": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && tsc --noEmit -p tsconfig.json && vite build",
     "preview": "vite preview",
     "check:terminology": "node scripts/check-ui-terminology.mjs",
-    "check:card-layout": "node scripts/check-card-layout.mjs"
+    "check:card-layout": "node scripts/check-card-layout.mjs",
+    "check:audio-toggle": "node scripts/check-audio-toggle.mjs"
   },
   "dependencies": {
     "react": "^19.1.1",
