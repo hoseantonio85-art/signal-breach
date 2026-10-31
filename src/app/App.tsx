@@ -137,11 +137,26 @@ export function App() {
         <button className="wordmark" onClick={() => setScreen('menu')}>SIGNAL//BREACH</button>
         <div className="top-actions">
           {screen === 'menu' && (
-            <select value={language} onChange={(event: { target: { value: string } }) => setLanguage(event.target.value as Language)} aria-label={t.language}>
-              <option value="ru">RU</option><option value="en">EN</option>
-            </select>
+            <button
+              type="button"
+              className="chip-btn menu-utility-btn menu-language-btn"
+              onClick={() => setLanguage((current) => current === 'ru' ? 'en' : 'ru')}
+              aria-label={language === 'ru' ? 'Переключить язык на английский' : 'Switch language to Russian'}
+              title={language === 'ru' ? 'English' : 'Русский'}
+            >
+              {language.toUpperCase()}
+            </button>
           )}
-          <button type="button" className={`chip-btn ${audioOn ? 'active' : ''}`} onClick={toggleAudio}>{audioOn ? <Volume2 size={17} strokeWidth={1.8} aria-hidden="true" /> : <VolumeX size={17} strokeWidth={1.8} aria-hidden="true" />}{audioOn ? t.audioOn : t.audioOff}</button>
+          <button
+            type="button"
+            className={`chip-btn menu-utility-btn menu-audio-btn ${audioOn ? 'active' : ''}`}
+            onClick={toggleAudio}
+            aria-label={audioOn ? t.audioOn : t.audioOff}
+            title={audioOn ? t.audioOn : t.audioOff}
+            aria-pressed={audioOn}
+          >
+            {audioOn ? <Volume2 size={17} strokeWidth={1.8} aria-hidden="true" /> : <VolumeX size={17} strokeWidth={1.8} aria-hidden="true" />}
+          </button>
         </div>
       </header>
 
