@@ -14,7 +14,7 @@ export const ru = {
   corruption: 'заражений',
   ready: 'ГОТОВО',
   locked: 'ЗАКРЫТО',
-  restored: 'ВОССТАНОВЛЕНО',
+  completed: 'ВЫПОЛНЕНО',
   signalScore: 'SIGNAL SCORE',
   storyProtocol: 'СЮЖЕТНЫЙ ПРОТОКОЛ',
   diagnosticMode: 'ДИАГНОСТИЧЕСКИЙ РЕЖИМ',
