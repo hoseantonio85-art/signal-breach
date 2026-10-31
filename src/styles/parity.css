@@ -444,11 +444,17 @@ html[data-display-font] .mode-card strong {
   letter-spacing: 0;
 }
 
-html[data-display-font] .mission-card strong {
-  font-size: 13px;
-  line-height: 1.35;
+/* Bigger mission titles, but keep two-word operation names on at most two
+   natural lines (never split SIGNATURE / PROTOCOL into extra lines). */
+html[data-display-font] .campaign-panel .mission-card strong {
+  font-size: 16px;
+  line-height: 1.3;
   letter-spacing: 0;
-  overflow-wrap: anywhere;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+  text-wrap: balance;
 }
 
 html[data-display-font] .difficulty-card b {
@@ -469,7 +475,25 @@ html[data-display-font] .state-title {
   html[data-display-font] .content-panel .panel-head h2 {
     font-size: clamp(17px, 4.8vw, 24px);
   }
-  html[data-display-font] .mission-card strong {
-    font-size: 11px;
+  html[data-display-font] .campaign-panel .mission-card strong {
+    font-size: clamp(12.5px, 3.6vw, 14.5px);
+    line-height: 1.3;
+  }
+}
+
+/* Between desktop and mobile, five columns make long operation codes too
+   narrow. Three columns let the larger font retain whole words. */
+@media (min-width: 761px) and (max-width: 930px) {
+  .campaign-panel .mission-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* At 320px the cards need a little more room for CHOIR SIGNATURE and WAKE
+   PROTOCOL. Do not reduce the title size back to the previous 11px. */
+@media (max-width: 390px) {
+  .campaign-panel .mission-card {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
