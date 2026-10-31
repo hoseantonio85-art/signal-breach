@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Volume2, VolumeX } from 'lucide-react'
 import { audioEngine } from '../audio/audioEngine'
 import { missions } from '../campaign/missions'
+import { AudioToggle } from '../components/AudioToggle'
 import { MissionCard } from '../components/MissionCard'
 import { MissionMetrics } from '../components/MissionMetrics'
 import type { GameSession, Language, Mission } from '../game/types'
@@ -149,16 +149,7 @@ export function App() {
               {language.toUpperCase()}
             </button>
           )}
-          <button
-            type="button"
-            className={`chip-btn menu-utility-btn menu-audio-btn audio-toggle ${audioOn ? 'active' : ''}`}
-            onClick={toggleAudio}
-            aria-label={audioOn ? t.audioOn : t.audioOff}
-            title={audioOn ? t.audioOn : t.audioOff}
-            aria-pressed={audioOn}
-          >
-            {audioOn ? <Volume2 size={17} strokeWidth={1.8} aria-hidden="true" /> : <VolumeX size={17} strokeWidth={1.8} aria-hidden="true" />}
-          </button>
+          <AudioToggle enabled={audioOn} onToggle={toggleAudio} t={t} variant="menu" />
         </div>
       </header>
 

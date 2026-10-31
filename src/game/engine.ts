@@ -131,6 +131,11 @@ export function chord(board: Board, row: number, col: number): RevealResult {
   return { board: next, hitMine: false, revealedDelta }
 }
 
+/** Return the actual mine that triggered defeat, including during a chord. */
+export function findExplodedCell(board: Board): Cell | undefined {
+  return board.cells.find((cell) => cell.exploded === true)
+}
+
 export function revealMines(board: Board, explodedRow: number, explodedCol: number): Board {
   return {
     ...board,
