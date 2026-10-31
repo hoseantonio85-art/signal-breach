@@ -373,3 +373,31 @@
   flex: 0 0 auto;
   display: block;
 }
+
+/* Main navigation: compact icon-only sound + direct RU/EN toggle, no select chevron. */
+.topbar .top-actions {
+  flex: 0 0 auto;
+  gap: 6px;
+}
+.topbar .wordmark {
+  min-width: 0;
+  white-space: nowrap;
+}
+.topbar .menu-utility-btn {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+}
+.topbar .menu-language-btn {
+  font: 800 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.02em;
+}
+.topbar .menu-audio-btn.active {
+  color: var(--cyan);
+}
+@media (max-width: 360px) {
+  .topbar .wordmark { font-size: 12px; }
+}
