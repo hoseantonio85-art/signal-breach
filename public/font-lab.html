@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#050713"/>
+  <title>Signal Breach · Typography Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Tektur:wght@500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root { color-scheme: dark; --bg:#050713; --panel:#0b1020; --line:rgba(113,241,255,.18); --cyan:#71f1ff; --pink:#ff4fd8; --muted:#8193a9; --text:#e8f8ff; }
+    * { box-sizing:border-box; }
+    html { -webkit-text-size-adjust:100%; }
+    body { background:radial-gradient(ellipse at 40% -10%,rgba(105,71,255,.17),transparent 48%),linear-gradient(#070a17,#03040b);color:var(--text);margin:0;min-height:100dvh;font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+    body:after { content:"";pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0 4px,rgba(255,255,255,.02) 4px 5px);opacity:.28; }
+    a { color:inherit; }
+    .shell { max-width:1230px;margin:auto;padding:22px clamp(15px,3.3vw,44px) 64px; }
+    .top { display:flex;align-items:center;justify-content:space-between;gap:14px;padding-bottom:18px;border-bottom:1px solid var(--line); }
+    .mark { display:flex;align-items:center;gap:12px;color:var(--cyan);font:800 12px ui-monospace,monospace;letter-spacing:.12em; }
+    .sigil { display:inline-block;position:relative;width:18px;height:18px; }
+    .sigil:before { content:"";position:absolute;inset:3px;border:1px solid var(--cyan);transform:rotate(45deg); }
+    .sigil:after { content:"";position:absolute;width:4px;height:4px;top:7px;left:7px;background:var(--pink); }
+    .back {font:700 11px ui-monospace,monospace;color:#9aaec4;text-decoration:none;border:1px solid #263249;border-radius:8px;padding:10px 12px;white-space:nowrap;}
+    .intro { margin:38px 0 22px; }
+    .eyebrow {font:700 10px ui-monospace,monospace;letter-spacing:.18em;color:var(--cyan);text-transform:uppercase;}
+    .intro h1 {font-size:clamp(26px,4vw,45px);line-height:1.13;letter-spacing:-.055em;margin:12px 0;}
+    .intro p {max-width:710px;color:#99a9bd;font-size:14px;line-height:1.7;margin:0;}
+    .board {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    .item {min-width:0;border:1px solid var(--line);border-radius:16px;background:radial-gradient(circle at 96% 0%,rgba(113,241,255,.05),transparent 48%),linear-gradient(180deg,rgba(13,20,40,.96),rgba(7,11,23,.98));overflow:hidden;display:flex;flex-direction:column;}
+    .item.featured {border-color:rgba(113,241,255,.43);}
+    .item-head {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:17px 18px;border-bottom:1px solid var(--line);}
+    .font-name {font:700 14px ui-sans-serif,system-ui,sans-serif;letter-spacing:-.015em;}
+    .tag {font:700 9px ui-monospace,monospace;letter-spacing:.09em;color:var(--cyan);}
+    .sample {padding:22px 18px 24px;flex:1;}
+    .op {font:700 9px ui-monospace,monospace;letter-spacing:.13em;color:var(--cyan);margin-bottom:20px;}
+    .title {font-size:clamp(19px,2.25vw,29px);line-height:1.25;font-weight:700;letter-spacing:-.045em;word-break:normal;overflow-wrap:break-word;min-height:80px;margin:0 0 18px;}
+    .latin {font-weight:700;line-height:1.2;letter-spacing:-.04em;font-size:clamp(19px,1.8vw,24px);margin-bottom:22px;overflow-wrap:anywhere;}
+    .divider {height:1px;background:rgba(113,241,255,.12);margin:22px 0;}
+    .secondary {font-size:17px;line-height:1.4;font-weight:600;color:#a8bbd1;}
+    .description {font-size:12px;line-height:1.55;color:#7f94ab;margin:18px 0 0;}
+    .actions {padding:14px 18px 18px;border-top:1px solid var(--line);}
+    .try {display:flex;justify-content:center;align-items:center;text-align:center;text-decoration:none;min-height:42px;padding:10px;border:1px solid rgba(113,241,255,.35);border-radius:9px;color:#dffaff;background:rgba(34,81,101,.22);font:700 11px ui-monospace,monospace;letter-spacing:.02em;}
+    .try:hover,.try:focus-visible {background:rgba(44,127,145,.3);border-color:var(--cyan);outline:none;}
+     .family-unbounded {font-family:'Unbounded',sans-serif;letter-spacing:0.005em;word-spacing:0.13em;}
+    .family-tektur {font-family:'Tektur',sans-serif;}
+    .family-russo {font-family:'Russo One',sans-serif;font-weight:400;}
+    .notes {margin-top:25px;padding:17px 20px;border:1px solid rgba(127,145,168,.17);border-radius:12px;color:#9dafc1;font-size:12px;line-height:1.65;}
+    .notes strong {color:#dcefff;}
+    .links {display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;}
+    .links a {color:var(--cyan);font-size:12px;}
+    @media(max-width:980px) { .board {grid-template-columns:1fr;} .sample {padding:22px 20px;} .title {font-size:clamp(23px,6vw,36px);min-height:0;} .latin {font-size:clamp(20px,5vw,30px);} }
+    @media(max-width:410px) { .mark {font-size:10px;} .back {font-size:9px;padding:9px;} .intro {margin-top:28px;} .title {font-size:clamp(21px,6vw,30px);} }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="mark"><span class="sigil" aria-hidden="true"></span>SIGNAL // BREACH / TYPE LAB</div>
+      <a class="back" href="./">← К игре</a>
+    </header>
+    <section class="intro">
+      <div class="eyebrow">DISPLAY TYPOGRAPHY // 01</div>
+      <h1>Ищем характер заголовков</h1>
+      <p>Три гарнитуры из Google Fonts. Каждая поддерживает русский и английский. Unbounded выбран основным шрифтом заголовков. Увеличены межбуквенные интервалы и добавлены пробелы вокруг // в видимом названии. Другие варианты остались для сравнения.</p>
+    </section>
+    <section class="board" aria-label="Сравнение шрифтов">
+      <article class="item featured">
+        <div class="item-head"><span class="font-name">Unbounded</span><span class="tag">01 / ВЫБРАН</span></div>
+        <div class="sample">
+          <div class="op">OP 01 / SIGNAL RESTORED</div>
+          <h2 class="title family-unbounded">ГЛОБАЛЬНЫЙ<br/>ИНЦИДЕНТ</h2>
+          <div class="latin family-unbounded">SIGNAL // BREACH</div>
+          <div class="divider"></div>
+          <div class="secondary family-unbounded">НУЛЕВОЙ СИГНАЛ</div>
+          <p class="description">Графичный, уверенный и очень широкий. Самый современный, но на узком экране требует аккуратного кегля.</p>
+        </div>
+        <div class="actions"><a class="try" href="./?font=unbounded">Примерить в настоящей игре ↗</a></div>
+      </article>
+      <article class="item">
+        <div class="item-head"><span class="font-name">Tektur</span><span class="tag">02 / ТЕХНО</span></div>
+        <div class="sample">
+          <div class="op">OP 02 / SIGNAL RESTORED</div>
+          <h2 class="title family-tektur">ГЛОБАЛЬНЫЙ<br/>ИНЦИДЕНТ</h2>
+          <div class="latin family-tektur">SIGNAL // BREACH</div>
+          <div class="divider"></div>
+          <div class="secondary family-tektur">НУЛЕВОЙ СИГНАЛ</div>
+          <p class="description">Индустриальная геометрия, прямые сегменты, ощущение интерфейса терминала. Ближе всего к эстетике самой игры.</p>
+        </div>
+        <div class="actions"><a class="try" href="./?font=tektur">Примерить в настоящей игре ↗</a></div>
+      </article>
+      <article class="item">
+        <div class="item-head"><span class="font-name">Russo One</span><span class="tag">03 / РЕТРО</span></div>
+        <div class="sample">
+          <div class="op">OP 03 / SIGNAL RESTORED</div>
+          <h2 class="title family-russo">ГЛОБАЛЬНЫЙ<br/>ИНЦИДЕНТ</h2>
+          <div class="latin family-russo">SIGNAL // BREACH</div>
+          <div class="divider"></div>
+          <div class="secondary family-russo">НУЛЕВОЙ СИГНАЛ</div>
+          <p class="description">Ретрофутуризм и выразительные прямоугольные формы. Более игровой характер, одна доступная насыщенность.</p>
+        </div>
+        <div class="actions"><a class="try" href="./?font=russo">Примерить в настоящей игре ↗</a></div>
+      </article>
+    </section>
+    <aside class="notes">
+      <strong>Что сравниваем:</strong> только крупные названия экранов, миссий и карточек. Логотип, HUD, числа, кнопки и описания пока не меняем. В текущей веб-версии шрифт загружается с Google Fonts; для будущего Android APK Unbounded нужно включить в офлайн-ресурсы, чтобы игра работала без сети.
+      <div class="links">
+        <a href="https://fonts.google.com/specimen/Unbounded" target="_blank" rel="noopener noreferrer">Unbounded · Google Fonts</a>
+        <a href="https://fonts.google.com/specimen/Tektur" target="_blank" rel="noopener noreferrer">Tektur · Google Fonts</a>
+        <a href="https://fonts.google.com/specimen/Russo+One" target="_blank" rel="noopener noreferrer">Russo One · Google Fonts</a>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { House, RotateCcw, Volume2, VolumeX } from 'lucide-react'
 import { audioEngine } from '../audio/audioEngine'
 import {
   chord,
@@ -79,8 +80,8 @@ export function GameScreen({
   const [result, setResult] = useState<{ score: number; rank: string; time: number } | null>(null)
   const [helpOpen, setHelpOpen] = useState(false)
   const startedAt = useRef<number | null>(null)
-  const longPress = useRef<{ key: string; timer: number; x: number; y: number } | null>(null)
-  const suppressClick = useRef<string | null>(null)
+  const longPress = useRef<{ key: string; timer: number; x: number; y: number; ready: boolean } | null>(null)
+  const suppressClick = useRef<{ key: string; expires: number } | null>(null)
 
   const quarantined = useMemo(() => countQuarantined(board), [board])
   const revealedSafe = useMemo(() => countRevealedSafe(board), [board])
@@ -200,15 +201,17 @@ export function GameScreen({
     else scanCell(row, col)
   }
 
+  // Recognise a long press while held, but change the board only on pointer release.
   function pointerDown(event: React.PointerEvent, row: number, col: number) {
-    if (event.pointerType !== 'touch') return
+    if (event.pointerType !== 'touch' || !event.isPrimary) return
+    const previous = longPress.current
+    if (previous) window.clearTimeout(previous.timer)
+
     const key = `${row}:${col}`
     const timer = window.setTimeout(() => {
-      suppressClick.current = key
-      quarantineCell(row, col)
-      navigator.vibrate?.(22)
+      if (longPress.current?.key === key) longPress.current.ready = true
     }, 430)
-    longPress.current = { key, timer, x: event.clientX, y: event.clientY }
+    longPress.current = { key, timer, x: event.clientX, y: event.clientY, ready: false }
   }
 
   function pointerMove(event: React.PointerEvent) {
@@ -216,24 +219,53 @@ export function GameScreen({
     if (!press || event.pointerType !== 'touch') return
     if (Math.hypot(event.clientX - press.x, event.clientY - press.y) > 12) {
       window.clearTimeout(press.timer)
-      suppressClick.current = press.key
+      suppressClick.current = { key: press.key, expires: performance.now() + 700 }
       longPress.current = null
     }
   }
 
-  function pointerEnd() {
+  function pointerEnd(event: React.PointerEvent, row: number, col: number) {
+    // Browser contextmenu may open on right-button down. We suppress it and
+    // quarantine only when the right mouse button is released.
+    if (event.pointerType === 'mouse') {
+      if (event.button === 2) quarantineCell(row, col)
+      return
+    }
+    if (event.pointerType !== 'touch') return
+
     const press = longPress.current
     if (!press) return
     window.clearTimeout(press.timer)
+    longPress.current = null
+    if (press.key !== `${row}:${col}`) return
+
+    const rect = event.currentTarget.getBoundingClientRect()
+    const inside = event.clientX >= rect.left && event.clientX <= rect.right
+      && event.clientY >= rect.top && event.clientY <= rect.bottom
+    if (!inside) {
+      suppressClick.current = { key: press.key, expires: performance.now() + 700 }
+      return
+    }
+    if (!press.ready) return
+
+    suppressClick.current = { key: press.key, expires: performance.now() + 700 }
+    quarantineCell(row, col)
+    navigator.vibrate?.(22)
+  }
+
+  function pointerCancel() {
+    const press = longPress.current
+    if (!press) return
+    window.clearTimeout(press.timer)
+    suppressClick.current = { key: press.key, expires: performance.now() + 700 }
     longPress.current = null
   }
 
   function handleClick(row: number, col: number) {
     const key = `${row}:${col}`
-    if (suppressClick.current === key) {
-      suppressClick.current = null
-      return
-    }
+    const suppressed = suppressClick.current
+    suppressClick.current = null
+    if (suppressed?.key === key && performance.now() <= suppressed.expires) return
     activateCell(row, col)
   }
 
@@ -267,16 +299,16 @@ export function GameScreen({
       <div className="scanlines" />
       <header className="game-topbar">
         <div className="game-brand">
-          <div className="brand-line"><span className="brand-mark" />SIGNAL//BREACH</div>
+          <div className="brand-line"><span className="brand-mark" />SIGNAL // BREACH</div>
           <div className="brand-sub">relay recovery / anomaly isolation protocol</div>
         </div>
         <div className="game-top-actions">
           {session.kind === 'campaign' && session.mission && (
             <button className="chip-btn operation-chip" onClick={onOperations}><span className="dot active-dot" />OP {String(session.mission.id).padStart(2, '0')} / 10</button>
           )}
-          <button className={`chip-btn audio-chip ${audioOn ? 'active' : ''}`} onClick={onAudioToggle}><span className="dot" /><span className="audio-label">{audioOn ? t.audioOn : t.audioOff}</span></button>
-          <button className="chip-btn restart-chip" onClick={resetGame} aria-label={t.newSession}><span className="restart-icon">↻</span><span className="restart-label">{t.newSession}</span></button>
-          <button className="chip-btn menu-chip" onClick={onMenu}><span>⌂</span><span className="menu-label">{t.menu}</span></button>
+          <button type="button" className={`chip-btn audio-chip audio-toggle ${audioOn ? 'active' : ''}`} onClick={onAudioToggle} aria-label={audioOn ? t.audioOn : t.audioOff} title={audioOn ? t.audioOn : t.audioOff} aria-pressed={audioOn}>{audioOn ? <Volume2 size={17} strokeWidth={1.8} aria-hidden="true" /> : <VolumeX size={17} strokeWidth={1.8} aria-hidden="true" />}<span className="audio-label">{audioOn ? t.audioOn : t.audioOff}</span></button>
+          <button type="button" className="chip-btn restart-chip" onClick={resetGame} aria-label={t.newSession}><RotateCcw size={17} strokeWidth={1.8} aria-hidden="true" /><span className="restart-label">{t.newSession}</span></button>
+          <button type="button" className="chip-btn menu-chip" onClick={onMenu} aria-label={t.menu}><House size={17} strokeWidth={1.8} aria-hidden="true" /><span className="menu-label">{t.menu}</span></button>
         </div>
       </header>
 
@@ -298,7 +330,7 @@ export function GameScreen({
         <div className={`game-content ${boardScrollable ? 'pannable-map' : ''}`}>
           <div className="board-shell">
             <div className="board-wrap">
-              <div className="coords-top"><span>{t.nodeMap} / X:{String(revealedSafe).padStart(2, '0')}</span><span>GRID {String(session.rows).padStart(2, '0')}×{String(session.cols).padStart(2, '0')}</span></div>
+              <div className="coords-top"><span>{t.nodeMap} / X:{String(revealedSafe).padStart(2, '0')}</span><span>{t.gridLabel} {String(session.rows).padStart(2, '0')}{t.gridSeparator}{String(session.cols).padStart(2, '0')}</span></div>
               <div className="board" role="grid" aria-label={t.nodeMap} style={{ gridTemplateColumns: `repeat(${session.cols}, minmax(${cellMin}px, 1fr))` }}>
                 {board.cells.map((cell) => {
                   const classes = ['cell']
@@ -314,11 +346,11 @@ export function GameScreen({
                       className={classes.join(' ')}
                       aria-label={cellLabel(cell.row, cell.col)}
                       onClick={() => handleClick(cell.row, cell.col)}
-                      onContextMenu={(event: { preventDefault(): void }) => { event.preventDefault(); quarantineCell(cell.row, cell.col) }}
+                      onContextMenu={(event: { preventDefault(): void }) => event.preventDefault()}
                       onPointerDown={(event: React.PointerEvent) => pointerDown(event, cell.row, cell.col)}
                       onPointerMove={pointerMove}
-                      onPointerUp={pointerEnd}
-                      onPointerCancel={pointerEnd}
+                      onPointerUp={(event: React.PointerEvent) => pointerEnd(event, cell.row, cell.col)}
+                      onPointerCancel={pointerCancel}
                     >
                       {cell.revealed && cell.mine ? <span className="mine-core" aria-hidden="true" /> : null}
                       {cell.quarantined && !cell.revealed ? <span className="flag-core" aria-hidden="true" /> : null}

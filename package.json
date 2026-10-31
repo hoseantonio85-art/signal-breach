@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit -p tsconfig.json && vite build",
-    "preview": "vite preview"
+    "build": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "check:terminology": "node scripts/check-ui-terminology.mjs",
+    "check:card-layout": "node scripts/check-card-layout.mjs",
+    "check:audio-toggle": "node scripts/check-audio-toggle.mjs"
   },
   "dependencies": {
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "lucide-react": "^1.65.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.10",
@@ -18,5 +22,8 @@
     "@vitejs/plugin-react": "^5.0.4",
     "typescript": "^5.9.2",
     "vite": "^7.1.7"
+  },
+  "overrides": {
+    "rollup": "4.67.2"
   }
 }

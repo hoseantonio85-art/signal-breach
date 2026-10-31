@@ -1,3 +1,5 @@
+const corruptionCountLabel = 'ЗАРАЖЕНИЕ'
+
 export const ru = {
   language: 'Язык',
   systemReady: 'СИСТЕМА ГОТОВА',
@@ -11,10 +13,12 @@ export const ru = {
   operations: 'ОПЕРАЦИИ',
   globalIncident: 'ГЛОБАЛЬНЫЙ ИНЦИДЕНТ',
   globalIncidentCopy: 'Связанное заражение распространяется по глобальной сети ретрансляторов.',
-  corruption: 'заражений',
+  gridLabel: 'СЕТКА',
+  gridSeparator: '×',
+  corruption: corruptionCountLabel,
   ready: 'ГОТОВО',
   locked: 'ЗАКРЫТО',
-  restored: 'ВОССТАНОВЛЕНО',
+  completed: 'ВЫПОЛНЕНО',
   signalScore: 'SIGNAL SCORE',
   storyProtocol: 'СЮЖЕТНЫЙ ПРОТОКОЛ',
   diagnosticMode: 'ДИАГНОСТИЧЕСКИЙ РЕЖИМ',
@@ -34,7 +38,7 @@ export const ru = {
   linkActive: 'LINK ACTIVE',
   signalLost: 'SIGNAL LOST',
   signalStable: 'SIGNAL STABLE',
-  corruptNodes: 'ЗАРАЖЁННЫЕ УЗЛЫ',
+  corruptNodes: corruptionCountLabel,
   estimated: 'ОЦЕНКА',
   traceTime: 'ВРЕМЯ ТРАССИРОВКИ',
   integrity: 'ЦЕЛОСТНОСТЬ',

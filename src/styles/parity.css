@@ -367,3 +367,120 @@
     to{opacity:.78;filter:drop-shadow(0 0 6px rgba(113,241,255,.38)) brightness(1.14)}
   }
 }
+
+/* Library SVG actions retain a stable 17px outline in compact controls. */
+.chip-btn > svg {
+  flex: 0 0 auto;
+  display: block;
+}
+
+/* Main navigation: compact icon-only sound + direct RU/EN toggle, no select chevron. */
+.topbar .top-actions {
+  flex: 0 0 auto;
+  gap: 6px;
+}
+.topbar .wordmark {
+  min-width: 0;
+  white-space: nowrap;
+}
+.topbar .menu-utility-btn {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+}
+.topbar .menu-language-btn {
+  font: 800 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.02em;
+}
+/* Sound uses one visual state on all screens, including the live game.
+   The enabled outline glows; the disabled icon stays neutral. */
+.chip-btn.audio-toggle.active {
+  color: var(--cyan);
+  border-color: rgba(113,241,255,.35);
+  background: rgba(113,241,255,.055);
+}
+.chip-btn.audio-toggle.active > svg {
+  filter: drop-shadow(0 0 5px rgba(113,241,255,.65));
+}
+@media (max-width: 360px) {
+  .topbar .wordmark { font-size: 12px; }
+}
+
+
+/* Boot wordmark uses the same approved Unbounded display face as the
+   main title. Keep the loading bar and small terminal labels monospaced. */
+html[data-display-font] .boot-screen .brand {
+  font-family: var(--signal-display-font), ui-sans-serif, sans-serif;
+  font-weight: 700;
+  font-synthesis: none;
+  font-size: clamp(16px, 4.3vw, 23px);
+  line-height: 1.3;
+  letter-spacing: .01em;
+  word-spacing: .13em;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Approved Unbounded display typography; alternatives remain in ?font= preview. */
+html[data-display-font] :is(
+  h1, h2,
+  .mode-card strong,
+  .mission-card strong,
+  .difficulty-card b,
+  .state-title,
+  .title-code
+) {
+  font-family: var(--signal-display-font), ui-sans-serif, sans-serif;
+  font-weight: 700;
+  font-synthesis: none;
+}
+
+html[data-display-font] .menu-hero-page h1 {
+  font-size: clamp(21px, 5vw, 52px);
+  line-height: 1.18;
+  letter-spacing: 0.005em;
+  word-spacing: 0.13em;
+  white-space: nowrap;
+}
+
+html[data-display-font] .content-panel .panel-head h2 {
+  font-size: clamp(19px, 3.25vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+html[data-display-font] .briefing-card-page h2 {
+  font-size: clamp(20px, 4vw, 30px);
+  line-height: 1.2;
+  letter-spacing: 0.005em;
+}
+
+html[data-display-font] .mode-card strong {
+  font-size: clamp(15px, 1.7vw, 18px);
+  letter-spacing: 0;
+}
+
+html[data-display-font] .difficulty-card b {
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+html[data-display-font] .state-title {
+  font-size: clamp(22px, 4vw, 34px);
+  line-height: 1.2;
+  letter-spacing: 0.005em;
+}
+
+@media(max-width:760px) {
+  html[data-display-font] .menu-hero-page h1 {
+    font-size: clamp(17px, 5.4vw, 38px);
+  }
+  html[data-display-font] .content-panel .panel-head h2 {
+    font-size: clamp(17px, 4.8vw, 24px);
+  }
+}

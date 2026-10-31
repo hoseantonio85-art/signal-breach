@@ -1,0 +1,32 @@
+/* Consistent bottom alignment for the other repeated selection-card patterns.
+   Mission cards have their own dedicated component and stylesheet. */
+
+/* Two main-menu mode cards contain descriptions of different lengths. */
+.mode-grid > .mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.mode-grid > .mode-card > small {
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+/* Campaign has a progress bar beneath its footer. Reserve that exact
+   14px gap + 2px bar on Free Run, without drawing a fake progress bar. */
+.mode-grid > .mode-card:not(.primary-card) > small {
+  padding-bottom: 16px;
+}
+
+/* Free Run density cards similarly keep the supporting label at the bottom. */
+.difficulty-cards > .difficulty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.difficulty-cards > .difficulty-card > em {
+  margin-top: auto;
+  padding-top: 12px;
+}

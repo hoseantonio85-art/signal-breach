@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Volume2, VolumeX } from 'lucide-react'
 import { audioEngine } from '../audio/audioEngine'
 import { missions } from '../campaign/missions'
+import { MissionCard } from '../components/MissionCard'
+import { MissionMetrics } from '../components/MissionMetrics'
 import type { GameSession, Language, Mission } from '../game/types'
 import { dictionaries } from '../i18n'
 import { GameScreen, type CampaignResult } from '../screens/GameScreen'
@@ -102,7 +105,7 @@ export function App() {
     return (
       <main className="boot-screen">
         <div className="boot-copy">
-          <div className="brand">SIGNAL//BREACH</div>
+          <div className="brand">SIGNAL // BREACH</div>
           <div className="boot-sub">RELAY RECOVERY TERMINAL</div>
           <div className="boot-track"><i /></div>
           <div className="micro">HANDSHAKE / NODE MAP / INTEGRITY CHECK / READY</div>
@@ -133,14 +136,29 @@ export function App() {
     <main className="shell">
       <div className="scanlines" />
       <header className="topbar">
-        <button className="wordmark" onClick={() => setScreen('menu')}>SIGNAL//BREACH</button>
+        <button className="wordmark" onClick={() => setScreen('menu')}>SIGNAL // BREACH</button>
         <div className="top-actions">
-          {screen === 'menu' && (
-            <select value={language} onChange={(event: { target: { value: string } }) => setLanguage(event.target.value as Language)} aria-label={t.language}>
-              <option value="ru">RU</option><option value="en">EN</option>
-            </select>
+          {(screen === 'menu' || screen === 'campaign' || screen === 'free') && (
+            <button
+              type="button"
+              className="chip-btn menu-utility-btn menu-language-btn"
+              onClick={() => setLanguage((current) => current === 'ru' ? 'en' : 'ru')}
+              aria-label={language === 'ru' ? 'Переключить язык на английский' : 'Switch language to Russian'}
+              title={language === 'ru' ? 'English' : 'Русский'}
+            >
+              {language.toUpperCase()}
+            </button>
           )}
-          <button className={`chip-btn ${audioOn ? 'active' : ''}`} onClick={toggleAudio}><span className="dot" />{audioOn ? t.audioOn : t.audioOff}</button>
+          <button
+            type="button"
+            className={`chip-btn menu-utility-btn menu-audio-btn audio-toggle ${audioOn ? 'active' : ''}`}
+            onClick={toggleAudio}
+            aria-label={audioOn ? t.audioOn : t.audioOff}
+            title={audioOn ? t.audioOn : t.audioOff}
+            aria-pressed={audioOn}
+          >
+            {audioOn ? <Volume2 size={17} strokeWidth={1.8} aria-hidden="true" /> : <VolumeX size={17} strokeWidth={1.8} aria-hidden="true" />}
+          </button>
         </div>
       </header>
 
@@ -149,7 +167,7 @@ export function App() {
           <div className="menu-hero-page">
             <div className="menu-sigil" />
             <div className="eyebrow">SIGNAL COMMAND // {t.systemReady}</div>
-            <h1>SIGNAL//BREACH</h1>
+            <h1>SIGNAL // BREACH</h1>
             <p className="lead">{t.globalIncidentCopy}</p>
           </div>
           <div className="menu-body-page">
@@ -187,32 +205,30 @@ export function App() {
             </div>
           </div>
           <div className="mission-grid">
-            {missions.map((mission) => {
-              const unlocked = mission.id <= progress.unlockedMission
-              const completed = progress.completed[mission.id]
-              return (
-                <button className={`mission-card ${completed ? 'completed' : ''} ${mission.id === progress.unlockedMission ? 'current' : ''}`} disabled={!unlocked} key={mission.id} onClick={() => openMission(mission.id)}>
-                  <span>OP {String(mission.id).padStart(2, '0')}</span>
-                  <strong>{mission.code}</strong>
-                  <small>{mission.rows}×{mission.cols} / {mission.mines} {t.corruption}</small>
-                  <em>{!unlocked ? t.locked : completed ? `${t.restored} / ${completed.bestRank}` : t.ready}</em>
-                </button>
-              )
-            })}
-          </div>
+            {missions.map((mission) => (
+              <MissionCard
+                key={mission.id}
+                mission={mission}
+                progress={progress}
+                t={t}
+                onSelect={openMission}
+              />
+            ))}          </div>
         </section>
       )}
 
       {screen === 'free' && (
         <section className="content-panel compact">
           <div className="panel-head">
-            <div><div className="eyebrow">SIGNAL//BREACH // {t.diagnosticMode}</div><h2>{t.freeRun}</h2><p className="panel-copy">{t.chooseDensity}</p></div>
+            <div><div className="eyebrow">SIGNAL // BREACH // {t.diagnosticMode}</div><h2>{t.freeRun}</h2><p className="panel-copy">{t.chooseDensity}</p></div>
             <button className="ghost" onClick={() => setScreen('menu')}>×</button>
           </div>
           <div className="difficulty-cards">
             {freePresets.map((preset) => (
               <button className="difficulty-card" key={preset.key} onClick={() => startFree(preset)}>
-                <b>{preset.label}</b><span>{preset.rows}×{preset.cols} / {preset.mines}</span><em>{t[preset.description]}</em>
+                <b>{preset.label}</b>
+                <MissionMetrics rows={preset.rows} cols={preset.cols} mines={preset.mines} t={t} variant="free" />
+                <em>{t[preset.description]}</em>
               </button>
             ))}
           </div>
@@ -227,7 +243,10 @@ export function App() {
             <h2>{selectedMission.code}</h2>
             <div className="briefing-location">{selectedMission.location[language]}</div>
             <div className="voss-line"><span className="voss-sigil">V</span><div><b>{t.colonelVoss}</b><p>{selectedMission.briefing[language]}</p></div></div>
-            <div className="briefing-grid"><span>{selectedMission.rows}×{selectedMission.cols}</span><span>{selectedMission.mines} {t.corruption}</span><span>PAR {formatPar(selectedMission.parSeconds)}</span></div>
+            <div className="briefing-grid">
+              <MissionMetrics rows={selectedMission.rows} cols={selectedMission.cols} mines={selectedMission.mines} t={t} variant="briefing" />
+              <span>PAR {formatPar(selectedMission.parSeconds)}</span>
+            </div>
             <div className="briefing-actions"><button className="secondary" onClick={() => setScreen('campaign')}>{t.back}</button><button className="primary" onClick={() => startMission(selectedMission)}>{t.startOperation}</button></div>
           </section>
         </div>
