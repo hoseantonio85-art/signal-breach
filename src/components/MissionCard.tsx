@@ -1,4 +1,5 @@
 import { CircleCheck } from 'lucide-react'
+import { MissionMetrics } from './MissionMetrics'
 import type { Mission } from '../game/types'
 import type { Dictionary } from '../i18n'
 import type { Progress } from '../stores/progress'
@@ -46,10 +47,7 @@ export function MissionCard({ mission, progress, t, onSelect }: MissionCardProps
       <strong className="mission-card-title">{mission.code}</strong>
 
       <div className="mission-card-footer">
-        <small className="mission-card-details">
-          <span className="mission-card-grid-size">{mission.rows}×{mission.cols}</span>
-          <span className="mission-card-bug-count">{mission.mines}&nbsp;{t.corruption}</span>
-        </small>
+        <MissionMetrics rows={mission.rows} cols={mission.cols} mines={mission.mines} t={t} />
         <span className="mission-status">{statusLabel}</span>
       </div>
     </button>
