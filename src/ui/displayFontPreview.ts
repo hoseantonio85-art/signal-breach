@@ -1,6 +1,7 @@
 /**
  * Test-only typography switch for GitHub Pages preview:
  * /signal-breach/preview/?font=unbounded|tektur|russo
+ * Display fonts are linked in index.html before the brief boot screen.
  * The production Android version must bundle approved font files locally.
  */
 const choices = {
@@ -18,8 +19,4 @@ const selected = query && Object.prototype.hasOwnProperty.call(choices, query) ?
   document.documentElement.dataset.displayFont = selected
   document.documentElement.style.setProperty('--signal-display-font', family)
 
-  const sheet = document.createElement('link')
-  sheet.rel = 'stylesheet'
-  sheet.href = 'https://fonts.googleapis.com/css2?family=Russo+One&family=Tektur:wght@500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap'
-  document.head.appendChild(sheet)
 }
