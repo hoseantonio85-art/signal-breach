@@ -14,6 +14,8 @@ export const en = {
   operations: 'OPERATIONS',
   globalIncident: 'GLOBAL RELAY INCIDENT',
   globalIncidentCopy: 'A connected corruption event is spreading through the global relay mesh.',
+  gridLabel: 'GRID',
+  gridSeparator: '×',
   corruption: bugCountLabel,
   ready: 'READY',
   locked: 'LOCKED',
