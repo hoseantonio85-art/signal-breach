@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit -p tsconfig.json && vite build",
-    "preview": "vite preview"
+    "build": "npm run check:terminology && tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "check:terminology": "node scripts/check-ui-terminology.mjs"
   },
   "dependencies": {
     "react": "^19.1.1",
