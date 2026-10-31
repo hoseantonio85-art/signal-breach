@@ -210,7 +210,7 @@ export function App() {
                 <button className={`mission-card ${completed ? 'completed' : ''} ${mission.id === progress.unlockedMission ? 'current' : ''}`} disabled={!unlocked} key={mission.id} onClick={() => openMission(mission.id)}>
                   <span>OP {String(mission.id).padStart(2, '0')}</span>
                   <strong>{mission.code}</strong>
-                  <small>{mission.rows}×{mission.cols} / {mission.mines} {language === 'en' ? 'BUGS' : t.corruption}</small>
+                  <small>{mission.rows}×{mission.cols} / {mission.mines} {t.corruption}</small>
                   <em>{!unlocked ? t.locked : completed ? `${t.restored} / ${completed.bestRank}` : t.ready}</em>
                 </button>
               )
@@ -228,7 +228,7 @@ export function App() {
           <div className="difficulty-cards">
             {freePresets.map((preset) => (
               <button className="difficulty-card" key={preset.key} onClick={() => startFree(preset)}>
-                <b>{preset.label}</b><span>{preset.rows}×{preset.cols} / {preset.mines}</span><em>{t[preset.description]}</em>
+                <b>{preset.label}</b><span>{preset.rows}×{preset.cols} / {preset.mines} {t.corruption}</span><em>{t[preset.description]}</em>
               </button>
             ))}
           </div>
