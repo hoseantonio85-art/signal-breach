@@ -395,8 +395,15 @@
   font: 800 11px ui-monospace, SFMono-Regular, Menlo, monospace;
   letter-spacing: 0.02em;
 }
-.topbar .menu-audio-btn.active {
+/* Sound uses one visual state on all screens, including the live game.
+   The enabled outline glows; the disabled icon stays neutral. */
+.chip-btn.audio-toggle.active {
   color: var(--cyan);
+  border-color: rgba(113,241,255,.35);
+  background: rgba(113,241,255,.055);
+}
+.chip-btn.audio-toggle.active > svg {
+  filter: drop-shadow(0 0 5px rgba(113,241,255,.65));
 }
 @media (max-width: 360px) {
   .topbar .wordmark { font-size: 12px; }
