@@ -10,6 +10,9 @@ import { GameScreen, type CampaignResult } from '../screens/GameScreen'
 import { loadProgress, saveProgress, type Progress } from '../stores/progress'
 import { loadLanguage, saveLanguage } from '../stores/settings'
 import { clearActiveSession, readActiveSession, sessionFromSave, type ActiveSession } from '../stores/activeSession'
+import { exportProgressBackup, mergeProgress, parseProgressBackup } from '../stores/progressBackup'
+import { Capacitor } from '@capacitor/core'
+import { Clipboard } from '@capacitor/clipboard'
 
 type Screen = 'boot' | 'menu' | 'campaign' | 'free' | 'briefing' | 'game'
 
@@ -39,6 +42,9 @@ export function App() {
   const [restoredSession, setRestoredSession] = useState<ActiveSession | null>(null)
   const [pendingSession, setPendingSession] = useState<GameSession | null>(null)
   const [gameRun, setGameRun] = useState(0)
+  const [backupOpen, setBackupOpen] = useState(false)
+  const [backupInput, setBackupInput] = useState('')
+  const [backupStatus, setBackupStatus] = useState<'copied' | 'restored' | 'invalid' | 'error' | null>(null)
   const t = dictionaries[language]
 
   const totalScore = useMemo(
@@ -80,6 +86,33 @@ export function App() {
     const next = !audioOn
     setAudioOn(next)
     await audioEngine.setEnabled(next)
+  }
+
+  async function copyBackup() {
+    setBackupStatus(null)
+    const code = exportProgressBackup(progress)
+    try {
+      if (Capacitor.isNativePlatform()) await Clipboard.write({ string: code, label: 'SIGNAL BREACH backup' })
+      else if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(code)
+      else throw new Error('Clipboard unavailable')
+      setBackupStatus('copied')
+    } catch {
+      setBackupStatus('error')
+    }
+  }
+
+  function restoreBackup() {
+    const candidate = parseProgressBackup(backupInput)
+    if (!candidate) { setBackupStatus('invalid'); return }
+    const combined = mergeProgress(progress, candidate)
+    try {
+      saveProgress(combined)
+      setProgress(combined)
+      setBackupInput('')
+      setBackupStatus('restored')
+    } catch {
+      setBackupStatus('error')
+    }
   }
 
   function openMission(missionId: number) {
@@ -256,6 +289,7 @@ export function App() {
               </button>
             </div>
             <div className="menu-meta-row"><span>{t.localProgress}</span><span>{`v${__APP_VERSION__} // ${__BUILD_TARGET__}`}</span></div>
+            <button type="button" className="backup-entry" onClick={() => { setBackupOpen(true); setBackupStatus(null) }}>{t.backupTitle}</button>
           </div>
         </section>
       )}
@@ -320,6 +354,26 @@ export function App() {
           </section>
         </div>
       )}
+      {backupOpen && (
+        <div className="modal-layer" role="presentation">
+          <section className="help-card backup-dialog" role="dialog" aria-modal="true" aria-label={t.backupTitle}>
+            <div className="state-kicker">SIGNAL // BREACH / LOCAL DATA</div>
+            <h2>{t.backupTitle}</h2>
+            <p>{t.backupDescription}</p>
+            <label className="backup-field-label" htmlFor="backup-output">{t.backupSaveLabel}</label>
+            <textarea id="backup-output" className="backup-code" value={exportProgressBackup(progress)} readOnly rows={3} />
+            <button type="button" className="secondary" onClick={copyBackup}>{t.backupCopy}</button>
+            <label className="backup-field-label" htmlFor="backup-input">{t.backupRestoreLabel}</label>
+            <textarea id="backup-input" className="backup-code" value={backupInput} onChange={(event) => { setBackupInput(event.target.value); setBackupStatus(null) }} placeholder={t.backupPlaceholder} rows={3} />
+            <div className="session-replace-actions">
+              <button type="button" className="secondary" onClick={() => setBackupOpen(false)}>{t.close}</button>
+              <button type="button" className="primary" onClick={restoreBackup}>{t.backupRestore}</button>
+            </div>
+            {backupStatus && <p className="backup-feedback" role="status" aria-live="polite">{t[backupStatus === 'copied' ? 'backupCopied' : backupStatus === 'restored' ? 'backupRestored' : backupStatus === 'invalid' ? 'backupInvalid' : 'backupError']}</p>}
+          </section>
+        </div>
+      )}
+
       {pendingSession && (
         <div className="modal-layer" role="presentation">
           <section className="help-card session-replace-dialog" role="dialog" aria-modal="true" aria-label={t.replaceSessionTitle}>

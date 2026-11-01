@@ -55,3 +55,22 @@ The Python 3 script needs no pip packages and deterministically writes:
 The native directory is regenerated in CI, so the generator is part of the release build and must be kept in the repository. **First successful branded-icon APK:** [Actions run 41247085110](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41247085110), artifact `signal-breach-android-debug`. Verify the resulting launcher icon on a real device and in the RuStore icon upload before release.
 
 **IMPORTANT: Existing player data.** The initial installed debug APK may use a different auto-generated debug signing certificate. Updating it in-place can fail; uninstalling can wipe campaign progress. Do not ask the tester to uninstall or overwrite their OP 07/08 progress until an export/import or verified recovery path exists. Track in [issue #7](https://github.com/hoseantonio85-art/signal-breach/issues/7).
+
+## P0: Lost campaign progression after uninstall (2026-11-01)
+**Confirmed:** installed test APK could not update in-place ("package conflict"); on uninstall/reinstall, campaign progress was wiped. Earlier retention on uninstall was non-deterministic Android backup behavior. This is a real user data-loss incident. **DO NOT recommend an uninstall/install of a tester APK with valuable progress.**
+
+### Persistent debug signing setup (owner action required)
+CI now **fails before producing any tester APK** unless the GitHub Actions secret `SIGNAL_BREACH_DEBUG_KEYSTORE_B64` exists. The secret is a stable Android **debug** keystore generated once and held privately. GitHub Actions decodes it into `~/.android/debug.keystore`, the standard Gradle debug signing identity, and logs its certificate SHA-256 fingerprint (not the private key). The debug alias is `androiddebugkey`, store/key password `android`.
+
+On a **trusted computer with Java keytool**, generate a brand-new test key once:
+```sh
+keytool -genkeypair -v -keystore signal-breach-debug.keystore -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 3072 -validity 10000 -dname "CN=SIGNAL BREACH Internal Test,O=Internal Android QA,C=DE"
+base64 -w 0 signal-breach-debug.keystore > signing-secret-base64.txt
+```
+On macOS, use `base64 < signal-breach-debug.keystore | tr -d '\n' > signing-secret-base64.txt`.
+
+In GitHub repository: Settings → Secrets and variables → Actions → New repository secret → name `SIGNAL_BREACH_DEBUG_KEYSTORE_B64`, value = contents of `signing-secret-base64.txt`. Keep the original keystore in secure private storage for future builds; **never commit it, the base64 value, or the password file to the public repository**. Wipe temporary base64 text after updating secrets.
+
+**Critical:** this *new permanent test key* will not match previous ephemeral debug APK certificates. Any existing installation still signed with an old ephemeral key requires explicit progress export before transitioning. The code in v0.2.4 adds a manual **Campaign Progress Backup**: copy the code to private notes or Telegram Saved Messages before uninstall, then import it after reinstall. It does not back up unfinished boards and cannot recover data already lost. After this one-time transition, further v0.2.4+ builds signed with the same persistent key should update without uninstall; check both signature fingerprint and monotonically increasing versionCode.
+
+Never reuse this test key for RuStore release: create a separate private **production release signing key** and publish signed release artifacts only after final QA.

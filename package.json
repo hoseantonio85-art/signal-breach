@@ -1,12 +1,12 @@
 {
   "name": "signal-breach",
   "private": false,
-  "version": "0.2.3",
+  "version": "0.2.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && npm run test:share && tsc --noEmit -p tsconfig.json && vite build",
-    "build:android": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && npm run test:share && tsc --noEmit -p tsconfig.json && vite build --mode android && node scripts/check-android-dist.mjs",
+    "build": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && npm run test:share && npm run test:backup && tsc --noEmit -p tsconfig.json && vite build",
+    "build:android": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && npm run test:share && npm run test:backup && tsc --noEmit -p tsconfig.json && vite build --mode android && node scripts/check-android-dist.mjs",
     "preview": "vite preview",
     "check:terminology": "node scripts/check-ui-terminology.mjs",
     "check:card-layout": "node scripts/check-card-layout.mjs",
@@ -16,7 +16,8 @@
     "android:init": "npm run android:configure && npx cap add android && npx cap sync android",
     "android:sync": "npm run build:android && npm run android:configure && npx cap sync android",
     "check:version": "node scripts/check-ui-version.mjs",
-    "test:share": "node --experimental-strip-types --test tests/share-result.test.mjs"
+    "test:share": "node --experimental-strip-types --test tests/share-result.test.mjs",
+    "test:backup": "node --experimental-strip-types --test tests/progress-backup.test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",
@@ -25,7 +26,8 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "lucide-react": "^1.65.0",
-    "@capacitor/share": "8.0.1"
+    "@capacitor/share": "8.0.1",
+    "@capacitor/clipboard": "8.0.1"
   },
   "devDependencies": {
     "@capacitor/cli": "8.6.0",
