@@ -60,6 +60,8 @@ The native directory is regenerated in CI, so the generator is part of the relea
 **Confirmed:** installed test APK could not update in-place ("package conflict"); on uninstall/reinstall, campaign progress was wiped. Earlier retention on uninstall was non-deterministic Android backup behavior. This is a real user data-loss incident. **DO NOT recommend an uninstall/install of a tester APK with valuable progress.**
 
 ### Persistent debug signing setup (owner action required)
+The assistant also generated a **test-only signing keystore** for owner setup in the private ChatGPT session (2026-11-01). If the owner chooses to install that specific secret, its **public certificate SHA-256 fingerprint** must equal `DF:9E:EF:3F:A2:5A:95:7F:3E:4D:E8:4D:0C:B9:37:5E:1C:E7:10:1C:97:39:1C:94:35:B6:8F:06:6F:51:85:E6`. This fingerprint is public information; **private key bytes must never be committed**. If the owner generates a different key instead, document its fingerprint and use it consistently from that point forward.
+
 CI now **fails before producing any tester APK** unless the GitHub Actions secret `SIGNAL_BREACH_DEBUG_KEYSTORE_B64` exists. The secret is a stable Android **debug** keystore generated once and held privately. GitHub Actions decodes it into `~/.android/debug.keystore`, the standard Gradle debug signing identity, and logs its certificate SHA-256 fingerprint (not the private key). The debug alias is `androiddebugkey`, store/key password `android`.
 
 On a **trusted computer with Java keytool**, generate a brand-new test key once:
