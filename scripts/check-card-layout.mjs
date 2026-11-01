@@ -45,6 +45,17 @@ assert.match(block(css, '.campaign-panel .mission-card-top'), /height:\s*20px/,
   'Header must be aligned to the top with a stable height')
 assert.match(block(css, '.campaign-panel .mission-card .mission-card-top > span'), /color:\s*var\(--cyan\)/,
   'OP numbers must retain the original cyan regardless of mission status')
+assert.match(block(css, '.campaign-panel .mission-complete-icon'), /position:\s*absolute/,
+  'Completion check must be positioned relative to the card')
+assert.match(block(css, '.campaign-panel .mission-complete-icon'), /top:\s*var\(--mission-check-inset\)/,
+  'Completion check must use top inset')
+assert.match(block(css, '.campaign-panel .mission-complete-icon'), /right:\s*var\(--mission-check-inset\)/,
+  'Completion check must use exactly the same right inset')
+assert.match(block(css, '.campaign-panel .mission-card'), /--mission-check-inset:\s*18px/,
+  'Desktop completion icon offset is 18px')
+assert.match(css, /@media \(max-width: 390px\)[\s\S]*?--mission-check-inset:\s*12px/,
+  'Mobile completion icon offset matches 12px horizontal padding')
+
 for (const status of ['ready', 'completed', 'locked']) {
   assert.doesNotMatch(css, new RegExp('mission-card\\.status-' + status + '[^\\{]*mission-card-top\\s*>\\s*span'),
     'Do not recolor operation numbers for individual statuses')

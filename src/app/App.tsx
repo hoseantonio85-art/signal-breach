@@ -177,7 +177,7 @@ export function App() {
                 <small>TRACE / BREACH / BLACK ICE</small>
               </button>
             </div>
-            <div className="menu-meta-row"><span>{t.localProgress}</span><span>{t.build}</span></div>
+            <div className="menu-meta-row"><span>{t.localProgress}</span><span>{`v${__APP_VERSION__} // ${__BUILD_TARGET__}`}</span></div>
           </div>
         </section>
       )}

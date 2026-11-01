@@ -1,0 +1,71 @@
+# R1 — Android debug build (Capacitor 8)
+
+**Status (2026-11-01):** First debug APK **built and uploaded successfully** in [Actions run 41243617194](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194); artifact `signal-breach-android-debug` (ZIP with `app-debug.apk`, expires 2026-11-14). **Real Android device QA has not yet been performed.**
+
+## What is implemented
+- The ordinary Vite build keeps `/signal-breach/` for GitHub Pages.
+- `npm run build:android` builds relative paths (`./`) and validates the output.
+- Unbounded Variable (weights 200–900, Cyrillic and Latin) is bundled as local WOFF2 through `@fontsource-variable/unbounded@5.3.0`; its SIL OFL license is at `licenses/UNBOUNDED-OFL.txt`.
+- Test-only Tektur/Russo are never requested in Android; the Android HTML strips all Google Fonts links.
+- Capacitor 8.6.0 generates the native Android shell, with `webDir: dist`, through a gitignored `capacitor.config.json`.
+- The owner approved the permanent Android application ID `com.hoseantonio85.signalbreach` on 2026-11-01. The native CI job runs automatically on branch push / PR. No signing secrets are committed.
+
+## Android application ID (approved)
+`com.hoseantonio85.signalbreach` — approved 2026-11-01. It is fixed in `scripts/configure-android.mjs`, and must remain the same for all subsequent Android builds. The generated Capacitor configuration is gitignored; no GitHub Actions variable is required.
+
+## Local (Node 22+, JDK 21, Android SDK)
+```sh
+npm install
+npm run build                 # existing Pages build
+npm run build:android         # Android offline assets, no package ID needed
+npm run android:init          # generates android/ and syncs dist
+(cd android && ./gradlew assembleDebug)
+npm run android:sync          # after modifying web code; then assemble again
+```
+
+## GitHub Actions
+1. Push to `release/android-rustore-v1`, or trigger the Android workflow in Actions.
+2. The `offline-web-bundle` job checks TypeScript, 6 engine tests, HTML URLs, CSS and local WOFF2. `debug-apk` then generates native Android and builds via Gradle using the approved ID.
+3. Under a successful workflow's **Artifacts**, download `signal-breach-android-debug`, unpack its ZIP and install `app-debug.apk` on Android.
+
+## R1 exit criteria (not yet met)
+- [x] Actual APK artifact in [GitHub Actions run 41243617194](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194).
+- [ ] Offline launch on real Android, not only a successful web build.
+- [ ] RU/EN, Unbounded, sound, gameplay, 16×30 map, status bar and safe areas checked on device.
+- [x] Pages source unchanged (`main`); [ ] perform post-install web visual smoke test.
+
+The `android/` directory is deliberately regenerated in CI at this preparation stage; review and version native customizations once the package ID is approved. R2 still includes Android Back, save/resume, background pausing and session protection.
+
+## Android QA feedback (2026-11-01)
+The tester installed the branded APK and confirmed offline launch and visible retained campaign progress, including after uninstall/reinstall. **An in-place upgrade failed**, so the old app was uninstalled before reinstalling. Successful restoration on one device is **not a guaranteed backup strategy**; this may depend on Android Auto Backup. See [#7](https://github.com/hoseantonio85-art/signal-breach/issues/7) for consistent signing and a safe progress export/import option.
+
+## Version source of truth
+- `package.json` is the only manually updated version field, currently **0.2.1**. Vite injects it into main-menu `v0.2.1 // ANDROID` / `v0.2.1 // WEB` at build time; RU/EN no longer hardcode version numbers.
+- CI runs `node scripts/sync-android-version.mjs` after creating the native shell, before Gradle. It writes Android `versionName "0.2.1"` and `versionCode 2001`. Formula is major × 1,000,000 + minor × 1,000 + patch, with guardrails. This makes future package bumps propagate to native build automatically.
+- **VersionCode does not fix signing incompatibility.** Do not uninstall the player's app with valuable progress simply to test a new version. Production updates require stable release signing.
+
+## Branded launcher icon
+The default Capacitor icon is overridden **after** `npm run android:init` and **before** `assembleDebug` by `python3 scripts/generate-android-icons.py android`. The source uses the already approved main-menu sigil (cyan diamond + solid magenta square, dark background), **not** a new logo.
+
+The Python 3 script needs no pip packages and deterministically writes:
+- legacy `ic_launcher.png`, `ic_launcher_round.png` at mdpi–xxxhdpi;
+- adaptive foreground at mdpi–xxxhdpi, dark XML background and adaptive icon XML;
+- a monochrome mask for Android 13+ themed icons.
+
+The native directory is regenerated in CI, so the generator is part of the release build and must be kept in the repository. **First successful branded-icon APK:** [Actions run 41247085110](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41247085110), artifact `signal-breach-android-debug`. Verify the resulting launcher icon on a real device and in the RuStore icon upload before release.
+
+**IMPORTANT: Existing player data.** The initial installed debug APK may use a different auto-generated debug signing certificate. Updating it in-place can fail; uninstalling can wipe campaign progress. Do not ask the tester to uninstall or overwrite their OP 07/08 progress until an export/import or verified recovery path exists. Track in [issue #7](https://github.com/hoseantonio85-art/signal-breach/issues/7).
+
+## STOP: tester package signature mismatch and lost campaign data (2026-11-01)
+An Android debug update failed with package conflict. Owner uninstalled, installed fresh and **campaign progress was erased**. Older apparently successful restoration was not a dependable backup. The cause is likely different ephemeral signing keys; compare APK certificate SHA-256 if available.
+
+**All new tester APK builds from this branch now fail at the signing gate** until GitHub Actions has `SIGNAL_BREACH_DEBUG_KEYSTORE_B64`, containing a single private stable keystore. No one should install an APK by uninstalling an existing app with meaningful progress without explicit export.
+
+Owner setup (one-time, private JDK keytool):
+```sh
+keytool -genkeypair -keystore signal-breach-debug.keystore -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 3072 -validity 10000 -dname "CN=SIGNAL BREACH Internal Test,O=Internal Android QA,C=DE"
+base64 -w 0 signal-breach-debug.keystore > signing-secret-base64.txt
+```
+Add **GitHub → Settings → Secrets and variables → Actions → New repository secret** named `SIGNAL_BREACH_DEBUG_KEYSTORE_B64` with the contents of that base64 file. Keep original key privately; **never commit the key, base64 value or passwords**. A default debug key uses store/key password `android` and alias `androiddebugkey`. CI installs the same private cert under `~/.android/debug.keystore` and prints only its public SHA-256 fingerprint.
+
+First permanent-signed APK will still be incompatible with **old** random-signed installations. To transition, export progress from the old app before uninstalling (the upcoming PR #11 adds code-based backup, not yet in this Android branch), then import. After transition, consistent signer + monotonic versionCode allow in-place updates. Production release needs a **separate secure release key**, never this debug key.

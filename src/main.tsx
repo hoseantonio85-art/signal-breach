@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { App } from './app/App'
+import '@fontsource-variable/unbounded/wght.css'
 import './styles/global.css'
 import './styles/parity.css'
 import './components/MissionCard.css'

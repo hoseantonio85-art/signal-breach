@@ -2,3 +2,8 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# Generated native shell and private/local Android configuration.
+# Native source will be tracked in a subsequent reviewed step after app ID approval.
+android/
+capacitor.config.json

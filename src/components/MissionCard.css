@@ -11,6 +11,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  --mission-check-inset: 18px;
   min-width: 0;
   min-height: 174px;
   height: 100%;
@@ -37,6 +38,10 @@
 .campaign-panel .mission-complete-icon {
   flex: 0 0 auto;
   display: block;
+  position: absolute;
+  /* Use identical top and right insets. */
+  top: var(--mission-check-inset);
+  right: var(--mission-check-inset);
   color: var(--cyan);
   filter: drop-shadow(0 0 5px rgba(113,241,255,.26));
 }
@@ -133,6 +138,7 @@ html[data-display-font] .campaign-panel .mission-card-title {
 
 @media (max-width: 390px) {
   .campaign-panel .mission-card {
+    --mission-check-inset: 12px;
     padding-left: 12px;
     padding-right: 12px;
   }
