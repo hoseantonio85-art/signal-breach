@@ -1,5 +1,8 @@
 type UiSound = 'start' | 'reveal' | 'cascade' | 'flag' | 'tick' | 'loss' | 'win'
 
+// Moderate +3.4 dB increase for Android speakers; keep system volume in control.
+const MASTER_GAIN = 0.62
+
 class SignalAudioEngine {
   private context: AudioContext | null = null
   private master: GainNode | null = null
@@ -24,12 +27,12 @@ class SignalAudioEngine {
     if (!this.context) {
       this.context = new AudioContext()
       this.master = this.context.createGain()
-      this.master.gain.value = 0.42
+      this.master.gain.value = MASTER_GAIN
       this.master.connect(this.context.destination)
     }
 
     if (this.context.state === 'suspended') await this.context.resume()
-    this.master?.gain.setTargetAtTime(0.42, this.context.currentTime, 0.04)
+    this.master?.gain.setTargetAtTime(MASTER_GAIN, this.context.currentTime, 0.04)
     this.startAmbient()
     this.ui('tick')
   }
