@@ -36,6 +36,14 @@ npm run android:sync          # after modifying web code; then assemble again
 
 The `android/` directory is deliberately regenerated in CI at this preparation stage; review and version native customizations once the package ID is approved. R2 still includes Android Back, save/resume, background pausing and session protection.
 
+## Android QA feedback (2026-11-01)
+The tester installed the branded APK and confirmed offline launch and visible retained campaign progress, including after uninstall/reinstall. **An in-place upgrade failed**, so the old app was uninstalled before reinstalling. Successful restoration on one device is **not a guaranteed backup strategy**; this may depend on Android Auto Backup. See [#7](https://github.com/hoseantonio85-art/signal-breach/issues/7) for consistent signing and a safe progress export/import option.
+
+## Version source of truth
+- `package.json` is the only manually updated version field, currently **0.2.1**. Vite injects it into main-menu `v0.2.1 // ANDROID` / `v0.2.1 // WEB` at build time; RU/EN no longer hardcode version numbers.
+- CI runs `node scripts/sync-android-version.mjs` after creating the native shell, before Gradle. It writes Android `versionName "0.2.1"` and `versionCode 2001`. Formula is major × 1,000,000 + minor × 1,000 + patch, with guardrails. This makes future package bumps propagate to native build automatically.
+- **VersionCode does not fix signing incompatibility.** Do not uninstall the player's app with valuable progress simply to test a new version. Production updates require stable release signing.
+
 ## Branded launcher icon
 The default Capacitor icon is overridden **after** `npm run android:init` and **before** `assembleDebug` by `python3 scripts/generate-android-icons.py android`. The source uses the already approved main-menu sigil (cyan diamond + solid magenta square, dark background), **not** a new logo.
 

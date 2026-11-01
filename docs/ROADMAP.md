@@ -21,7 +21,7 @@
 - [x] Подключить локальный Unbounded WOFF2 с лицензией и исключить удалённые Google Fonts из Android HTML. [ ] Подтвердить офлайн на Android-девайсе.
 - [x] Утвердить и зафиксировать Android `applicationId = com.hoseantonio85.signalbreach` (2026-11-01); отдельная Actions variable не требуется.
 - [x] Android Actions: offline bundle, native `assembleDebug`, artifact [signal-breach-android-debug](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41243617194) — всё успешно 2026-11-01. [ ] Скачать и протестировать APK на телефоне.
-- [ ] Установить APK на телефон и проверить загрузку в airplane mode, шрифты, основные экраны и поля.
+- [x] Установить новую APK на телефон; игра запускается без сети и прогресс кампании виден. [ ] Проверить строго airplane mode, шрифты, все экраны и большие поля отдельно.
 - [ ] На этапе первого APK проверить status bar, safe areas, вырезы и жестовую навигацию; полноценное поведение Back и защиту партии завершить в R2.
 - [x] Генератор фирменной Android launcher-иконки (cyan diamond + filled magenta square) с adaptive/round/monochrome; [x] APK собран с иконкой в [Actions run 41247085110](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41247085110); [ ] визуально проверить на телефоне **без удаления старого APK с прогрессом**.
 
@@ -30,6 +30,8 @@
 **Инструкция по сборке:** [ANDROID_BUILD.md](ANDROID_BUILD.md).
 
 **Определение готовности R1:** debug APK скачивается из Actions, устанавливается, запускается без сети; игра открывает карту, шрифты и ассеты локальны; GitHub Pages продолжает работать.
+
+**Результаты полевого QA 2026-11-01:** [x] первый запуск; [x] работа без интернета; [x] прогресс кампании сохранился после переустановки на одном Android-девайсе, однако механизм восстановления не подтверждён. [ ] Полноценная проверка RU/EN, звук, жесты, выигрыш/поражение, scroll 16×30, safe areas, системные Back/фон/сохранение активной партии. [x] Исправлены инкремент версии (package.json 0.2.1 → label + Android versionName/versionCode) и равные top/right отступы галочки CircleCheck в ветке; [ ] визуально проверить оба изменения в APK.
 
 **Риск обновления debug APK:** разные CI debug-подписи могут блокировать установку поверх старого APK. [ ] Подготовить безопасный перенос прогресса/стабильную подпись **до тестовой переустановки**; см. [issue #7](https://github.com/hoseantonio85-art/signal-breach/issues/7).
 
