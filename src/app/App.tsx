@@ -57,6 +57,25 @@ export function App() {
     return () => window.clearTimeout(timer)
   }, [screen])
 
+  useEffect(() => {
+    const updateAudioActivity = () => {
+      if (document.hidden) void audioEngine.suspendForBackground()
+      else void audioEngine.resumeFromBackground()
+    }
+    const suspend = () => { void audioEngine.suspendForBackground() }
+    const resume = () => { if (!document.hidden) void audioEngine.resumeFromBackground() }
+    document.addEventListener('visibilitychange', updateAudioActivity)
+    window.addEventListener('pagehide', suspend)
+    window.addEventListener('blur', suspend)
+    window.addEventListener('focus', resume)
+    return () => {
+      document.removeEventListener('visibilitychange', updateAudioActivity)
+      window.removeEventListener('pagehide', suspend)
+      window.removeEventListener('blur', suspend)
+      window.removeEventListener('focus', resume)
+    }
+  }, [])
+
   async function toggleAudio() {
     const next = !audioOn
     setAudioOn(next)
