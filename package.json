@@ -1,7 +1,7 @@
 {
   "name": "signal-breach",
   "private": false,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,7 @@
     "check:terminology": "node scripts/check-ui-terminology.mjs",
     "check:card-layout": "node scripts/check-card-layout.mjs",
     "check:audio-toggle": "node scripts/check-audio-toggle.mjs",
-    "test:engine": "node --experimental-strip-types --test tests/game-engine.test.mjs",
+    "test:engine": "node --experimental-strip-types --test tests/game-engine.test.mjs tests/active-session.test.mjs",
     "android:configure": "node scripts/configure-android.mjs",
     "android:init": "npm run android:configure && npx cap add android && npx cap sync android",
     "android:sync": "npm run build:android && npm run android:configure && npx cap sync android",
