@@ -1,12 +1,12 @@
 {
   "name": "signal-breach",
   "private": false,
-  "version": "0.2.6",
+  "version": "0.2.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && npm run test:share && npm run test:backup && tsc --noEmit -p tsconfig.json && vite build",
-    "build:android": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && npm run test:share && npm run test:backup && tsc --noEmit -p tsconfig.json && vite build --mode android && node scripts/check-android-dist.mjs",
+    "build": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && npm run test:share && npm run test:backup && npm run test:audio && tsc --noEmit -p tsconfig.json && vite build",
+    "build:android": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && npm run test:share && npm run test:backup && npm run test:audio && tsc --noEmit -p tsconfig.json && vite build --mode android && node scripts/check-android-dist.mjs",
     "preview": "vite preview",
     "check:terminology": "node scripts/check-ui-terminology.mjs",
     "check:card-layout": "node scripts/check-card-layout.mjs",
@@ -17,7 +17,8 @@
     "android:sync": "npm run build:android && npm run android:configure && npx cap sync android",
     "check:version": "node scripts/check-ui-version.mjs",
     "test:share": "node --experimental-strip-types --test tests/share-result.test.mjs",
-    "test:backup": "node --experimental-strip-types --test tests/progress-backup.test.mjs"
+    "test:backup": "node --experimental-strip-types --test tests/progress-backup.test.mjs",
+    "test:audio": "node --experimental-strip-types --test tests/audio-volume.test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",
