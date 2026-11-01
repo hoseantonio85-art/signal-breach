@@ -1,0 +1,22 @@
+/* R2 active-session banner: small, terminal-like, without adding a store screen. */
+.resume-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  border: 1px solid rgba(113,241,255,.28);
+  border-radius: 12px;
+  background: rgba(113,241,255,.045);
+  padding: 12px 14px;
+  margin: 0 0 18px;
+}
+.resume-panel-copy { display:flex; flex-direction:column; gap:5px; min-width:0; }
+.resume-panel-copy strong { font:700 15px ui-monospace,SFMono-Regular,Menlo,monospace; color:var(--cyan); letter-spacing:.08em; }
+.resume-panel .primary { flex:0 0 auto; }
+.session-replace-dialog { width:min(420px, calc(100vw - 32px)); }
+.session-replace-actions { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:10px; margin-top:22px; }
+@media(max-width:390px) {
+  .resume-panel .primary { width:100%; }
+  .session-replace-actions > button { flex:1 1 45%; }
+}

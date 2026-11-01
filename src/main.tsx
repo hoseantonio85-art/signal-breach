@@ -7,6 +7,7 @@ import './styles/parity.css'
 import './components/MissionCard.css'
 import './components/MissionMetrics.css'
 import './styles/card-layout.css'
+import './styles/active-session.css'
 import './ui/panHints'
 import './ui/displayFontPreview'
 

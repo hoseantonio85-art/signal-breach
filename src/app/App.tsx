@@ -9,6 +9,7 @@ import { dictionaries } from '../i18n'
 import { GameScreen, type CampaignResult } from '../screens/GameScreen'
 import { loadProgress, saveProgress, type Progress } from '../stores/progress'
 import { loadLanguage, saveLanguage } from '../stores/settings'
+import { clearActiveSession, readActiveSession, sessionFromSave, type ActiveSession } from '../stores/activeSession'
 
 type Screen = 'boot' | 'menu' | 'campaign' | 'free' | 'briefing' | 'game'
 
@@ -34,6 +35,10 @@ export function App() {
   const [selectedMission, setSelectedMission] = useState<Mission>(missions[0])
   const [session, setSession] = useState<GameSession | null>(null)
   const [audioOn, setAudioOn] = useState(false)
+  const [savedSession, setSavedSession] = useState<ActiveSession | null>(() => readActiveSession())
+  const [restoredSession, setRestoredSession] = useState<ActiveSession | null>(null)
+  const [pendingSession, setPendingSession] = useState<GameSession | null>(null)
+  const [gameRun, setGameRun] = useState(0)
   const t = dictionaries[language]
 
   const totalScore = useMemo(
@@ -65,8 +70,53 @@ export function App() {
     setScreen('briefing')
   }
 
+  function openFreshGame(nextSession: GameSession) {
+    clearActiveSession()
+    setSavedSession(null)
+    setRestoredSession(null)
+    setPendingSession(null)
+    setSession(nextSession)
+    setGameRun((value) => value + 1)
+    setScreen('game')
+  }
+
+  function beginSession(nextSession: GameSession) {
+    // Never silently overwrite an unfinished campaign or Free Run board.
+    const existing = readActiveSession()
+    if (existing && sessionFromSave(existing, missions)) {
+      setSavedSession(existing)
+      setPendingSession(nextSession)
+      return
+    }
+    openFreshGame(nextSession)
+  }
+
+  function resumeSaved() {
+    const existing = readActiveSession()
+    const restored = existing && sessionFromSave(existing, missions)
+    if (!existing || !restored) {
+      clearActiveSession()
+      setSavedSession(null)
+      setPendingSession(null)
+      return
+    }
+    setSession(restored)
+    setRestoredSession(existing)
+    setSavedSession(existing)
+    setPendingSession(null)
+    setGameRun((value) => value + 1)
+    setScreen('game')
+  }
+
+  function leaveGame(destination: 'menu' | 'campaign') {
+    // GameScreen commits its latest board synchronously before calling back.
+    setSavedSession(readActiveSession())
+    setRestoredSession(null)
+    setScreen(destination)
+  }
+
   function startMission(mission: Mission) {
-    setSession({
+    beginSession({
       kind: 'campaign',
       label: `OP ${String(mission.id).padStart(2, '0')}`,
       rows: mission.rows,
@@ -74,12 +124,10 @@ export function App() {
       mines: mission.mines,
       mission,
     })
-    setScreen('game')
   }
 
   function startFree(preset: FreePreset) {
-    setSession({ kind: 'free', label: preset.label, rows: preset.rows, cols: preset.cols, mines: preset.mines })
-    setScreen('game')
+    beginSession({ kind: 'free', label: preset.label, rows: preset.rows, cols: preset.cols, mines: preset.mines })
   }
 
   function recordCampaignWin(result: CampaignResult) {
@@ -117,15 +165,16 @@ export function App() {
   if (screen === 'game' && session) {
     return (
       <GameScreen
-        key={`${session.kind}-${session.mission?.id ?? session.label}`}
+        key={session.kind + "-" + (session.mission?.id ?? session.label) + "-" + gameRun}
         session={session}
+        initialSave={restoredSession}
         language={language}
         t={t}
         audioOn={audioOn}
         onAudioToggle={toggleAudio}
         onLanguageChange={setLanguage}
-        onMenu={() => setScreen('menu')}
-        onOperations={() => setScreen('campaign')}
+        onMenu={() => leaveGame('menu')}
+        onOperations={() => leaveGame('campaign')}
         onNextMission={(missionId) => openMission(missionId)}
         onCampaignWin={recordCampaignWin}
       />
@@ -162,6 +211,15 @@ export function App() {
             <p className="lead">{t.globalIncidentCopy}</p>
           </div>
           <div className="menu-body-page">
+            {savedSession && (
+              <div className="resume-panel">
+                <div className="resume-panel-copy">
+                  <span className="eyebrow">{t.savedSignal}</span>
+                  <strong>{savedSession.session.kind === 'campaign' ? savedSession.session.label : savedSession.session.label}</strong>
+                </div>
+                <button className="primary" type="button" onClick={resumeSaved}>{t.continueSession}</button>
+              </div>
+            )}
             <div className="mode-grid">
               <button className="mode-card primary-card" onClick={() => setScreen('campaign')}>
                 <span className="mode-index">{t.storyProtocol}</span>
@@ -239,6 +297,19 @@ export function App() {
               <span>PAR {formatPar(selectedMission.parSeconds)}</span>
             </div>
             <div className="briefing-actions"><button className="secondary" onClick={() => setScreen('campaign')}>{t.back}</button><button className="primary" onClick={() => startMission(selectedMission)}>{t.startOperation}</button></div>
+          </section>
+        </div>
+      )}
+      {pendingSession && (
+        <div className="modal-layer" role="presentation">
+          <section className="help-card session-replace-dialog" role="dialog" aria-modal="true" aria-label={t.replaceSessionTitle}>
+            <div className="state-kicker">SIGNAL // BREACH</div>
+            <h2>{t.replaceSessionTitle}</h2>
+            <p>{t.replaceSessionDescription}</p>
+            <div className="session-replace-actions">
+              <button className="secondary" type="button" onClick={() => setPendingSession(null)}>{t.back}</button>
+              <button className="primary" type="button" onClick={() => openFreshGame(pendingSession)}>{t.newSession}</button>
+            </div>
           </section>
         </div>
       )}
