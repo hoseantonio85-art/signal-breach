@@ -69,6 +69,33 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
+      - name: Verify APK signature and package identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="android/app/build/outputs/apk/debug/app-debug.apk"
+          apksigner="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          aapt="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          test -s "$apk"
+
+          # Verify the ACTUAL final APK signing identity (not only the secret).
+          "$apksigner" verify --verbose --print-certs "$apk" | tee "$RUNNER_TEMP/signal-breach-apk-signature.txt"
+          actual="$(sed -n 's/.*Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/signal-breach-apk-signature.txt" | head -n 1 | tr -d '\r' | tr 'A-F' 'a-f')"
+          expected="$(keytool -exportcert -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey 2>/dev/null | sha256sum | cut -d ' ' -f 1)"
+          test -n "$actual"
+          if [[ "$actual" != "$expected" ]]; then
+            echo "::error::APK signing fingerprint does not match persistent CI key"
+            exit 1
+          fi
+          echo "APK signing fingerprint verified."
+
+          expected_name="$(node -p "require('./package.json').version")"
+          expected_code="$(node -p "const [a,b,c]=require('./package.json').version.split('.').map(Number);a*1000000+b*1000+c")"
+          badge="$("$aapt" dump badging "$apk" | head -n 1)"
+          [[ "$badge" == *"name='com.hoseantonio85.signalbreach'"* ]]
+          [[ "$badge" == *"versionCode='$expected_code'"* ]]
+          [[ "$badge" == *"versionName='$expected_name'"* ]]
+          echo "Verified $expected_name (versionCode $expected_code), package com.hoseantonio85.signalbreach."
       - name: Publish installable APK
         uses: actions/upload-artifact@v4
         with:
