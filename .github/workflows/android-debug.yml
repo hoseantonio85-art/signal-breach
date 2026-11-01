@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, release/android-rustore-v1]
   push:
-    branches: [release/android-rustore-v1]
+    branches: [release/android-rustore-v1, feature/r2-session-recovery]
   workflow_dispatch:
 
 permissions:
