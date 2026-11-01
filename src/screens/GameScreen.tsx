@@ -19,6 +19,7 @@ import {
 import type { Board, GamePhase, GameSession, InteractionMode, Language } from '../game/types'
 import type { Dictionary } from '../i18n'
 import { clearActiveSession, makeActiveSession, writeActiveSession, type ActiveSession } from '../stores/activeSession'
+import { formatResultShareText, shareResultText, type ShareOutcome } from '../utils/shareResult'
 
 export type CampaignResult = {
   missionId: number
@@ -84,6 +85,7 @@ export function GameScreen({
   const [lossCoord, setLossCoord] = useState('')
   const [result, setResult] = useState<{ score: number; rank: string; time: number } | null>(null)
   const [helpOpen, setHelpOpen] = useState(false)
+  const [shareFeedback, setShareFeedback] = useState<Extract<ShareOutcome, 'copied' | 'failed'> | null>(null)
   const [confirmReset, setConfirmReset] = useState(false)
   // Keep accumulated time separate from the running clock. Time outside the app is free.
   const elapsedMsRef = useRef(initialSave?.elapsedMs ?? 0)
@@ -192,6 +194,7 @@ export function GameScreen({
     clearActiveSession()
     setLossCoord('')
     setResult(null)
+    setShareFeedback(null)
     setLog(session.kind === 'campaign' ? t.operationReady : t.awaiting)
   }
 
@@ -377,14 +380,11 @@ export function GameScreen({
 
   async function shareResult() {
     if (!result) return
+    setShareFeedback(null)
     const missionLabel = session.mission ? `OP ${String(session.mission.id).padStart(2, '0')} // ${session.mission.code}` : session.label
-    const text = `SIGNAL//BREACH — ${missionLabel} — ${result.rank} / ${result.score} / ${formatTime(result.time)}`
-    try {
-      if (navigator.share) await navigator.share({ title: 'SIGNAL//BREACH', text })
-      else await navigator.clipboard.writeText(text)
-    } catch {
-      // Native share can be cancelled by the user; no error UI is necessary.
-    }
+    const text = formatResultShareText(missionLabel, result.rank, result.score, formatTime(result.time))
+    const outcome = await shareResultText(text, t.shareResult)
+    if (outcome === 'copied' || outcome === 'failed') setShareFeedback(outcome)
   }
 
   const campaignTitle = session.mission ? `OP ${String(session.mission.id).padStart(2, '0')} // ${session.mission.code}` : session.label
@@ -492,8 +492,13 @@ export function GameScreen({
                     <button className="primary" onClick={session.kind === 'campaign' ? onOperations : resetGame}>{session.kind === 'campaign' ? t.operations : t.retrySession}</button>
                   )}
                   <button className="secondary" onClick={session.kind === 'campaign' ? onOperations : onMenu}>{session.kind === 'campaign' ? t.operations : t.menu}</button>
-                  {phase === 'won' && <button className="secondary" onClick={shareResult}>{t.shareResult}</button>}
+                  {phase === 'won' && <button type="button" className="secondary" onClick={shareResult}>{t.shareResult}</button>}
                 </div>
+                {phase === 'won' && shareFeedback && (
+                  <div className="share-feedback" role="status" aria-live="polite">
+                    {shareFeedback === 'copied' ? t.shareCopied : t.shareFailed}
+                  </div>
+                )}
               </div>
             </div>
           )}

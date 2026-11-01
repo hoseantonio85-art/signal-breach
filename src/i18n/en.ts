@@ -72,6 +72,8 @@ export const en = {
   time: 'TIME',
   nextOperation: 'NEXT OPERATION',
   shareResult: 'SHARE RESULT',
+  shareCopied: 'RESULT COPIED TO CLIPBOARD',
+  shareFailed: 'COULD NOT SHARE. PLEASE TRY AGAIN.',
   freeWin: 'All corrupted nodes isolated. Signal integrity restored.',
   helpTitle: 'RECOVERY PROTOCOL',
   helpCopy: 'Reveal clean nodes and quarantine suspected corruption. Each number shows how many corrupted nodes touch that cell. On mobile use SCAN/QUARANTINE or a long press.',
