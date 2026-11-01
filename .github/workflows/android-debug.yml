@@ -2,7 +2,7 @@ name: Android debug APK
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, release/android-rustore-v1]
   push:
     branches: [release/android-rustore-v1]
   workflow_dispatch:
