@@ -9,6 +9,10 @@ import { dictionaries } from '../i18n'
 import { GameScreen, type CampaignResult } from '../screens/GameScreen'
 import { loadProgress, saveProgress, type Progress } from '../stores/progress'
 import { loadLanguage, saveLanguage } from '../stores/settings'
+import { clearActiveSession, readActiveSession, sessionFromSave, type ActiveSession } from '../stores/activeSession'
+import { exportProgressBackup, mergeProgress, parseProgressBackup } from '../stores/progressBackup'
+import { Capacitor } from '@capacitor/core'
+import { Clipboard } from '@capacitor/clipboard'
 
 type Screen = 'boot' | 'menu' | 'campaign' | 'free' | 'briefing' | 'game'
 
@@ -34,6 +38,13 @@ export function App() {
   const [selectedMission, setSelectedMission] = useState<Mission>(missions[0])
   const [session, setSession] = useState<GameSession | null>(null)
   const [audioOn, setAudioOn] = useState(false)
+  const [savedSession, setSavedSession] = useState<ActiveSession | null>(() => readActiveSession())
+  const [restoredSession, setRestoredSession] = useState<ActiveSession | null>(null)
+  const [pendingSession, setPendingSession] = useState<GameSession | null>(null)
+  const [gameRun, setGameRun] = useState(0)
+  const [backupOpen, setBackupOpen] = useState(false)
+  const [backupInput, setBackupInput] = useState('')
+  const [backupStatus, setBackupStatus] = useState<'copied' | 'restored' | 'invalid' | 'error' | null>(null)
   const t = dictionaries[language]
 
   const totalScore = useMemo(
@@ -52,10 +63,56 @@ export function App() {
     return () => window.clearTimeout(timer)
   }, [screen])
 
+  useEffect(() => {
+    const updateAudioActivity = () => {
+      if (document.hidden) void audioEngine.suspendForBackground()
+      else void audioEngine.resumeFromBackground()
+    }
+    const suspend = () => { void audioEngine.suspendForBackground() }
+    const resume = () => { if (!document.hidden) void audioEngine.resumeFromBackground() }
+    document.addEventListener('visibilitychange', updateAudioActivity)
+    window.addEventListener('pagehide', suspend)
+    window.addEventListener('blur', suspend)
+    window.addEventListener('focus', resume)
+    return () => {
+      document.removeEventListener('visibilitychange', updateAudioActivity)
+      window.removeEventListener('pagehide', suspend)
+      window.removeEventListener('blur', suspend)
+      window.removeEventListener('focus', resume)
+    }
+  }, [])
+
   async function toggleAudio() {
     const next = !audioOn
     setAudioOn(next)
     await audioEngine.setEnabled(next)
+  }
+
+  async function copyBackup() {
+    setBackupStatus(null)
+    const code = exportProgressBackup(progress)
+    try {
+      if (Capacitor.isNativePlatform()) await Clipboard.write({ string: code, label: 'SIGNAL BREACH backup' })
+      else if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(code)
+      else throw new Error('Clipboard unavailable')
+      setBackupStatus('copied')
+    } catch {
+      setBackupStatus('error')
+    }
+  }
+
+  function restoreBackup() {
+    const candidate = parseProgressBackup(backupInput)
+    if (!candidate) { setBackupStatus('invalid'); return }
+    const combined = mergeProgress(progress, candidate)
+    try {
+      saveProgress(combined)
+      setProgress(combined)
+      setBackupInput('')
+      setBackupStatus('restored')
+    } catch {
+      setBackupStatus('error')
+    }
   }
 
   function openMission(missionId: number) {
@@ -65,8 +122,53 @@ export function App() {
     setScreen('briefing')
   }
 
+  function openFreshGame(nextSession: GameSession) {
+    clearActiveSession()
+    setSavedSession(null)
+    setRestoredSession(null)
+    setPendingSession(null)
+    setSession(nextSession)
+    setGameRun((value) => value + 1)
+    setScreen('game')
+  }
+
+  function beginSession(nextSession: GameSession) {
+    // Never silently overwrite an unfinished campaign or Free Run board.
+    const existing = readActiveSession()
+    if (existing && sessionFromSave(existing, missions)) {
+      setSavedSession(existing)
+      setPendingSession(nextSession)
+      return
+    }
+    openFreshGame(nextSession)
+  }
+
+  function resumeSaved() {
+    const existing = readActiveSession()
+    const restored = existing && sessionFromSave(existing, missions)
+    if (!existing || !restored) {
+      clearActiveSession()
+      setSavedSession(null)
+      setPendingSession(null)
+      return
+    }
+    setSession(restored)
+    setRestoredSession(existing)
+    setSavedSession(existing)
+    setPendingSession(null)
+    setGameRun((value) => value + 1)
+    setScreen('game')
+  }
+
+  function leaveGame(destination: 'menu' | 'campaign') {
+    // GameScreen commits its latest board synchronously before calling back.
+    setSavedSession(readActiveSession())
+    setRestoredSession(null)
+    setScreen(destination)
+  }
+
   function startMission(mission: Mission) {
-    setSession({
+    beginSession({
       kind: 'campaign',
       label: `OP ${String(mission.id).padStart(2, '0')}`,
       rows: mission.rows,
@@ -74,15 +176,14 @@ export function App() {
       mines: mission.mines,
       mission,
     })
-    setScreen('game')
   }
 
   function startFree(preset: FreePreset) {
-    setSession({ kind: 'free', label: preset.label, rows: preset.rows, cols: preset.cols, mines: preset.mines })
-    setScreen('game')
+    beginSession({ kind: 'free', label: preset.label, rows: preset.rows, cols: preset.cols, mines: preset.mines })
   }
 
   function recordCampaignWin(result: CampaignResult) {
+    setSavedSession(null)
     setProgress((current) => {
       const existing = current.completed[result.missionId]
       const nextResult = !existing
@@ -117,15 +218,16 @@ export function App() {
   if (screen === 'game' && session) {
     return (
       <GameScreen
-        key={`${session.kind}-${session.mission?.id ?? session.label}`}
+        key={session.kind + "-" + (session.mission?.id ?? session.label) + "-" + gameRun}
         session={session}
+        initialSave={restoredSession}
         language={language}
         t={t}
         audioOn={audioOn}
         onAudioToggle={toggleAudio}
         onLanguageChange={setLanguage}
-        onMenu={() => setScreen('menu')}
-        onOperations={() => setScreen('campaign')}
+        onMenu={() => leaveGame('menu')}
+        onOperations={() => leaveGame('campaign')}
         onNextMission={(missionId) => openMission(missionId)}
         onCampaignWin={recordCampaignWin}
       />
@@ -162,6 +264,15 @@ export function App() {
             <p className="lead">{t.globalIncidentCopy}</p>
           </div>
           <div className="menu-body-page">
+            {savedSession && (
+              <div className="resume-panel">
+                <div className="resume-panel-copy">
+                  <span className="eyebrow">{t.savedSignal}</span>
+                  <strong>{savedSession.session.kind === 'campaign' ? savedSession.session.label : savedSession.session.label}</strong>
+                </div>
+                <button className="primary" type="button" onClick={resumeSaved}>{t.continueSession}</button>
+              </div>
+            )}
             <div className="mode-grid">
               <button className="mode-card primary-card" onClick={() => setScreen('campaign')}>
                 <span className="mode-index">{t.storyProtocol}</span>
@@ -178,6 +289,7 @@ export function App() {
               </button>
             </div>
             <div className="menu-meta-row"><span>{t.localProgress}</span><span>{`v${__APP_VERSION__} // ${__BUILD_TARGET__}`}</span></div>
+            <button type="button" className="backup-entry" onClick={() => { setBackupOpen(true); setBackupStatus(null) }}>{t.backupTitle}</button>
           </div>
         </section>
       )}
@@ -239,6 +351,39 @@ export function App() {
               <span>PAR {formatPar(selectedMission.parSeconds)}</span>
             </div>
             <div className="briefing-actions"><button className="secondary" onClick={() => setScreen('campaign')}>{t.back}</button><button className="primary" onClick={() => startMission(selectedMission)}>{t.startOperation}</button></div>
+          </section>
+        </div>
+      )}
+      {backupOpen && (
+        <div className="modal-layer" role="presentation">
+          <section className="help-card backup-dialog" role="dialog" aria-modal="true" aria-label={t.backupTitle}>
+            <div className="state-kicker">SIGNAL // BREACH / LOCAL DATA</div>
+            <h2>{t.backupTitle}</h2>
+            <p>{t.backupDescription}</p>
+            <label className="backup-field-label" htmlFor="backup-output">{t.backupSaveLabel}</label>
+            <textarea id="backup-output" className="backup-code" value={exportProgressBackup(progress)} readOnly rows={3} />
+            <button type="button" className="secondary" onClick={copyBackup}>{t.backupCopy}</button>
+            <label className="backup-field-label" htmlFor="backup-input">{t.backupRestoreLabel}</label>
+            <textarea id="backup-input" className="backup-code" value={backupInput} onChange={(event) => { setBackupInput(event.target.value); setBackupStatus(null) }} placeholder={t.backupPlaceholder} rows={3} />
+            <div className="session-replace-actions">
+              <button type="button" className="secondary" onClick={() => setBackupOpen(false)}>{t.close}</button>
+              <button type="button" className="primary" onClick={restoreBackup}>{t.backupRestore}</button>
+            </div>
+            {backupStatus && <p className="backup-feedback" role="status" aria-live="polite">{t[backupStatus === 'copied' ? 'backupCopied' : backupStatus === 'restored' ? 'backupRestored' : backupStatus === 'invalid' ? 'backupInvalid' : 'backupError']}</p>}
+          </section>
+        </div>
+      )}
+
+      {pendingSession && (
+        <div className="modal-layer" role="presentation">
+          <section className="help-card session-replace-dialog" role="dialog" aria-modal="true" aria-label={t.replaceSessionTitle}>
+            <div className="state-kicker">SIGNAL // BREACH</div>
+            <h2>{t.replaceSessionTitle}</h2>
+            <p>{t.replaceSessionDescription}</p>
+            <div className="session-replace-actions">
+              <button className="secondary" type="button" onClick={() => setPendingSession(null)}>{t.back}</button>
+              <button className="primary" type="button" onClick={() => openFreshGame(pendingSession)}>{t.newSession}</button>
+            </div>
           </section>
         </div>
       )}

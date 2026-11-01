@@ -1,0 +1,26 @@
+.backup-entry {
+  align-self: flex-start;
+  background: transparent;
+  color: var(--cyan);
+  border: 1px solid rgba(113, 241, 255, .22);
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin-top: 10px;
+  font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  cursor: pointer;
+}
+.backup-dialog { width: min(520px, calc(100vw - 24px)); max-height: 90vh; overflow: auto; }
+.backup-field-label { display: block; color: var(--cyan); margin: 16px 0 6px; font: 600 11px ui-monospace, monospace; }
+.backup-code {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  color: var(--cyan);
+  background: rgba(5,7,19,.65);
+  border: 1px solid rgba(113,241,255,.24);
+  border-radius: 7px;
+  font: 11px/1.4 ui-monospace, monospace;
+  resize: vertical;
+  overflow-wrap: anywhere;
+}
+.backup-feedback { color: var(--cyan); margin-top: 12px; }

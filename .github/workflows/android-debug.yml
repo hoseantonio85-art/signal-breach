@@ -2,7 +2,7 @@ name: Android debug APK
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, release/android-rustore-v1]
   push:
     branches: [release/android-rustore-v1]
   workflow_dispatch:
@@ -57,6 +57,13 @@ jobs:
           python3 scripts/generate-android-icons.py android
           test -s android/app/src/main/res/mipmap-hdpi/ic_launcher.png
           test -s android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+      - name: Require a persistent signing certificate for tester APK
+        env:
+          SIGNAL_BREACH_DEBUG_KEYSTORE_B64: ${{ secrets.SIGNAL_BREACH_DEBUG_KEYSTORE_B64 }}
+        run: |
+          node scripts/install-test-signing.mjs
+          # This SHA-256 fingerprint MUST match across consecutive tester APKs.
+          keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | grep 'SHA256:' | head -n 1
       - name: Assemble debug APK
         working-directory: android
         run: |

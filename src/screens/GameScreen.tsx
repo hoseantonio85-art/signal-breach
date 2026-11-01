@@ -18,6 +18,8 @@ import {
 } from '../game/engine'
 import type { Board, GamePhase, GameSession, InteractionMode, Language } from '../game/types'
 import type { Dictionary } from '../i18n'
+import { clearActiveSession, makeActiveSession, writeActiveSession, type ActiveSession } from '../stores/activeSession'
+import { formatResultShareText, shareResultText, type ShareOutcome } from '../utils/shareResult'
 
 export type CampaignResult = {
   missionId: number
@@ -28,6 +30,7 @@ export type CampaignResult = {
 
 type Props = {
   session: GameSession
+  initialSave: ActiveSession | null
   language: Language
   t: Dictionary
   audioOn: boolean
@@ -62,6 +65,7 @@ function scoreFor(session: GameSession, seconds: number) {
 
 export function GameScreen({
   session,
+  initialSave,
   language,
   t,
   audioOn,
@@ -73,15 +77,23 @@ export function GameScreen({
   onCampaignWin,
 }: Props) {
   void onLanguageChange
-  const [board, setBoard] = useState<Board>(() => createBoard(session.rows, session.cols, session.mines))
-  const [phase, setPhase] = useState<GamePhase>('idle')
-  const [interactionMode, setInteractionMode] = useState<InteractionMode>('scan')
-  const [elapsed, setElapsed] = useState(0)
-  const [log, setLog] = useState(session.kind === 'campaign' ? t.operationReady : t.awaiting)
+  const [board, setBoard] = useState<Board>(() => initialSave?.board ?? createBoard(session.rows, session.cols, session.mines))
+  const [phase, setPhase] = useState<GamePhase>(() => initialSave?.phase ?? 'idle')
+  const [interactionMode, setInteractionMode] = useState<InteractionMode>(() => initialSave?.interactionMode ?? 'scan')
+  const [elapsed, setElapsed] = useState(() => Math.floor((initialSave?.elapsedMs ?? 0) / 1000))
+  const [log, setLog] = useState(initialSave ? t.sessionRestored : session.kind === 'campaign' ? t.operationReady : t.awaiting)
   const [lossCoord, setLossCoord] = useState('')
   const [result, setResult] = useState<{ score: number; rank: string; time: number } | null>(null)
   const [helpOpen, setHelpOpen] = useState(false)
-  const startedAt = useRef<number | null>(null)
+  const [shareFeedback, setShareFeedback] = useState<Extract<ShareOutcome, 'copied' | 'failed'> | null>(null)
+  const [confirmReset, setConfirmReset] = useState(false)
+  // Keep accumulated time separate from the running clock. Time outside the app is free.
+  const elapsedMsRef = useRef(initialSave?.elapsedMs ?? 0)
+  const startedAt = useRef<number | null>(initialSave?.phase === 'running' && !document.hidden ? performance.now() : null)
+  const boardRef = useRef(board)
+  const phaseRef = useRef(phase)
+  const interactionModeRef = useRef(interactionMode)
+  const lastStoredSecond = useRef(-1)
   const longPress = useRef<{ key: string; timer: number; x: number; y: number; ready: boolean } | null>(null)
   const suppressClick = useRef<{ key: string; expires: number } | null>(null)
 
@@ -91,43 +103,125 @@ export function GameScreen({
   const integrity = totalSafe ? Math.round((revealedSafe / totalSafe) * 100) : 0
   const remaining = Math.max(0, session.mines - quarantined)
 
+  function elapsedMilliseconds() {
+    return Math.max(0, Math.floor(elapsedMsRef.current
+      + (startedAt.current === null ? 0 : performance.now() - startedAt.current)))
+  }
+
+  function switchPhase(next: GamePhase) {
+    phaseRef.current = next
+    setPhase(next)
+  }
+
+  function persistCurrent() {
+    const active = phaseRef.current
+    const currentBoard = boardRef.current
+    if ((active === 'running' || active === 'idle')
+      && (currentBoard.generated || currentBoard.cells.some((cell) => cell.quarantined))) {
+      writeActiveSession(makeActiveSession(
+        session, currentBoard, active, interactionModeRef.current, elapsedMilliseconds(),
+      ))
+    }
+  }
+
+  function updateBoard(next: Board) {
+    boardRef.current = next
+    setBoard(next)
+    persistCurrent()
+  }
+
+  function changeInteractionMode(next: InteractionMode) {
+    interactionModeRef.current = next
+    setInteractionMode(next)
+    persistCurrent()
+  }
+
   useEffect(() => {
     if (phase !== 'running') return
     const timer = window.setInterval(() => {
-      if (startedAt.current != null) setElapsed(Math.floor((performance.now() - startedAt.current) / 1000))
+      const seconds = Math.floor(elapsedMilliseconds() / 1000)
+      setElapsed(seconds)
+      if (seconds > 0 && seconds % 5 === 0 && lastStoredSecond.current !== seconds) {
+        lastStoredSecond.current = seconds
+        persistCurrent()
+      }
     }, 250)
     return () => window.clearInterval(timer)
   }, [phase])
 
   useEffect(() => {
-    setLog(session.kind === 'campaign' ? t.operationReady : t.awaiting)
-  }, [language, session.kind, t.awaiting, t.operationReady])
+    const background = () => {
+      if (startedAt.current !== null) {
+        elapsedMsRef.current = elapsedMilliseconds()
+        startedAt.current = null
+        setElapsed(Math.floor(elapsedMsRef.current / 1000))
+      }
+      persistCurrent()
+    }
+    const foreground = () => {
+      if (!document.hidden && phaseRef.current === 'running' && startedAt.current === null) {
+        startedAt.current = performance.now()
+      }
+    }
+    const onVisibilityChange = () => document.hidden ? background() : foreground()
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('pagehide', background)
+    window.addEventListener('blur', background)
+    window.addEventListener('focus', foreground)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      window.removeEventListener('pagehide', background)
+      window.removeEventListener('blur', background)
+      window.removeEventListener('focus', foreground)
+    }
+  }, [session])
+
+  useEffect(() => {
+    // A restored game keeps its recovery message; other text is localized normally.
+    setLog(initialSave ? t.sessionRestored : session.kind === 'campaign' ? t.operationReady : t.awaiting)
+  }, [language, session.kind, t.awaiting, t.operationReady, t.sessionRestored, initialSave])
 
   function resetGame() {
+    elapsedMsRef.current = 0
     startedAt.current = null
     setElapsed(0)
-    setPhase('idle')
+    switchPhase('idle')
+    interactionModeRef.current = 'scan'
     setInteractionMode('scan')
-    setBoard(createBoard(session.rows, session.cols, session.mines))
+    const freshBoard = createBoard(session.rows, session.cols, session.mines)
+    boardRef.current = freshBoard
+    setBoard(freshBoard)
+    clearActiveSession()
     setLossCoord('')
     setResult(null)
+    setShareFeedback(null)
     setLog(session.kind === 'campaign' ? t.operationReady : t.awaiting)
   }
 
+  function requestRestart() {
+    if (phaseRef.current === 'running' || boardRef.current.cells.some((cell) => cell.quarantined)) {
+      setConfirmReset(true)
+    } else {
+      resetGame()
+    }
+  }
+
   function finishLoss(nextBoard: Board, row: number, col: number) {
-    const seconds = startedAt.current == null ? elapsed : Math.floor((performance.now() - startedAt.current) / 1000)
+    const seconds = Math.floor(elapsedMilliseconds() / 1000)
     // Chording can detonate a neighboring mine rather than the tapped number.
     const hitCell = findExplodedCell(nextBoard) ?? { row, col }
     setElapsed(seconds)
+    startedAt.current = null
     setLossCoord(coord(hitCell.row, hitCell.col))
     setBoard(revealMines(nextBoard, hitCell.row, hitCell.col))
-    setPhase('lost')
+    switchPhase('lost')
+    clearActiveSession()
     setLog(t.signalLost)
     audioEngine.ui('loss')
   }
 
   function finishWin(nextBoard: Board) {
-    const seconds = startedAt.current == null ? elapsed : Math.floor((performance.now() - startedAt.current) / 1000)
+    const seconds = Math.floor(elapsedMilliseconds() / 1000)
     const score = scoreFor(session, seconds)
     const rank = rankFor(session.mission?.parSeconds ?? Math.max(45, session.mines * 4), seconds)
     const completedBoard: Board = {
@@ -136,8 +230,10 @@ export function GameScreen({
     }
     setBoard(completedBoard)
     setElapsed(seconds)
+    startedAt.current = null
     setResult({ score, rank, time: seconds })
-    setPhase('won')
+    switchPhase('won')
+    clearActiveSession()
     setLog(t.signalStable)
     audioEngine.ui('win')
     if (session.kind === 'campaign' && session.mission) {
@@ -150,8 +246,9 @@ export function GameScreen({
     let working = board
     if (!working.generated) {
       working = generateBoard(working, row, col)
-      startedAt.current = performance.now()
-      setPhase('running')
+      elapsedMsRef.current = 0
+      startedAt.current = document.hidden ? null : performance.now()
+      switchPhase('running')
       setLog(language === 'ru' ? `HANDSHAKE // узел ${coord(row, col)} принят.` : `HANDSHAKE // node ${coord(row, col)} accepted.`)
       audioEngine.ui('start')
     }
@@ -162,7 +259,7 @@ export function GameScreen({
       const nearby = neighbors(working, row, col)
       const marked = nearby.filter((cell) => cell.quarantined).length
       if (marked !== target.adjacent) {
-        setBoard(working)
+        updateBoard(working)
         setLog(t.mismatch)
         audioEngine.ui('tick')
         return
@@ -177,12 +274,12 @@ export function GameScreen({
       return
     }
 
-    setBoard(revealResult.board)
     if (isWon(revealResult.board)) {
       finishWin(revealResult.board)
       return
     }
 
+    updateBoard(revealResult.board)
     const opened = revealResult.board.cells[row * revealResult.board.cols + col]
     if (opened?.revealed) setLog(opened.adjacent === 0 ? t.cleanZero : t.cleanNear)
     audioEngine.ui(revealResult.revealedDelta > 1 ? 'cascade' : 'reveal', revealResult.revealedDelta)
@@ -194,7 +291,7 @@ export function GameScreen({
     const before = board.cells[key]
     if (!before || before.revealed) return
     const next = toggleQuarantine(board, row, col)
-    setBoard(next)
+    updateBoard(next)
     const after = next.cells[key]
     setLog(after.quarantined ? t.quarantineOn : t.quarantineOff)
     audioEngine.ui('flag')
@@ -283,14 +380,11 @@ export function GameScreen({
 
   async function shareResult() {
     if (!result) return
+    setShareFeedback(null)
     const missionLabel = session.mission ? `OP ${String(session.mission.id).padStart(2, '0')} // ${session.mission.code}` : session.label
-    const text = `SIGNAL//BREACH — ${missionLabel} — ${result.rank} / ${result.score} / ${formatTime(result.time)}`
-    try {
-      if (navigator.share) await navigator.share({ title: 'SIGNAL//BREACH', text })
-      else await navigator.clipboard.writeText(text)
-    } catch {
-      // Native share can be cancelled by the user; no error UI is necessary.
-    }
+    const text = formatResultShareText(missionLabel, result.rank, result.score, formatTime(result.time))
+    const outcome = await shareResultText(text, t.shareResult)
+    if (outcome === 'copied' || outcome === 'failed') setShareFeedback(outcome)
   }
 
   const campaignTitle = session.mission ? `OP ${String(session.mission.id).padStart(2, '0')} // ${session.mission.code}` : session.label
@@ -308,11 +402,11 @@ export function GameScreen({
         </div>
         <div className="game-top-actions">
           {session.kind === 'campaign' && session.mission && (
-            <button className="chip-btn operation-chip" onClick={onOperations}><span className="dot active-dot" />OP {String(session.mission.id).padStart(2, '0')} / 10</button>
+            <button className="chip-btn operation-chip" onClick={() => { persistCurrent(); onOperations() }}><span className="dot active-dot" />OP {String(session.mission.id).padStart(2, '0')} / 10</button>
           )}
           <AudioToggle enabled={audioOn} onToggle={onAudioToggle} t={t} variant="game" />
-          <button type="button" className="chip-btn restart-chip" onClick={resetGame} aria-label={t.newSession}><RotateCcw size={17} strokeWidth={1.8} aria-hidden="true" /><span className="restart-label">{t.newSession}</span></button>
-          <button type="button" className="chip-btn menu-chip" onClick={onMenu} aria-label={t.menu}><House size={17} strokeWidth={1.8} aria-hidden="true" /><span className="menu-label">{t.menu}</span></button>
+          <button type="button" className="chip-btn restart-chip" onClick={requestRestart} aria-label={t.newSession}><RotateCcw size={17} strokeWidth={1.8} aria-hidden="true" /><span className="restart-label">{t.newSession}</span></button>
+          <button type="button" className="chip-btn menu-chip" onClick={() => { persistCurrent(); onMenu() }} aria-label={t.menu}><House size={17} strokeWidth={1.8} aria-hidden="true" /><span className="menu-label">{t.menu}</span></button>
         </div>
       </header>
 
@@ -378,7 +472,7 @@ export function GameScreen({
           {(phase === 'lost' || phase === 'won') && (
             <div className="state-overlay show">
               <div className="state-card">
-                {phase === 'lost' && <button className="state-close" type="button" onClick={() => setPhase('review')} aria-label={t.close}>×</button>}
+                {phase === 'lost' && <button className="state-close" type="button" onClick={() => switchPhase('review')} aria-label={t.close}>×</button>}
                 <div className="state-kicker">{session.kind === 'campaign' && session.mission ? `OP ${String(session.mission.id).padStart(2, '0')} / ${phase === 'lost' ? 'BREACH' : 'SIGNAL RESTORED'}` : `RELAY 07 / ${session.label}`}</div>
                 <div className={`state-title ${phase === 'lost' ? 'loss' : 'win'}`}>{phase === 'lost' ? t.breachDetected : t.restoreComplete}</div>
                 <div className="state-copy">{phase === 'lost' ? interpolate(session.kind === 'campaign' ? t.campaignLoss : t.freeLoss, { coord: lossCoord }) : resultCopy}</div>
@@ -398,8 +492,13 @@ export function GameScreen({
                     <button className="primary" onClick={session.kind === 'campaign' ? onOperations : resetGame}>{session.kind === 'campaign' ? t.operations : t.retrySession}</button>
                   )}
                   <button className="secondary" onClick={session.kind === 'campaign' ? onOperations : onMenu}>{session.kind === 'campaign' ? t.operations : t.menu}</button>
-                  {phase === 'won' && <button className="secondary" onClick={shareResult}>{t.shareResult}</button>}
+                  {phase === 'won' && <button type="button" className="secondary" onClick={shareResult}>{t.shareResult}</button>}
                 </div>
+                {phase === 'won' && shareFeedback && (
+                  <div className="share-feedback" role="status" aria-live="polite">
+                    {shareFeedback === 'copied' ? t.shareCopied : t.shareFailed}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -409,13 +508,27 @@ export function GameScreen({
           <div className="review-modebar"><span className="review-dot" /><span>{t.mapReview}</span></div>
         ) : phase !== 'won' ? (
           <div className="mobile-modebar">
-            <button className={`mode-toggle ${interactionMode === 'scan' ? 'active' : ''}`} onClick={() => setInteractionMode('scan')}>{t.scan}</button>
-            <button className={`mode-toggle ${interactionMode === 'quarantine' ? 'active' : ''}`} onClick={() => setInteractionMode('quarantine')}>{t.quarantine}</button>
+            <button className={`mode-toggle ${interactionMode === 'scan' ? 'active' : ''}`} onClick={() => changeInteractionMode('scan')}>{t.scan}</button>
+            <button className={`mode-toggle ${interactionMode === 'quarantine' ? 'active' : ''}`} onClick={() => changeInteractionMode('quarantine')}>{t.quarantine}</button>
           </div>
         ) : null}
 
         <div className="terminal-foot"><div className="log">{log}</div><div className="foot-meta">{t.protocol}</div></div>
       </section>
+
+      {confirmReset && (
+        <div className="modal-layer" role="presentation">
+          <section className="help-card session-replace-dialog" role="dialog" aria-modal="true" aria-label={t.resetSessionTitle}>
+            <div className="state-kicker">SIGNAL // BREACH</div>
+            <h2>{t.resetSessionTitle}</h2>
+            <p>{t.resetSessionDescription}</p>
+            <div className="session-replace-actions">
+              <button className="secondary" type="button" onClick={() => setConfirmReset(false)}>{t.back}</button>
+              <button className="primary" type="button" onClick={() => { setConfirmReset(false); resetGame() }}>{t.newSession}</button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {helpOpen && (
         <div className="modal-layer" onMouseDown={() => setHelpOpen(false)}>

@@ -107,6 +107,22 @@ class SignalAudioEngine {
     })
   }
 
+  async suspendForBackground() {
+    if (this.ambientTimer !== null) window.clearInterval(this.ambientTimer)
+    this.ambientTimer = null
+    if (this.context?.state === 'running') {
+      try { await this.context.suspend() } catch { /* Android may interrupt AudioContext */ }
+    }
+  }
+
+  async resumeFromBackground() {
+    if (!this.enabled || document.hidden || !this.context) return
+    try {
+      if (this.context.state === 'suspended') await this.context.resume()
+      this.startAmbient()
+    } catch { /* Audio can resume on the next user gesture */ }
+  }
+
   private startAmbient() {
     if (this.ambientTimer != null) window.clearInterval(this.ambientTimer)
 
