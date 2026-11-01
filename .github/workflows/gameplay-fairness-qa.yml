@@ -24,9 +24,12 @@ jobs:
         run: |
           mkdir -p qa-reports
           node --experimental-strip-types scripts/analyze-board-solvability.mjs --samples=100 --json=qa-reports/fairness-op06-10.json
+      - name: Exact bounded CSP check for proven guesses (small seeded sample)
+        run: |
+          node --experimental-strip-types scripts/analyze-board-solvability.mjs --samples=30 --exact --json=qa-reports/fairness-exact-op06-10.json
       - uses: actions/upload-artifact@v4
         with:
           name: fairness-analysis-op06-10
-          path: qa-reports/fairness-op06-10.json
+          path: qa-reports/*.json
           if-no-files-found: error
           retention-days: 14
