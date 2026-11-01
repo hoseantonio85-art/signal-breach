@@ -150,6 +150,7 @@ export function App() {
   }
 
   function recordCampaignWin(result: CampaignResult) {
+    setSavedSession(null)
     setProgress((current) => {
       const existing = current.completed[result.missionId]
       const nextResult = !existing

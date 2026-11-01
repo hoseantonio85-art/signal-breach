@@ -84,6 +84,7 @@ export function GameScreen({
   const [lossCoord, setLossCoord] = useState('')
   const [result, setResult] = useState<{ score: number; rank: string; time: number } | null>(null)
   const [helpOpen, setHelpOpen] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
   // Keep accumulated time separate from the running clock. Time outside the app is free.
   const elapsedMsRef = useRef(initialSave?.elapsedMs ?? 0)
   const startedAt = useRef<number | null>(initialSave?.phase === 'running' && !document.hidden ? performance.now() : null)
@@ -192,6 +193,14 @@ export function GameScreen({
     setLossCoord('')
     setResult(null)
     setLog(session.kind === 'campaign' ? t.operationReady : t.awaiting)
+  }
+
+  function requestRestart() {
+    if (phaseRef.current === 'running' || boardRef.current.cells.some((cell) => cell.quarantined)) {
+      setConfirmReset(true)
+    } else {
+      resetGame()
+    }
   }
 
   function finishLoss(nextBoard: Board, row: number, col: number) {
@@ -396,7 +405,7 @@ export function GameScreen({
             <button className="chip-btn operation-chip" onClick={() => { persistCurrent(); onOperations() }}><span className="dot active-dot" />OP {String(session.mission.id).padStart(2, '0')} / 10</button>
           )}
           <AudioToggle enabled={audioOn} onToggle={onAudioToggle} t={t} variant="game" />
-          <button type="button" className="chip-btn restart-chip" onClick={resetGame} aria-label={t.newSession}><RotateCcw size={17} strokeWidth={1.8} aria-hidden="true" /><span className="restart-label">{t.newSession}</span></button>
+          <button type="button" className="chip-btn restart-chip" onClick={requestRestart} aria-label={t.newSession}><RotateCcw size={17} strokeWidth={1.8} aria-hidden="true" /><span className="restart-label">{t.newSession}</span></button>
           <button type="button" className="chip-btn menu-chip" onClick={() => { persistCurrent(); onMenu() }} aria-label={t.menu}><House size={17} strokeWidth={1.8} aria-hidden="true" /><span className="menu-label">{t.menu}</span></button>
         </div>
       </header>
@@ -501,6 +510,20 @@ export function GameScreen({
 
         <div className="terminal-foot"><div className="log">{log}</div><div className="foot-meta">{t.protocol}</div></div>
       </section>
+
+      {confirmReset && (
+        <div className="modal-layer" role="presentation">
+          <section className="help-card session-replace-dialog" role="dialog" aria-modal="true" aria-label={t.resetSessionTitle}>
+            <div className="state-kicker">SIGNAL // BREACH</div>
+            <h2>{t.resetSessionTitle}</h2>
+            <p>{t.resetSessionDescription}</p>
+            <div className="session-replace-actions">
+              <button className="secondary" type="button" onClick={() => setConfirmReset(false)}>{t.back}</button>
+              <button className="primary" type="button" onClick={() => { setConfirmReset(false); resetGame() }}>{t.newSession}</button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {helpOpen && (
         <div className="modal-layer" onMouseDown={() => setHelpOpen(false)}>

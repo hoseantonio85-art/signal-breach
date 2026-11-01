@@ -38,6 +38,8 @@ export const ru = {
   savedSignal: 'СОХРАНЁННЫЙ СИГНАЛ',
   continueSession: 'ПРОДОЛЖИТЬ',
   sessionRestored: 'SIGNAL RECOVERED // партия восстановлена.',
+  resetSessionTitle: 'Перезапустить операцию?',
+  resetSessionDescription: 'Открытые узлы и карантин текущей партии будут потеряны.',
   replaceSessionTitle: 'Начать новую операцию?',
   replaceSessionDescription: 'Текущая партия ещё не завершена. Если начать новую, сохранённое поле будет потеряно.',
   linkActive: 'LINK ACTIVE',

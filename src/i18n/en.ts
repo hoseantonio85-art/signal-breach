@@ -39,6 +39,8 @@ export const en = {
   savedSignal: 'SAVED SIGNAL',
   continueSession: 'CONTINUE',
   sessionRestored: 'SIGNAL RECOVERED // session restored.',
+  resetSessionTitle: 'Restart the operation?',
+  resetSessionDescription: 'Revealed nodes and quarantined cells in this session will be lost.',
   replaceSessionTitle: 'Start a new operation?',
   replaceSessionDescription: 'An unfinished session is saved. Starting a new one will replace the current board.',
   linkActive: 'LINK ACTIVE',
