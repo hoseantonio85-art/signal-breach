@@ -57,6 +57,12 @@ jobs:
           python3 scripts/generate-android-icons.py android
           test -s android/app/src/main/res/mipmap-hdpi/ic_launcher.png
           test -s android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+      - name: Require persistent signing before publishing tester APK
+        env:
+          SIGNAL_BREACH_DEBUG_KEYSTORE_B64: ${{ secrets.SIGNAL_BREACH_DEBUG_KEYSTORE_B64 }}
+        run: |
+          node scripts/install-test-signing.mjs
+          keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | grep 'SHA256:' | head -n 1
       - name: Assemble debug APK
         working-directory: android
         run: |

@@ -55,3 +55,17 @@ The Python 3 script needs no pip packages and deterministically writes:
 The native directory is regenerated in CI, so the generator is part of the release build and must be kept in the repository. **First successful branded-icon APK:** [Actions run 41247085110](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41247085110), artifact `signal-breach-android-debug`. Verify the resulting launcher icon on a real device and in the RuStore icon upload before release.
 
 **IMPORTANT: Existing player data.** The initial installed debug APK may use a different auto-generated debug signing certificate. Updating it in-place can fail; uninstalling can wipe campaign progress. Do not ask the tester to uninstall or overwrite their OP 07/08 progress until an export/import or verified recovery path exists. Track in [issue #7](https://github.com/hoseantonio85-art/signal-breach/issues/7).
+
+## STOP: tester package signature mismatch and lost campaign data (2026-11-01)
+An Android debug update failed with package conflict. Owner uninstalled, installed fresh and **campaign progress was erased**. Older apparently successful restoration was not a dependable backup. The cause is likely different ephemeral signing keys; compare APK certificate SHA-256 if available.
+
+**All new tester APK builds from this branch now fail at the signing gate** until GitHub Actions has `SIGNAL_BREACH_DEBUG_KEYSTORE_B64`, containing a single private stable keystore. No one should install an APK by uninstalling an existing app with meaningful progress without explicit export.
+
+Owner setup (one-time, private JDK keytool):
+```sh
+keytool -genkeypair -keystore signal-breach-debug.keystore -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 3072 -validity 10000 -dname "CN=SIGNAL BREACH Internal Test,O=Internal Android QA,C=DE"
+base64 -w 0 signal-breach-debug.keystore > signing-secret-base64.txt
+```
+Add **GitHub → Settings → Secrets and variables → Actions → New repository secret** named `SIGNAL_BREACH_DEBUG_KEYSTORE_B64` with the contents of that base64 file. Keep original key privately; **never commit the key, base64 value or passwords**. A default debug key uses store/key password `android` and alias `androiddebugkey`. CI installs the same private cert under `~/.android/debug.keystore` and prints only its public SHA-256 fingerprint.
+
+First permanent-signed APK will still be incompatible with **old** random-signed installations. To transition, export progress from the old app before uninstalling (the upcoming PR #11 adds code-based backup, not yet in this Android branch), then import. After transition, consistent signer + monotonic versionCode allow in-place updates. Production release needs a **separate secure release key**, never this debug key.
