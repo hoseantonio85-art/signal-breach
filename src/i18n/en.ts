@@ -38,6 +38,7 @@ export const en = {
   newSession: 'NEW SESSION',
   savedSignal: 'SAVED SIGNAL',
   continueSession: 'CONTINUE',
+  sessionRestored: 'SIGNAL RECOVERED // session restored.'
   replaceSessionTitle: 'Start a new operation?',
   replaceSessionDescription: 'An unfinished session is saved. Starting a new one will replace the current board.',
   linkActive: 'LINK ACTIVE',

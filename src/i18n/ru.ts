@@ -37,6 +37,7 @@ export const ru = {
   newSession: 'НОВАЯ СЕССИЯ',
   savedSignal: 'СОХРАНЁННЫЙ СИГНАЛ',
   continueSession: 'ПРОДОЛЖИТЬ',
+  sessionRestored: 'SIGNAL RECOVERED // партия восстановлена.',
   replaceSessionTitle: 'Начать новую операцию?',
   replaceSessionDescription: 'Текущая партия ещё не завершена. Если начать новую, сохранённое поле будет потеряно.',
   linkActive: 'LINK ACTIVE',
