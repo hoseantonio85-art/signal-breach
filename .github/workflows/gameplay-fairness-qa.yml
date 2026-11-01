@@ -18,6 +18,8 @@ jobs:
           node-version: '22'
       - name: Verify seeded production generator
         run: node --experimental-strip-types --test tests/fairness-seeded.test.mjs
+      - name: Test exact frontier constraints without hidden mine peeking
+        run: node --experimental-strip-types --test tests/fairness-exact.test.mjs
       - name: Sample OP 06-10 using visible-information logical rules
         run: |
           mkdir -p qa-reports
