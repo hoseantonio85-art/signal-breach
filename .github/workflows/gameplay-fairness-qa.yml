@@ -1,0 +1,30 @@
+name: Gameplay fairness QA (test only)
+
+on:
+  push:
+    branches: [qa/op07-10-solvability]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  solvability-sampling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify seeded production generator
+        run: node --experimental-strip-types --test tests/fairness-seeded.test.mjs
+      - name: Sample OP 06-10 using visible-information logical rules
+        run: |
+          mkdir -p qa-reports
+          node --experimental-strip-types scripts/analyze-board-solvability.mjs --samples=100 --json=qa-reports/fairness-op06-10.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fairness-analysis-op06-10
+          path: qa-reports/fairness-op06-10.json
+          if-no-files-found: error
+          retention-days: 14
