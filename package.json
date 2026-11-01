@@ -1,12 +1,12 @@
 {
   "name": "signal-breach",
   "private": false,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run test:engine && tsc --noEmit -p tsconfig.json && vite build",
-    "build:android": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run test:engine && tsc --noEmit -p tsconfig.json && vite build --mode android && node scripts/check-android-dist.mjs",
+    "build": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && tsc --noEmit -p tsconfig.json && vite build",
+    "build:android": "npm run check:terminology && npm run check:card-layout && npm run check:audio-toggle && npm run check:version && npm run test:engine && tsc --noEmit -p tsconfig.json && vite build --mode android && node scripts/check-android-dist.mjs",
     "preview": "vite preview",
     "check:terminology": "node scripts/check-ui-terminology.mjs",
     "check:card-layout": "node scripts/check-card-layout.mjs",
@@ -14,7 +14,8 @@
     "test:engine": "node --experimental-strip-types --test tests/game-engine.test.mjs",
     "android:configure": "node scripts/configure-android.mjs",
     "android:init": "npm run android:configure && npx cap add android && npx cap sync android",
-    "android:sync": "npm run build:android && npm run android:configure && npx cap sync android"
+    "android:sync": "npm run build:android && npm run android:configure && npx cap sync android",
+    "check:version": "node scripts/check-ui-version.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",

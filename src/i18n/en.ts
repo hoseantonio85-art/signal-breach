@@ -70,5 +70,4 @@ export const en = {
   helpCopy: 'Reveal clean nodes and quarantine suspected corruption. Each number shows how many corrupted nodes touch that cell. On mobile use SCAN/QUARANTINE or a long press.',
   close: 'Close',
   protocol: 'protocol 7.3 / local node',
-  build: 'v0.2.0 // TYPESCRIPT CORE',
 } as const

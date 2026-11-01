@@ -50,6 +50,8 @@ jobs:
         run: npm run build:android
       - name: Generate and sync native Android project
         run: npm run android:init
+      - name: Sync Android versionName and versionCode from package.json
+        run: node scripts/sync-android-version.mjs
       - name: Generate branded Android launcher icons
         run: |
           python3 scripts/generate-android-icons.py android

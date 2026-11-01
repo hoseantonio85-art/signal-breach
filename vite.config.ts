@@ -1,5 +1,8 @@
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import { readFileSync } from 'node:fs'
+
+const appVersion = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version as string
 
 // Android assets must be relative for the app's local WebView origin.
 // Pages deliberately keeps /signal-breach/ in the standard build.
@@ -18,4 +21,8 @@ function androidOfflineHtml(): Plugin {
 export default defineConfig(({ mode }) => ({
   plugins: [react(), ...(mode === 'android' ? [androidOfflineHtml()] : [])],
   base: mode === 'android' ? './' : '/signal-breach/',
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion),
+    __BUILD_TARGET__: JSON.stringify(mode === 'android' ? 'ANDROID' : 'WEB'),
+  },
 }))
