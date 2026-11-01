@@ -69,6 +69,24 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
+      # Capacitor/Gradle's generated debug signing configuration can ignore the
+      # injected ~/.android/debug.keystore. Explicitly sign the FINAL APK with
+      # the stable test key before verifying/publishing it.
+      - name: Sign final APK with persistent test identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="android/app/build/outputs/apk/debug/app-debug.apk"
+          signed="$RUNNER_TEMP/signal-breach-persistent-signed.apk"
+          test -s "$apk"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" sign \
+            --ks "$HOME/.android/debug.keystore" \
+            --ks-key-alias androiddebugkey \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --out "$signed" "$apk"
+          test -s "$signed"
+          mv "$signed" "$apk"
       - name: Verify APK signature and package identity
         shell: bash
         run: |
