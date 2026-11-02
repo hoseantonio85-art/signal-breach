@@ -33,6 +33,12 @@ jobs:
             node --experimental-strip-types scripts/analyze-board-solvability.mjs --samples=100 --variant="$variant" --json="qa-reports/ab-local-$variant.json"
             node --experimental-strip-types scripts/analyze-board-solvability.mjs --samples=60 --exact --variant="$variant" --json="qa-reports/ab-exact-$variant.json"
           done
+      - name: Audit early Campaign OP 01-05, including actual inset 3x3 first click
+        run: |
+          for variant in baseline opening; do
+            node --experimental-strip-types scripts/analyze-board-solvability.mjs --from=1 --to=5 --samples=120 --variant="$variant" --json="qa-reports/early-local-$variant.json"
+            node --experimental-strip-types scripts/analyze-board-solvability.mjs --from=1 --to=5 --samples=80 --exact --variant="$variant" --json="qa-reports/early-exact-$variant.json"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: fairness-analysis-op06-10
