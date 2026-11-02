@@ -183,20 +183,25 @@ function args() {
   let json = null
   let exactMode = false
   let variant = 'baseline'
+  let fromMission = 6
+  let toMission = 10
   for (const arg of process.argv.slice(2)) {
     if (arg.startsWith('--samples=')) samples = Number(arg.slice(10))
     else if (arg.startsWith('--json=')) json = arg.slice(7)
     else if (arg === '--exact') exactMode = true
     else if (arg.startsWith('--variant=')) variant = arg.slice(10)
+    else if (arg.startsWith('--from=')) fromMission = Number(arg.slice(7))
+    else if (arg.startsWith('--to=')) toMission = Number(arg.slice(5))
     else throw new Error('Unknown argument ' + arg)
   }
   if (!Number.isSafeInteger(samples) || samples < 1 || samples > 1000) throw new Error('samples must be integer 1..1000')
   if (!Object.hasOwn(variants, variant)) throw Error('invalid variant')
-  return { samples, json, exactMode, variant }
+  if (![fromMission, toMission].every(Number.isSafeInteger) || fromMission < 1 || toMission > 10 || fromMission > toMission) throw Error('invalid mission range')
+  return { samples, json, exactMode, variant, fromMission, toMission }
 }
 
-const { samples, json, exactMode, variant } = args()
-const targets = missions.filter(m => m.id >= 6)
+const { samples, json, exactMode, variant, fromMission, toMission } = args()
+const targets = missions.filter(m => m.id >= fromMission && m.id <= toMission)
 const findings = []
 for (const mission of targets) {
   for (const origin of ['center', 'corner']) {
