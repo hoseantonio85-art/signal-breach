@@ -27,6 +27,12 @@ jobs:
       - name: Exact bounded CSP check for proven guesses (small seeded sample)
         run: |
           node --experimental-strip-types scripts/analyze-board-solvability.mjs --samples=30 --exact --json=qa-reports/fairness-exact-op06-10.json
+      - name: A/B check, common seeded fields (no gameplay changes)
+        run: |
+          for variant in baseline density opening both; do
+            node --experimental-strip-types scripts/analyze-board-solvability.mjs --samples=100 --variant="$variant" --json="qa-reports/ab-local-$variant.json"
+            node --experimental-strip-types scripts/analyze-board-solvability.mjs --samples=60 --exact --variant="$variant" --json="qa-reports/ab-exact-$variant.json"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: fairness-analysis-op06-10
