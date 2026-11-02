@@ -245,7 +245,8 @@ export function GameScreen({
     if (phase === 'won' || phase === 'lost' || phase === 'review') return
     let working = board
     if (!working.generated) {
-      working = generateBoard(working, row, col)
+      working = generateBoard(working, row, col, Math.random,
+        session.kind === 'campaign' ? 'inset-3x3' : 'classic')
       elapsedMsRef.current = 0
       startedAt.current = document.hidden ? null : performance.now()
       switchPhase('running')
