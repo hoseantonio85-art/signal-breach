@@ -43,6 +43,15 @@
 - [ ] Проверить, что новое нативное меню «Поделиться результатом» работает (формат сообщения пока без изменений).
 - [ ] Занести фактический результат в [GitHub #13](https://github.com/hoseantonio85-art/signal-breach/issues/13).
 
+### 0.2.8 balance trial (do not release before feedback)
+- [ ] Android APK produced and final SHA-256 signing certificate matches v0.2.7; package ID unchanged; versionCode 2008.
+- [ ] Install **over** 0.2.7 with no uninstall. Campaign unlocks and best scores persist; unfinished OP 07–10 from 0.2.7 restores with old mine count, exact cells, flags and timer.
+- [ ] New OP 07: 14×14 / 40 mines; OP 08: 15×15 / 47; OP 09: 16×16 / 54; OP 10: 16×18 / 62.
+- [ ] Campaign first tap at all corners/edges protects inward 3×3 mine-free window; Free Run untouched.
+- [ ] Compare perceived difficulty OP 07/08 against 0.2.7. Does it still feel like classic Minesweeper rather than automatic success?
+- [ ] Previous campaign best scores are not wiped. Scoring reward bands for OP 07–10 remain comparable with pre-trial version.
+- [ ] Track feedback in GitHub #8, do not merge without owner's approval.
+
 ## Android QA
 - [ ] Установка / запуск на Android 13+ и на более узком экране
 - [ ] Нет полос/зазоров и конфликтов с системными жестами и вырезами
