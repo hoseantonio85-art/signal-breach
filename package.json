@@ -1,7 +1,7 @@
 {
   "name": "signal-breach",
   "private": false,
-  "version": "0.2.8",
+  "version": "0.2.9",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -27,8 +27,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "lucide-react": "^1.65.0",
-    "@capacitor/share": "8.0.1",
-    "@capacitor/clipboard": "8.0.1"
+    "@capacitor/share": "8.0.1"
   },
   "devDependencies": {
     "@capacitor/cli": "8.6.0",
