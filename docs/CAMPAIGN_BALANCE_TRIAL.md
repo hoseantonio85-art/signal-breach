@@ -38,3 +38,6 @@ New density helped center, and the full 3×3 opening generally improved the *amo
 5. Feedback determines if changes are worth including in a later release. Do not automatically merge draft PR or change main.
 
 Signing remains the same private Android *test* key, application ID com.hoseantonio85.signalbreach and monotonically increasing versionCode 2008. RuStore production signing will use a different key.
+
+## Промежуточная обратная связь, 2026-11-03
+Игрок тестирует `0.2.8`, после небольшой игры сообщил, что «вроде нормально», однако текущую OP 04 **ещё не завершил**. В исследовании ранних миссий подтверждены отдельные неизбежные угадывания даже в OP 01–05; для классического случайного Minesweeper они возможны. **Не считать тест баланса законченным; не менять минные параметры до более продолжительного прохождения OP 04–08.** Необходимо отдельно оценить UX горизонтального скролла (на двух скриншотах OP 04 карта показана в разных горизонтальных положениях). Без одобрения пользователя PR #16 не объединять.
