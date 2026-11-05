@@ -60,7 +60,11 @@ function scoreFor(session: GameSession, seconds: number) {
   const par = session.mission?.parSeconds ?? Math.max(45, session.mines * 4)
   const speedBonus = Math.max(0, par - seconds) * 30
   const overtime = Math.max(0, seconds - par) * 14
-  return Math.max(500, Math.round(5000 + session.mines * 95 + speedBonus - overtime))
+  // Keep score reward levels compatible with pre-balance best scores.
+  // New boards contain fewer mines, but completed mission records aren't reset.
+  const legacyRewards: Record<number, number> = { 7: 45, 8: 55, 9: 65, 10: 80 }
+  const rewardMines = session.mission ? (legacyRewards[session.mission.id] ?? session.mines) : session.mines
+  return Math.max(500, Math.round(5000 + rewardMines * 95 + speedBonus - overtime))
 }
 
 export function GameScreen({
@@ -245,7 +249,8 @@ export function GameScreen({
     if (phase === 'won' || phase === 'lost' || phase === 'review') return
     let working = board
     if (!working.generated) {
-      working = generateBoard(working, row, col)
+      working = generateBoard(working, row, col, Math.random,
+        session.kind === 'campaign' ? 'inset-3x3' : 'classic')
       elapsedMsRef.current = 0
       startedAt.current = document.hidden ? null : performance.now()
       switchPhase('running')

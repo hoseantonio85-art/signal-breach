@@ -88,3 +88,29 @@ test('restoration refuses incorrect mission or unknown Free Run presets', () => 
   freeSave.session.mines = 1
   assert.equal(sessionFromSave(freeSave, []), null)
 })
+
+test('legacy OP 07-10 live board with old mine count survives campaign rebalance update', () => {
+  const changes = [
+    { id: 7, rows: 14, cols: 14, old: 45, newCount: 40 },
+    { id: 8, rows: 15, cols: 15, old: 55, newCount: 47 },
+    { id: 9, rows: 16, cols: 16, old: 65, newCount: 54 },
+    { id: 10, rows: 16, cols: 18, old: 80, newCount: 62 },
+  ]
+  for (const m of changes) {
+    const newMission = { ...campaignMission, id: m.id, rows: m.rows, cols: m.cols, mines: m.newCount }
+    const oldGameSession = { kind: 'campaign', label: 'OP ' + String(m.id).padStart(2,'0'),
+      rows: m.rows, cols: m.cols, mines: m.old, mission: { ...newMission, mines: m.old } }
+    let board = generateBoard(createBoard(m.rows, m.cols, m.old), 3, 3, () => 0.34)
+    board = reveal(board, 3, 3).board
+    const index = board.cells.findIndex(cell => !cell.revealed)
+    board = toggleQuarantine(board, Math.floor(index / m.cols), index % m.cols)
+    const save = makeActiveSession(oldGameSession, board, 'running', 'quarantine', 45000)
+    assert.ok(validateActiveSession(save))
+    const restored = sessionFromSave(save, [newMission])
+    assert.equal(restored?.mines, m.old)
+    assert.equal(restored?.mission?.mines, m.old)
+    assert.equal(restored?.rows, m.rows)
+    assert.equal(restored?.cols, m.cols)
+    assert.equal(sessionFromSave({ ...save, session: { ...save.session, mines: m.old - 1 } }, [newMission]), null)
+  }
+})

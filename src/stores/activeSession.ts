@@ -136,14 +136,24 @@ export function clearActiveSession(storage: SessionStorage | null = localStore()
   try { storage?.removeItem(ACTIVE_SESSION_KEY) } catch { /* unavailable storage */ }
 }
 
+// Allow ongoing games from v0.2.7 (pre-balance-tuning) to survive an Android upgrade.
+// Only known historical mine counts are accepted; new missions use the updated counts.
+const LEGACY_CAMPAIGN_MINES: Record<number, number> = {
+  7: 45, 8: 55, 9: 65, 10: 80,
+}
+
 /** Rebuild the campaign mission from trusted sources instead of trusting JSON mission data. */
 export function sessionFromSave(save: ActiveSession, missions: Mission[]): GameSession | null {
   const s = save.session
   if (s.kind === 'campaign') {
     const mission = missions.find(m => m.id === s.missionId)
-    if (!mission || mission.rows !== s.rows || mission.cols !== s.cols || mission.mines !== s.mines) return null
+    if (!mission || mission.rows !== s.rows || mission.cols !== s.cols
+      || (mission.mines !== s.mines && LEGACY_CAMPAIGN_MINES[mission.id] !== s.mines)) return null
+    // The old board keeps its original mine count for the rest of this run.
+    // Starting the operation afresh uses the new campaign balancing.
+    const restoredMission = mission.mines === s.mines ? mission : { ...mission, mines: s.mines }
     return { kind: 'campaign', label: 'OP ' + String(mission.id).padStart(2, '0'),
-      rows: mission.rows, cols: mission.cols, mines: mission.mines, mission }
+      rows: mission.rows, cols: mission.cols, mines: s.mines, mission: restoredMission }
   }
   const presets = [
     { label: 'TRACE', rows: 9, cols: 9, mines: 10 },
