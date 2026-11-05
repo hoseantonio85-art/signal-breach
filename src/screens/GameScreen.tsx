@@ -298,7 +298,7 @@ export function GameScreen({
     const next = toggleQuarantine(board, row, col, interactionModeRef.current)
     updateBoard(next)
     const after = next.cells[key]
-    setLog(after.quarantined ? t.quarantineOn : t.quarantineOff)
+    setLog(after.quarantined ? (after.markOrigin === 'quarantine' ? t.hypothesisOn : t.scanMarkOn) : t.quarantineOff)
     audioEngine.ui('flag')
   }
 
