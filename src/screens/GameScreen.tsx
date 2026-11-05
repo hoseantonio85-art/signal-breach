@@ -398,7 +398,7 @@ export function GameScreen({
   const boardScrollable = session.rows > 9 || session.cols > 9
 
   return (
-    <main className={`game-app ${phase === 'lost' || phase === 'review' ? 'glitch-ready' : ''}`}>
+    <main className={`game-app mode-${interactionMode} ${phase === 'lost' || phase === 'review' ? 'glitch-ready' : ''}`}>
       <div className="scanlines" />
       <header className="game-topbar">
         <div className="game-brand">
