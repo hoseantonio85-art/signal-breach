@@ -1,22 +1,21 @@
 /**
  * Test-only typography switch for GitHub Pages preview:
  * /signal-breach/preview/?font=unbounded|tektur|russo
- * Display fonts are linked in index.html before the brief boot screen.
- * The production Android version must bundle approved font files locally.
+ * Approved Unbounded is now local; diagnostic Tektur/Russo are web-only.
  */
 const choices = {
-  unbounded: "'Unbounded'",
+  unbounded: "'Unbounded Variable'",
   tektur: "'Tektur'",
   russo: "'Russo One'",
 } as const
 
-// The approved display face is Unbounded. Other candidates remain accessible
-// through ?font=tektur or ?font=russo for design comparison only.
+// Android always uses approved local font; the ?font= experiment is web-only.
 const query = new URLSearchParams(window.location.search).get('font')
-const selected = query && Object.prototype.hasOwnProperty.call(choices, query) ? query as keyof typeof choices : 'unbounded'
-{
-  const family = choices[selected]
-  document.documentElement.dataset.displayFont = selected
-  document.documentElement.style.setProperty('--signal-display-font', family)
+const selected = import.meta.env.MODE === 'android'
+  ? 'unbounded'
+  : query && Object.prototype.hasOwnProperty.call(choices, query)
+    ? query as keyof typeof choices
+    : 'unbounded'
 
-}
+document.documentElement.dataset.displayFont = selected
+document.documentElement.style.setProperty('--signal-display-font', choices[selected])

@@ -28,15 +28,34 @@ export function neighbors(board: Board, row: number, col: number): Cell[] {
   return result
 }
 
-export function generateBoard(board: Board, safeRow: number, safeCol: number, random: () => number = Math.random): Board {
+export function generateBoard(
+  board: Board,
+  safeRow: number,
+  safeCol: number,
+  random: () => number = Math.random,
+  safeZone: 'classic' | 'inset-3x3' = 'classic',
+): Board {
   const next: Board = {
     ...board,
     generated: true,
     cells: board.cells.map((cell) => ({ ...cell, mine: false, adjacent: 0, exploded: false })),
   }
 
-  const protectedIndexes = new Set<number>([indexOf(next, safeRow, safeCol)])
-  for (const cell of neighbors(next, safeRow, safeCol)) protectedIndexes.add(indexOf(next, cell.row, cell.col))
+  const protectedIndexes = new Set<number>()
+  if (safeZone === 'inset-3x3' && next.rows >= 3 && next.cols >= 3) {
+    // Campaign-only: an equal-size 3x3 safe opening, including corners/edges.
+    const rowFrom = Math.max(0, Math.min(next.rows - 3, safeRow - 1))
+    const colFrom = Math.max(0, Math.min(next.cols - 3, safeCol - 1))
+    for (let row = rowFrom; row < rowFrom + 3; row += 1) {
+      for (let col = colFrom; col < colFrom + 3; col += 1) {
+        protectedIndexes.add(indexOf(next, row, col))
+      }
+    }
+  } else {
+    // Preserve the classic generator for Free Run and existing callers.
+    protectedIndexes.add(indexOf(next, safeRow, safeCol))
+    for (const cell of neighbors(next, safeRow, safeCol)) protectedIndexes.add(indexOf(next, cell.row, cell.col))
+  }
 
   let candidates = next.cells.map((_, index) => index).filter((index) => !protectedIndexes.has(index))
   if (candidates.length < next.mineCount) {

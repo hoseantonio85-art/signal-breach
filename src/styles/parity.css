@@ -84,7 +84,7 @@
   margin-right:0;
 }
 
-/* Quarantine marker from the HTML prototype: magenta diamond + cyan lock point. */
+/* Amber quarantines are hypotheses; confirmed corruption remains a red reticle. */
 .cell{
   display:grid;
   place-items:center;
@@ -93,9 +93,9 @@
   content:"";
   width:10px;
   height:10px;
-  border:1.5px solid var(--pink);
+  border:1.5px solid #ffc56b;
   transform:rotate(45deg);
-  box-shadow:0 0 10px rgba(255,79,216,.55), inset 0 0 5px rgba(255,79,216,.12);
+  box-shadow:0 0 10px rgba(255,197,107,.5), inset 0 0 5px rgba(255,197,107,.12);
 }
 .cell.flagged::after{
   content:"";
@@ -114,6 +114,12 @@
 .glitch-ready .cell.flagged.revealed::before,
 .glitch-ready .cell.flagged.revealed::after{
   display:none;
+}
+/* Confirmed mines in post-mortem have no amber hypothesis background. */
+.glitch-ready .cell.flagged.revealed{
+  border-color:rgba(93,119,150,.12);
+  background:rgba(7,12,25,.88);
+  box-shadow:none;
 }
 
 /* Revealed corruption / mine: exact pulsing reticle from the HTML prototype. */

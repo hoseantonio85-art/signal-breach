@@ -100,3 +100,9 @@
 - Общий CSS-хук `audio-toggle.active` используется и в `App.tsx`, и в `GameScreen.tsx`; обе кнопки имеют `aria-pressed`, `aria-label` и состояние на основе одного `audioOn`.
 - Регрессионная проверка `scripts/check-audio-toggle.mjs` запускается вместе с `npm run build`.
 - Код изменения остаётся в `feature/release-interactions-icons` до пользовательского разрешения на merge. Правка документации в `main` не означает слияния игрового кода.
+
+## 2026-11-01 — утверждён постоянный Android applicationId
+- Решение владельца: `com.hoseantonio85.signalbreach`.
+- Значение зафиксировано в `scripts/configure-android.mjs` и используется для всех debug-сборок и будущего RuStore release.
+- Не менять идентификатор без отдельного решения: обновление Android-приложения зависит от постоянного package ID и подписи.
+- R1 остаётся незавершённым до успешного APK и проверки на реальном Android-устройстве.

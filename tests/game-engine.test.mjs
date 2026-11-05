@@ -71,3 +71,31 @@ test('chord does nothing when the quarantine count is incorrect', () => {
   assert.strictEqual(result.board, board)
   assert.equal(result.revealedDelta, 0)
 })
+
+test('campaign inset first-click protects full 3x3 square at corners and edges', () => {
+  for (const mission of [
+    { rows: 14, cols: 14, mines: 40 },
+    { rows: 15, cols: 15, mines: 47 },
+    { rows: 16, cols: 16, mines: 54 },
+    { rows: 16, cols: 18, mines: 62 },
+  ]) {
+    const { rows, cols, mines } = mission
+    for (const [row, col] of [[0,0],[0,cols-1],[rows-1,0],[rows-1,cols-1],[0,Math.floor(cols/2)],[Math.floor(rows/2),0],[Math.floor(rows/2),Math.floor(cols/2)]]) {
+      const board = generateBoard(createBoard(rows, cols, mines), row, col, () => 0.37, 'inset-3x3')
+      assert.equal(board.cells.filter(cell => cell.mine).length, mines)
+      const r0 = Math.max(0, Math.min(rows - 3, row - 1))
+      const c0 = Math.max(0, Math.min(cols - 3, col - 1))
+      for (let r = r0; r < r0 + 3; r++) for (let c = c0; c < c0 + 3; c++) {
+        assert.equal(board.cells[r * cols + c].mine, false, 'inset window must be safe')
+      }
+      assert.equal(reveal(board, row, col).hitMine, false)
+    }
+  }
+})
+
+test('classic Free Run still protects only tapped cell plus adjacent cells', () => {
+  const board = generateBoard(createBoard(9, 9, 10), 0, 0, () => 0.37)
+  const protectedNeighbors = [board.cells[0], ...neighbors(board, 0, 0)]
+  assert.equal(protectedNeighbors.length, 4)
+  assert.ok(protectedNeighbors.every(cell => !cell.mine))
+})

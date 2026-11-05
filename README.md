@@ -1,41 +1,52 @@
 # SIGNAL//BREACH
 
-Atmospheric synthwave/cyberpunk Minesweeper game with campaign missions, RU/EN localization, mobile-first interaction, local progress, and a future Android build via Capacitor.
+Атмосферный synthwave/cyberpunk «Сапёр»: сюжетная кампания, Free Run, русский и английский языки, Android и браузер.
 
-> **Continue development in a new chat:** start with [docs/START_HERE.md](docs/START_HERE.md). Current milestones and checkboxes: [docs/ROADMAP.md](docs/ROADMAP.md). The Android readiness audit is [docs/ANDROID_READINESS_AUDIT.md](docs/ANDROID_READINESS_AUDIT.md).
+**Играть в браузере:** https://hoseantonio85-art.github.io/signal-breach/
 
-## Current direction
+**Скачать Android:** [GitHub Releases](https://github.com/hoseantonio85-art/signal-breach/releases). Пока публикуются **тестовые предварительные APK**, а не финальные RuStore-релизы. Новые тестовые APK устанавливаются поверх предыдущих с сохранением прогресса, если используется одинаковая подпись.
 
-This repository is the source of truth for the TypeScript migration of the working standalone prototype.
+**Текущая версия:** 0.2.10. Баланс поздних операций сглажен; янтарный карантин отделён от подтверждённых красных мин. Полная проверка OP 09–10, звука и подготовка RuStore ещё впереди.
 
-### Architecture
+> Продолжение проекта: [START_HERE.md](docs/START_HERE.md) · [ROADMAP.md](docs/ROADMAP.md) · [RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
 
-- React + TypeScript + Vite
-- pure game engine under `src/game`
-- screens under `src/screens`
-- campaign data under `src/campaign`
-- RU/EN dictionaries under `src/i18n`
-- local settings/progress stores under `src/stores`
-- Web Audio engine under `src/audio`
-- Capacitor will be added after the web build is stable
+## Технологии
 
-### Product flow
+- React 19 + TypeScript — интерфейс и игровой движок;
+- Vite 7 — сборка игры для Web и Android;
+- CSS — интерфейс, эффекты и анимация;
+- Web Audio API — синтез звуков;
+- Capacitor 8 — Android WebView, нативная отправка результатов;
+- GitHub Actions — тесты, публикация Pages, сборка и проверка APK.
 
-`Boot -> Main Menu -> Campaign / Free Run -> Mission / Difficulty -> Briefing -> Game -> Result -> Map Review`
+Одна кодовая база используется для Android и для браузера.
 
-### Migration principle
+## Архитектура
 
-The existing standalone HTML prototype is a visual and UX reference. The TypeScript migration should preserve the current atmosphere and interaction model rather than redesigning the game during refactoring.
+- src/game — игровой движок;
+- src/screens — экраны;
+- src/campaign — параметры миссий и сюжет;
+- src/i18n — русский и английский;
+- src/stores — настройки и прогресс;
+- src/audio — звуки;
+- tests — регрессионные тесты;
+- docs — документация и QA.
 
-## Development
+## Запуск
 
-```bash
-npm install
-npm run dev
-```
+    npm install
+    npm run dev
 
-Build:
+Проверка веб-сборки:
 
-```bash
-npm run build
-```
+    npm run build
+
+Подготовка Android-ассетов:
+
+    npm run build:android
+
+## Публикация
+
+Каждый push в main обновляет веб-версию на GitHub Pages. Android Actions собирает APK, проверяет сертификат подписи **самого конечного файла** и, после успешной проверки, автоматически создаёт новый **GitHub pre-release** с APK в разделе Releases. Версия и тег берутся из package.json.
+
+**Важно:** тестовый Android keystore хранится приватно, не в репозитории. В RuStore будет отдельная политика релизной подписи. Перед новым выпуском обязательно увеличивать версию, чтобы обновление устанавливалось поверх предыдущей.
