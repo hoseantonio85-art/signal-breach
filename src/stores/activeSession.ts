@@ -80,6 +80,8 @@ export function validateActiveSession(value: unknown): ActiveSession | null {
       || typeof cell.mine !== 'boolean'
       || typeof cell.revealed !== 'boolean'
       || typeof cell.quarantined !== 'boolean'
+      || (cell.markOrigin !== undefined && cell.markOrigin !== 'scan' && cell.markOrigin !== 'quarantine')
+      || (!cell.quarantined && cell.markOrigin !== undefined)
       || !nonNegativeInt(cell.adjacent) || cell.adjacent > 8
       || cell.exploded === true || (cell.revealed && cell.quarantined)) return null
     if (cell.mine) mineCount++
