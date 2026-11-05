@@ -1,5 +1,14 @@
 # SIGNAL//BREACH — продолжение работы из нового чата
 
+## ✅ Публикация GitHub Web + Android v0.2.10 (2026-11-05)
+- **Все новые изменения уже объединены в main (одобрено владельцем):** PR [#15](https://github.com/hoseantonio85-art/signal-breach/pull/15) (Fairness QA), [#16](https://github.com/hoseantonio85-art/signal-breach/pull/16) (баланс, карантин, снятие резервного блока, Pages/Releases), [#11](https://github.com/hoseantonio85-art/signal-breach/pull/11) (R2 автосохранение и Android UX), [#4](https://github.com/hoseantonio85-art/signal-breach/pull/4) (Android инфраструктура). Все **MERGED/CLOSED**. Коммит main после объединения: `5d2869359608d99875ccb6627b15b30dc0507733`. Не возвращаться к прежним записям ниже, что эти PR Draft/Open: они исторические.
+- **GitHub Pages уже обновился:** [актуальная веб-игра](https://hoseantonio85-art.github.io/signal-breach/), [успешный Pages run 41994836454](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41994836454). Pages автоматически публикует main.
+- **Готов первый GitHub Release:** [v0.2.10 · Android test](https://github.com/hoseantonio85-art/signal-breach/releases/tag/v0.2.10) — именно **Pre-release** (тестовая APK), с версионным файлом `signal-breach-0.2.10-android-debug.apk` и описанием. [Успешный Android + Release run 41994836474](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41994836474), итоговый сертификат `df9eef3fa25a957f3e4de84d0cb9375e1ce7101c97391c9435b68f066f5185e6` проверен, `versionCode 2010`, один package id. Release создан автоматически с помощью `github-prerelease` после зелёной сборки Android. Для нового тега поднять `package.json`, не перезаписывать прошлые выпуски.
+- **Никакого RuStore production релиза пока нет.** Понадобится отдельный release key, QA, политика публикации и карточка магазина. Тестовый keystore хранится приватно на Google Drive и GitHub secret.
+- **Открытый продуктовый QA:** игрок впервые дошёл до OP 09, не закончил OP 09/10; проверить янтарный карантин vs красный прицел [#17](https://github.com/hoseantonio85-art/signal-breach/issues/17), звук [#9](https://github.com/hoseantonio85-art/signal-breach/issues/9) (отложен), мобильное QA, [#8](https://github.com/hoseantonio85-art/signal-breach/issues/8) по балансу. Формат текста Share [#14](https://github.com/hoseantonio85-art/signal-breach/issues/14) в будущем.
+- **Технологии:** React 19 + TypeScript, Vite 7, CSS, Web Audio, Capacitor 8 (Android), одна кодовая база. База релизов — `main`; не нужно вручную собирать APK из feature-ветки после согласованного merge.
+
+
 ## Публикация main и GitHub Releases — 2026-11-05
 - Владелец одобрил объединение новых функциональных изменений и публикацию актуальной версии через GitHub Pages.
 - Текущий технологический стек: React + TypeScript + Vite, Capacitor 8 для Android; общий код двух платформ.
