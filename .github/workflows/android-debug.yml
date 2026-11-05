@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, release/android-rustore-v1]
   push:
-    branches: [release/android-rustore-v1, feature/r2-session-recovery, feature/campaign-balance-trial]
+    branches: [main, release/android-rustore-v1, feature/r2-session-recovery, feature/campaign-balance-trial]
   workflow_dispatch:
 
 permissions:
@@ -121,3 +121,45 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+  # Public GitHub Releases contain DEBUG tester APKs, not RuStore production builds.
+  github-prerelease:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [offline-web-bundle, debug-apk]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download the final signed Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: signal-breach-android-debug
+          path: release-artifacts
+      - name: Publish GitHub Android test pre-release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          tag="v${version}"
+          apk="release-artifacts/app-debug.apk"
+          test -s "$apk"
+          filename="release-artifacts/signal-breach-${version}-android-debug.apk"
+          mv "$apk" "$filename"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release ${tag} already exists; bump package version for the next one."
+            exit 0
+          fi
+          gh release create "$tag" "$filename" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "SIGNAL//BREACH ${tag} · Android test" \
+            --notes-file docs/GITHUB_RELEASE_NOTES.md \
+            --prerelease
+          echo "Published GitHub Android test release ${tag}."
