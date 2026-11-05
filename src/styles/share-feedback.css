@@ -1,0 +1,8 @@
+.share-feedback {
+  margin-top: 12px;
+  text-align: center;
+  font: 600 10px ui-monospace, SFMono-Regular, Menlo, monospace;
+  line-height: 1.5;
+  letter-spacing: .04em;
+  color: var(--cyan);
+}
