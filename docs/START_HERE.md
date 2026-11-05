@@ -1,5 +1,12 @@
 # SIGNAL//BREACH — продолжение работы из нового чата
 
+## UX hotfix — v0.2.11: цвета по активному режиму (2026-11-05)
+- Исправлено замечание пользователя: прежняя 0.2.10 показывала отметки оранжевыми и в Скане, и в Карантине. Теперь **Скан — розовые, Карантин — янтарные**; уже поставленные метки меняют цвет при переключении, состояния мин и число флагов не меняются.
+- Реализация: класс активного режима на game-app; обычная cell.flagged — розовая как раньше, только mode-quarantine переопределяет фон и ромб. Обнаруженные после поражения мины остаются красными прицелами в любом режиме.
+- Версия 0.2.11 / Android versionCode 2011. Добавлены 5 regression tests. Пользователь разрешил сразу merge после зелёного CI и релиз через Pages + GitHub Pre-release.
+- На устройстве проверить цвета, продолжение OP 09 и обновление поверх 0.2.10 без удаления. GitHub #17 закрывать после обратной связи.
+
+
 ## ✅ Публикация GitHub Web + Android v0.2.10 (2026-11-05)
 - **Все новые изменения уже объединены в main (одобрено владельцем):** PR [#15](https://github.com/hoseantonio85-art/signal-breach/pull/15) (Fairness QA), [#16](https://github.com/hoseantonio85-art/signal-breach/pull/16) (баланс, карантин, снятие резервного блока, Pages/Releases), [#11](https://github.com/hoseantonio85-art/signal-breach/pull/11) (R2 автосохранение и Android UX), [#4](https://github.com/hoseantonio85-art/signal-breach/pull/4) (Android инфраструктура). Все **MERGED/CLOSED**. Коммит main после объединения: `5d2869359608d99875ccb6627b15b30dc0507733`. Не возвращаться к прежним записям ниже, что эти PR Draft/Open: они исторические.
 - **GitHub Pages уже обновился:** [актуальная веб-игра](https://hoseantonio85-art.github.io/signal-breach/), [успешный Pages run 41994836454](https://github.com/hoseantonio85-art/signal-breach/actions/runs/41994836454). Pages автоматически публикует main.
