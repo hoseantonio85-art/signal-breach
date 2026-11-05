@@ -6,6 +6,8 @@ export type Cell = {
   mine: boolean
   revealed: boolean
   quarantined: boolean
+  // Absence on a quarantined legacy cell means a committed Scan mark.
+  markOrigin?: 'scan' | 'quarantine'
   adjacent: number
   exploded?: boolean
 }

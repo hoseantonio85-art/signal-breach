@@ -99,3 +99,41 @@ test('classic Free Run still protects only tapped cell plus adjacent cells', () 
   assert.equal(protectedNeighbors.length, 4)
   assert.ok(protectedNeighbors.every(cell => !cell.mine))
 })
+
+test('Scan marks and Quarantine hypotheses retain individual origins on one board', () => {
+  let board = boardWithOneCornerMine()
+  board = toggleQuarantine(board, 0, 0, 'scan')
+  board = toggleQuarantine(board, 2, 2, 'quarantine')
+  assert.equal(countQuarantined(board), 2)
+  assert.equal(board.cells[0].markOrigin, 'scan')
+  assert.equal(board.cells[8].markOrigin, 'quarantine')
+  assert.equal(reveal(board, 2, 2).revealedDelta, 0)
+  const old = board
+  // The "Scan" toggle does not change an orange marker just by entering Scan.
+  assert.equal(old.cells[8].markOrigin, 'quarantine')
+  // A deliberate different-mode mark converts the same cell without adding a flag.
+  board = toggleQuarantine(board, 2, 2, 'scan')
+  assert.equal(board.cells[8].markOrigin, 'scan')
+  assert.equal(countQuarantined(board), 2)
+  board = toggleQuarantine(board, 0, 0, 'quarantine')
+  assert.equal(board.cells[0].markOrigin, 'quarantine')
+  board = toggleQuarantine(board, 0, 0, 'quarantine')
+  assert.equal(board.cells[0].quarantined, false)
+  assert.equal(board.cells[0].markOrigin, undefined)
+  assert.equal(countQuarantined(board), 1)
+})
+
+test('legacy flags without mark origin are pink Scan marks, with reversible toggle', () => {
+  let board = toggleQuarantine(boardWithOneCornerMine(), 0, 0)
+  const legacyCells = board.cells.map(cell => {
+    const oldCell = { ...cell }
+    delete oldCell.markOrigin
+    return oldCell
+  })
+  board = { ...board, cells: legacyCells }
+  // The absence of markOrigin means an old committed Scan mark.
+  board = toggleQuarantine(board, 0, 0, 'scan')
+  assert.equal(board.cells[0].quarantined, false)
+  board = toggleQuarantine(board, 0, 0, 'quarantine')
+  assert.equal(board.cells[0].markOrigin, 'quarantine')
+})

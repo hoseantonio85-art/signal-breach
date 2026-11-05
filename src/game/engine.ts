@@ -74,11 +74,30 @@ export function generateBoard(
   return next
 }
 
-export function toggleQuarantine(board: Board, row: number, col: number): Board {
+/**
+ * A mark belongs to the mode in which it was CREATED, not the currently
+ * selected mode. Scan creates a committed pink flag; Quarantine creates a
+ * tentative amber flag. Same-kind tap removes it; other kind promotes/switches.
+ *
+ * Existing v0.2.11 saves have quarantined=true and no markOrigin: treat those
+ * as committed Scan flags so their historical meaning is not lost on update.
+ */
+export function toggleQuarantine(
+  board: Board, row: number, col: number,
+  markOrigin: 'scan' | 'quarantine' = 'scan',
+): Board {
   const key = indexOf(board, row, col)
   const cell = board.cells[key]
   if (!cell || cell.revealed) return board
-  const cells = board.cells.map((entry, index) => index === key ? { ...entry, quarantined: !entry.quarantined } : entry)
+  const cells = board.cells.map((entry, index) => {
+    if (index !== key) return entry
+    if (entry.quarantined && (entry.markOrigin ?? 'scan') === markOrigin) {
+      const unmarked = { ...entry, quarantined: false }
+      delete unmarked.markOrigin
+      return unmarked
+    }
+    return { ...entry, quarantined: true, markOrigin }
+  })
   return { ...board, cells }
 }
 

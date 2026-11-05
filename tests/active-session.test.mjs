@@ -114,3 +114,42 @@ test('legacy OP 07-10 live board with old mine count survives campaign rebalance
     assert.equal(sessionFromSave({ ...save, session: { ...save.session, mines: m.old - 1 } }, [newMission]), null)
   }
 })
+
+test('pink and orange flags persist independently through active-session storage', () => {
+  let board = generateBoard(createBoard(14, 14, 45), 5, 5, () => 0.34)
+  board = reveal(board, 5, 5).board
+  const hidden = board.cells.filter(cell => !cell.revealed)
+  board = toggleQuarantine(board, hidden[0].row, hidden[0].col, 'scan')
+  board = toggleQuarantine(board, hidden[1].row, hidden[1].col, 'quarantine')
+  const save = makeActiveSession(gameSession, board, 'running', 'scan', 54321)
+  const store = fakeStorage()
+  assert.ok(writeActiveSession(save, store))
+  const restored = readActiveSession(store)
+  assert.equal(restored.board.cells[hidden[0].row * 14 + hidden[0].col].markOrigin, 'scan')
+  assert.equal(restored.board.cells[hidden[1].row * 14 + hidden[1].col].markOrigin, 'quarantine')
+  assert.equal(restored.elapsedMs, 54321)
+  assert.equal(restored.interactionMode, 'scan')
+  assert.deepEqual(restored.board, board)
+})
+
+test('v0.2.11 legacy saved flags without origin remain valid; invalid types are rejected', () => {
+  const board = toggleQuarantine(createBoard(14, 14, 45), 1, 1, 'scan')
+  const flag = board.cells[15]
+  delete flag.markOrigin
+  const original = makeActiveSession(gameSession, board, 'idle', 'quarantine', 0)
+  assert.ok(validateActiveSession(original))
+  const store = fakeStorage()
+  assert.ok(writeActiveSession(original, store))
+  const restored = readActiveSession(store)
+  assert.equal(restored.board.cells[15].quarantined, true)
+  assert.equal(restored.board.cells[15].markOrigin, undefined)
+  for (const invalid of ['blue', false, null, 123]) {
+    const bad = structuredClone(original)
+    bad.board.cells[15].markOrigin = invalid
+    assert.equal(validateActiveSession(bad), null)
+  }
+  const invalidNoFlag = structuredClone(original)
+  invalidNoFlag.board.cells[15].quarantined = false
+  invalidNoFlag.board.cells[15].markOrigin = 'quarantine'
+  assert.equal(validateActiveSession(invalidNoFlag), null)
+})
