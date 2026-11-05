@@ -295,7 +295,7 @@ export function GameScreen({
     const key = row * board.cols + col
     const before = board.cells[key]
     if (!before || before.revealed) return
-    const next = toggleQuarantine(board, row, col)
+    const next = toggleQuarantine(board, row, col, interactionModeRef.current)
     updateBoard(next)
     const after = next.cells[key]
     setLog(after.quarantined ? t.quarantineOn : t.quarantineOff)
@@ -377,9 +377,11 @@ export function GameScreen({
 
   function cellLabel(row: number, col: number) {
     const cell = board.cells[row * board.cols + col]
-    if (cell.quarantined) return language === 'ru' ? `Узел ${coord(row, col)}, карантин` : `Node ${coord(row, col)}, quarantined`
+    if (cell.revealed && cell.mine) return language === 'ru' ? `Узел ${coord(row, col)}, заражение` : `Node ${coord(row, col)}, corruption`
+    if (cell.quarantined) return cell.markOrigin === 'quarantine'
+      ? (language === 'ru' ? `Узел ${coord(row, col)}, гипотеза` : `Node ${coord(row, col)}, hypothesis`)
+      : (language === 'ru' ? `Узел ${coord(row, col)}, помеченная мина` : `Node ${coord(row, col)}, marked mine`)
     if (!cell.revealed) return language === 'ru' ? `Узел ${coord(row, col)}, не просканирован` : `Node ${coord(row, col)}, not scanned`
-    if (cell.mine) return language === 'ru' ? `Узел ${coord(row, col)}, заражение` : `Node ${coord(row, col)}, corruption`
     return language === 'ru' ? `Узел ${coord(row, col)}, чистый` : `Node ${coord(row, col)}, clean`
   }
 
@@ -398,7 +400,7 @@ export function GameScreen({
   const boardScrollable = session.rows > 9 || session.cols > 9
 
   return (
-    <main className={`game-app mode-${interactionMode} ${phase === 'lost' || phase === 'review' ? 'glitch-ready' : ''}`}>
+    <main className={`game-app ${phase === 'lost' || phase === 'review' ? 'glitch-ready' : ''}`}>
       <div className="scanlines" />
       <header className="game-topbar">
         <div className="game-brand">
@@ -438,7 +440,10 @@ export function GameScreen({
                 {board.cells.map((cell) => {
                   const classes = ['cell']
                   if (cell.revealed) classes.push('revealed')
-                  if (cell.quarantined) classes.push('flagged')
+                  if (cell.quarantined) {
+                    classes.push('flagged')
+                    classes.push(cell.markOrigin === 'quarantine' ? 'flagged-tentative' : 'flagged-confirmed')
+                  }
                   if (cell.exploded) classes.push('exploded')
                   if (cell.revealed && !cell.mine && cell.adjacent) classes.push(`n${cell.adjacent}`)
                   return (

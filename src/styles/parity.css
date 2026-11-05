@@ -84,8 +84,8 @@
   margin-right:0;
 }
 
-/* Flag color follows active interaction mode: Scan pink, Quarantine amber.
-   The cyan center remains unchanged and the game flag state is unchanged. */
+/* Mark color belongs to the cell: Scan's committed mark stays pink,
+   Quarantine's tentative hypothesis stays amber across mode switches. */
 .cell{
   display:grid;
   place-items:center;
@@ -98,7 +98,7 @@
   transform:rotate(45deg);
   box-shadow:0 0 10px rgba(255,79,216,.55), inset 0 0 5px rgba(255,79,216,.12);
 }
-.game-app.mode-quarantine .cell.flagged::before{
+.cell.flagged.flagged-tentative::before{
   border-color:#ffc56b;
   box-shadow:0 0 10px rgba(255,197,107,.5), inset 0 0 5px rgba(255,197,107,.12);
 }
