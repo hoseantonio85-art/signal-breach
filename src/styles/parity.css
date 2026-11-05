@@ -84,7 +84,8 @@
   margin-right:0;
 }
 
-/* Amber quarantines are hypotheses; confirmed corruption remains a red reticle. */
+/* Flag color follows active interaction mode: Scan pink, Quarantine amber.
+   The cyan center remains unchanged and the game flag state is unchanged. */
 .cell{
   display:grid;
   place-items:center;
@@ -93,8 +94,12 @@
   content:"";
   width:10px;
   height:10px;
-  border:1.5px solid #ffc56b;
+  border:1.5px solid var(--pink);
   transform:rotate(45deg);
+  box-shadow:0 0 10px rgba(255,79,216,.55), inset 0 0 5px rgba(255,79,216,.12);
+}
+.game-app.mode-quarantine .cell.flagged::before{
+  border-color:#ffc56b;
   box-shadow:0 0 10px rgba(255,197,107,.5), inset 0 0 5px rgba(255,197,107,.12);
 }
 .cell.flagged::after{
@@ -115,8 +120,8 @@
 .glitch-ready .cell.flagged.revealed::after{
   display:none;
 }
-/* Confirmed mines in post-mortem have no amber hypothesis background. */
-.glitch-ready .cell.flagged.revealed{
+/* Confirmed mines in post-mortem are red reticles, regardless of mode. */
+.game-app.glitch-ready .cell.flagged.revealed{
   border-color:rgba(93,119,150,.12);
   background:rgba(7,12,25,.88);
   box-shadow:none;
