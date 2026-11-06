@@ -1,0 +1,137 @@
+# Isolated RuStore release candidate. No automatic store publication.
+# pull_request: unsigned assembleRelease smoke test, NO access to production secrets.
+# workflow_dispatch on main: sign and verify the final APK with the separate production key.
+name: RuStore release candidate
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  assemble-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Prepare Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${ANDROID_HOME:?Android SDK not installed}"
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          test -n "$sdkmanager"
+          "$sdkmanager" --install "platforms;android-36" "build-tools;36.0.0"
+      - name: Install app dependencies
+        run: npm install --no-audit --no-fund
+      - name: Validate and bundle offline game
+        run: npm run build:android
+      - name: Generate Android project
+        run: |
+          npm run android:init
+          node scripts/sync-android-version.mjs
+          python3 scripts/generate-android-icons.py android
+          test -s android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          test -s android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+      - name: Assemble actual RELEASE variant (not debug)
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+      - name: Verify unsigned release manifest and version
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -s "$apk"
+          aapt="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          expected_name="$(node -p "require('./package.json').version")"
+          expected_code="$(node -p "const [a,b,c]=require('./package.json').version.split('.').map(Number);a*1000000+b*1000+c")"
+          badge="$("$aapt" dump badging "$apk" | head -n 1)"
+          [[ "$badge" == *"name='com.hoseantonio85.signalbreach'"* ]]
+          [[ "$badge" == *"versionCode='$expected_code'"* ]]
+          [[ "$badge" == *"versionName='$expected_name'"* ]]
+          "$aapt" dump xmltree "$apk" AndroidManifest.xml > "$RUNNER_TEMP/release-manifest.txt"
+          if grep -F 'android:debuggable' "$RUNNER_TEMP/release-manifest.txt" | grep -Fvq '(type 0x12)0x0'; then
+            echo "::error::Release APK must not be debuggable"
+            exit 1
+          fi
+          echo "Release manifest and version verified: $expected_name / $expected_code"
+          "$aapt" dump permissions "$apk"
+      # Upload only for a deliberate manual production run, never for a PR.
+      - name: Sign, verify, and stage RuStore APK
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          RELEASE_KEYSTORE_B64: ${{ secrets.SIGNAL_BREACH_RELEASE_KEYSTORE_B64 }}
+          RELEASE_KEY_ALIAS: ${{ secrets.SIGNAL_BREACH_RELEASE_KEY_ALIAS }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.SIGNAL_BREACH_RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.SIGNAL_BREACH_RELEASE_KEY_PASSWORD }}
+          EXPECTED_CERT_SHA256: ${{ vars.SIGNAL_BREACH_RELEASE_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          # Prevent accidentally shipping a test version as a store candidate.
+          version="$(node -p "require('./package.json').version")"
+          [[ "$version" =~ ^1\.[0-9]+\.[0-9]+$ ]] || {
+            echo "::error::Bump package.json to approved v1.x.x before production signing"
+            exit 1
+          }
+          for variable in RELEASE_KEYSTORE_B64 RELEASE_KEY_ALIAS RELEASE_STORE_PASSWORD RELEASE_KEY_PASSWORD EXPECTED_CERT_SHA256; do
+            if [[ -z "${!variable}" ]]; then
+              echo "::error::Missing release signing secret/variable: $variable"
+              exit 1
+            fi
+          done
+          expected="$(printf '%s' "$EXPECTED_CERT_SHA256" | tr '[:upper:]' '[:lower:]' | tr -cd '0-9a-f')"
+          [[ "${#expected}" -eq 64 ]] || { echo "::error::Invalid expected certificate SHA-256"; exit 1; }
+          umask 077
+          keystore="$RUNNER_TEMP/signal-breach-production.keystore"
+          aligned="$RUNNER_TEMP/signal-breach-release-aligned.apk"
+          signed="$RUNNER_TEMP/signal-breach-release-signed.apk"
+          trap 'rm -f "$keystore" "$aligned"' EXIT
+          printf '%s' "$RELEASE_KEYSTORE_B64" | base64 --decode > "$keystore"
+          test -s "$keystore"
+          source_apk="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          build_tools="$ANDROID_HOME/build-tools/36.0.0"
+          "$build_tools/zipalign" -p -f 4 "$source_apk" "$aligned"
+          "$build_tools/apksigner" sign \
+            --ks "$keystore" \
+            --ks-key-alias "$RELEASE_KEY_ALIAS" \
+            --ks-pass env:RELEASE_STORE_PASSWORD \
+            --key-pass env:RELEASE_KEY_PASSWORD \
+            --out "$signed" "$aligned"
+          "$build_tools/zipalign" -c -v 4 "$signed"
+          "$build_tools/apksigner" verify --verbose --print-certs "$signed" > "$RUNNER_TEMP/release-signature.txt"
+          actual="$(sed -n 's/.*Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/release-signature.txt" | head -n 1 | tr 'A-F' 'a-f' | tr -cd '0-9a-f')"
+          [[ "$actual" == "$expected" ]] || {
+            echo "::error::APK signer does not match the pinned production certificate"
+            exit 1
+          }
+          aapt="$build_tools/aapt"
+          badge="$("$aapt" dump badging "$signed" | head -n 1)"
+          expected_code="$(node -p "const [a,b,c]=require('./package.json').version.split('.').map(Number);a*1000000+b*1000+c")"
+          [[ "$badge" == *"name='com.hoseantonio85.signalbreach'"* ]]
+          [[ "$badge" == *"versionCode='$expected_code'"* ]]
+          [[ "$badge" == *"versionName='$version'"* ]]
+          "$aapt" dump permissions "$signed"
+          echo "Production certificate SHA-256: $actual"
+          sha256sum "$signed"
+          mkdir -p release-artifacts
+          cp "$signed" "release-artifacts/signal-breach-${version}-rustore-release.apk"
+      - name: Upload verified release candidate for manual QA (NOT published)
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: signal-breach-rustore-release-candidate
+          path: release-artifacts/signal-breach-*-rustore-release.apk
+          if-no-files-found: error
+          retention-days: 7
