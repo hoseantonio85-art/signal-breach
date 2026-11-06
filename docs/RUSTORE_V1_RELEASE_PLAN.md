@@ -47,6 +47,8 @@
 
 **Сначала production `assembleRelease` и отдельный signing key**, параллельно карточка магазина и короткий QA звука/маркеров, затем выпуск v1.0.0, контрольная установка (без требования сохранять старый тестовый прогресс), пробное обновление production v1.0.0→v1.0.1, отправка на модерацию. Не начинать нативный Kotlin до первого RuStore релиза.
 
+**Первый результат:** [PR #21 — CI release run 42285765055](https://github.com/hoseantonio85-art/signal-breach/actions/runs/42285765055) — успешная unsigned `assembleRelease` сборка 0.2.12/2012. Manifest permission: INTERNET и generated internal receiver permission. Production signed APK и реальный update test пока отсутствуют.
+
 **Подготовлено в ветке:** `.github/workflows/rustore-release.yml` проверяет unsigned `assembleRelease` на pull request без доступа к production secrets. После отдельного одобрения и merge в `main` ручной `workflow_dispatch` сможет подписать релизный APK только при наличии production secrets, проверки сертификата, версии `1.x.x`, package ID и `debuggable=false`. Готовый файл остаётся GitHub Actions artifact для QA и **не публикуется автоматически**. Пока ключ и secrets не настроены, подписанного production APK нет.
 
 **GitHub:** основной выпуск GitHub Pages и тестовые APK продолжают идти по `main`; отдельные production secrets и release workflow не должны прикреплять production ключи к общедоступному test pre-release. Текущие `v0.2.10/11/12` — тестовые GitHub Pre-releases, а не RuStore релизы.
