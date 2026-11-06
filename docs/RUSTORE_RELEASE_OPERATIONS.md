@@ -46,6 +46,11 @@ base64 -w 0 signal-breach-rustore-release.jks
 
 Удалить временные файлы с base64 сразу после настройки. Оригинальный JKS и пароли должны пережить потерю GitHub-аккаунта и доступность CI. Не использовать существующий `SIGNAL_BREACH_DEBUG_KEYSTORE_B64`.
 
+### Первый CI-результат (2026-11-06)
+
+- [x] [PR #21: `assembleRelease` / run 42285765055](https://github.com/hoseantonio85-art/signal-breach/actions/runs/42285765055) — **SUCCESS**. Получен реальный unsigned release APK на CI (v0.2.12 / versionCode 2012); проверены package ID и отсутствие debug mode. Это проверка пайплайна, **не** подписанный APK RuStore.
+- **Фактические permission entries unsigned APK:** `android.permission.INTERNET`, а также generated `com.hoseantonio85.signalbreach.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` (receiver internal permission). Наличие INTERNET permission само по себе не доказывает передачу данных. Перед релизом отдельно проверить runtime-сетевые запросы/SDK, чтобы верно заполнить декларацию.
+
 ## Безопасный процесс CI
 
 1. PR из `prep/rustore-release-candidate` выполняет web/Android проверки и **`./gradlew assembleRelease`** на временном runner. **Без production secrets, без подписанного APK**, без отправки в RuStore.
