@@ -1,7 +1,15 @@
 # Android / RuStore v1 — дорожная карта
 
-**Обновлено: 2026-11-05. R3: достигнута OP 09 в тестовом балансе, а UX карантина дорабатывается в 0.2.10. Затем QA и RuStore.**
+**Обновлено: 2026-11-06. Баланс v1 принят (достигнута OP10); переходим к release signing, переносу прогресса, короткому Android QA и публикации RuStore.**
 Основа: опубликованная ветка `main` после [PR #2](https://github.com/hoseantonio85-art/signal-breach/pull/2) и [PR #3](https://github.com/hoseantonio85-art/signal-breach/pull/3). Цель: бесплатная, полностью офлайн-игра без регистрации, рекламы, сервера и покупок.
+
+## Релизный фокус 2026-11-06 — принятие классического сапёра
+- Игрок дошёл до OP 10, текущий баланс оценивает как приемлемый, готов двигаться к публикации. Игровой QA не означает документированное завершение OP10.
+- **Классические случайные поля могут требовать угадывания**; не вводить No Guess в v1, исследование/тюнинг [#8](https://github.com/hoseantonio85-art/signal-breach/issues/8) закрыты.
+- Release P0: production `assembleRelease` + production key (отдельный от test debug) и **безопасная миграция сохранений с существующего пакета**, так как инсталляция с несовпадающим сертификатом не обновит тестовую APK и может потерять прогресс при удалении.
+- Release P1: телефонный тест новых двух видов меток [#17](https://github.com/hoseantonio85-art/signal-breach/issues/17), звук [#9](https://github.com/hoseantonio85-art/signal-breach/issues/9), офлайн/Back/Free Run/большие поля/RU EN.
+- Release P2: RuStore developer account, скриншоты, описание, контакт, возраст, декларация разрешений/приватности, загрузка и модерация.
+- Основной документ [RUSTORE_V1_RELEASE_PLAN.md](RUSTORE_V1_RELEASE_PLAN.md); release epic [#7](https://github.com/hoseantonio85-art/signal-breach/issues/7). Kotlin [#18](https://github.com/hoseantonio85-art/signal-breach/issues/18) отложен.
 
 **Для продолжения из нового чата:** [START_HERE.md](START_HERE.md) — статус, следующая задача, правила веток и ссылки.  
 **Технический аудит и приоритеты:** [ANDROID_READINESS_AUDIT.md](ANDROID_READINESS_AUDIT.md).  
