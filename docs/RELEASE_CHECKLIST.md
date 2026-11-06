@@ -3,14 +3,16 @@
 ## V1 GATE — 2026-11-06, переход к релизу
 - [x] Игрок дошёл до OP10 (не обязательно победил) и считает баланс в целом приемлемым. Стандартный Minesweeper допускает вынужденное угадывание; **No Guess не входит в v1**. [Баланс #8](https://github.com/hoseantonio85-art/signal-breach/issues/8) продуктово принят.
 - [x] GitHub Pages и test GitHub Pre-release `0.2.12` опубликованы, web/Android CI зелёный, постоянный **тестовый** сертификат подтверждён.
-- [ ] **Release P0:** согласовать production release key и release-build (не debug). Создать ключ, сохранить приватный бэкап и обеспечить безопасный перенос текущего прогресса, прежде чем предлагать удаление тестовой APK.
+- [x] **Решение владельца:** личный прогресс тестовой APK переносить не нужно. При смене подписи допустима переустановка с потерей тестовых сохранений; предупредить перед удалением. Production-обновления должны сохранять прогресс.
+- [x] **Release CI подготовлен (ветка `prep/rustore-release-candidate`):** отдельный workflow собирает `assembleRelease` и предусматривает ручную production-подпись; **ещё не проверено CI/не выпущена APK**.
+- [ ] **Release P0:** согласовать production package/version/key, создать отдельный ключ с приватной резервной копией, настроить secrets и проверить выпуск signing workflow после code-review.
 - [ ] **Release P0:** production APK `assembleRelease` проверить по package/versionCode/certificate/permissions/debuggable и испытать последовательное обновление двух production версий без потери прогресса.
 - [ ] **Android QA:** проверить одновременно розовую и оранжевую отметку после переключения/закрытия [#17](https://github.com/hoseantonio85-art/signal-breach/issues/17); звук [#9](https://github.com/hoseantonio85-art/signal-breach/issues/9); один проход поражение/победа/Back/продолжить, Free Run, 16×30 pan, RU/EN, офлайн.
 - [ ] **RuStore:** учётная запись, описание, иконка, реальные скриншоты, возрастная категория, контакты, информация о данных/разрешениях, политика (если требуются), загрузка production APK/AAB.
 - [ ] Только после контрольной установки и проверки owner **явно подтверждает отправку на модерацию**.
 - [ ] Kotlin [#18](https://github.com/hoseantonio85-art/signal-breach/issues/18), No Guess, сканер/кредиты и необязательные доработки Share — вне v1 scope.
 
-Подробности: [RUSTORE_V1_RELEASE_PLAN.md](RUSTORE_V1_RELEASE_PLAN.md).
+Подробности: [RUSTORE_V1_RELEASE_PLAN.md](RUSTORE_V1_RELEASE_PLAN.md), [операционная инструкция](RUSTORE_RELEASE_OPERATIONS.md), [черновик карточки RuStore](RUSTORE_STORE_LISTING_DRAFT.md).
 
 
 ## v0.2.12 — два сохраняемых типа меток (2026-11-05)
