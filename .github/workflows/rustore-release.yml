@@ -39,9 +39,19 @@ jobs:
         run: |
           npm run android:init
           node scripts/sync-android-version.mjs
-          python3 scripts/generate-android-icons.py android
+          python3 scripts/generate-android-icons.py android --store-icon release-artifacts/rustore-icon-512.png
           test -s android/app/src/main/res/mipmap-hdpi/ic_launcher.png
           test -s android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          p = Path('release-artifacts/rustore-icon-512.png')
+          raw = p.read_bytes()
+          assert raw[:8] == b'\x89PNG\r\n\x1a\n'
+          assert struct.unpack('>II', raw[16:24]) == (512, 512)
+          assert p.stat().st_size < 3 * 1024 * 1024
+          print(f'RuStore icon verified: 512x512, {p.stat().st_size} bytes')
+          PY
       - name: Assemble actual RELEASE variant (not debug)
         working-directory: android
         run: |
@@ -67,6 +77,13 @@ jobs:
           fi
           echo "Release manifest and version verified: $expected_name / $expected_code"
           "$aapt" dump permissions "$apk"
+      - name: Upload store icon for RuStore listing QA (not a public release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: signal-breach-rustore-store-icon
+          path: release-artifacts/rustore-icon-512.png
+          if-no-files-found: error
+          retention-days: 14
       # Upload only for a deliberate manual production run, never for a PR.
       - name: Sign, verify, and stage RuStore APK
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
