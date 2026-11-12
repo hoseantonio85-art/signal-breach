@@ -1,7 +1,16 @@
 # SIGNAL//BREACH — продолжение работы из нового чата
 
-## ОБНОВЛЕНО 2026-11-12 — RuStore v1 preparation
-- [Draft PR #21](https://github.com/hoseantonio85-art/signal-breach/pull/21) остаётся отдельным от `main`, без production ключа или отправки на модерацию.
+## АКТУАЛЬНЫЙ СТАТУС — 2026-11-13
+- [x] [PR #21](https://github.com/hoseantonio85-art/signal-breach/pull/21) **MERGED** в `main` (`e8015755`): release CI, изолированный production signing-job, 512×512 RuStore icon, lockfile, документы. В `main` по-прежнему **0.2.12**.
+- [x] **Проверки после merge:** [GitHub Pages](https://github.com/hoseantonio85-art/signal-breach/actions/runs/43308401816) и [Android debug](https://github.com/hoseantonio85-art/signal-breach/actions/runs/43308401683) — SUCCESS. GitHub Pages продолжает работу.
+- [ ] [Draft PR #23](https://github.com/hoseantonio85-art/signal-breach/pull/23): **кандидат v1.0.0**, только `package.json` и `package-lock.json`, Android code `1000000`, пакет `com.hoseantonio85.signalbreach`. CI проверить до merge; **не объединять без согласования production identity и дальнейших шагов**.
+- [ ] Production key **не создан и не настроен**, подписанный release APK не выпускался, публикации RuStore не было. Следующий необходимый ручной этап владельца: ключ на доверенном устройстве, приватная резервная копия и GitHub Secrets. Затем `workflow_dispatch` на `main` для подписи/QA.
+- [ ] Критерии перед магазином: обновление production 1.0.0→1.0.1 **поверх** с сохранениями, Android smoke, настоящий скриншоты, контакты и декларации RuStore. **Личный debug прогресс 0.2.x переносить не требуется.**
+- [Операции RuStore](RUSTORE_RELEASE_OPERATIONS.md) · [карточка](RUSTORE_STORE_LISTING_DRAFT.md) · [релизная задача #7](https://github.com/hoseantonio85-art/signal-breach/issues/7). Kotlin [#18](https://github.com/hoseantonio85-art/signal-breach/issues/18) и backend [#22](https://github.com/hoseantonio85-art/signal-breach/issues/22) — после v1.
+
+
+## ИСТОРИЯ 2026-11-12 — RuStore v1 preparation
+- На тот момент [PR #21](https://github.com/hoseantonio85-art/signal-breach/pull/21) ещё был Draft. **Уже объединён 2026-11-13.** Production ключ и отправка на модерацию по-прежнему впереди.
 - Все CI проверки исходной release-подготовки от 2026-11-06 прошли; 2026-11-12 добавлены автоматическая store icon 512×512 из настоящего launcher-сигила, `package-lock.json` (221 пакет), переход главных Actions на `npm ci` и черновик privacy notice. Исправлена потенциальная поломка Pages preview (у legacy ветки нет lockfile), производство подписи изолировано от npm/Gradle в отдельном job, проверяется allowlist Android permissions. Сверить финальный CI после последних правок.
 - **Следующий технический gate:** после зелёного PR CI согласовать merge, package/version 1.0.0, отдельную production-подпись с приватным бэкапом и контрольные установки. Тестовый прогресс переносить не нужно; production прогресс и обновления сохранять обязательно.
 - [Инструкция release](RUSTORE_RELEASE_OPERATIONS.md) · [черновик RuStore карточки](RUSTORE_STORE_LISTING_DRAFT.md) · [черновик privacy](PRIVACY_POLICY_RUSTORE_DRAFT.md).

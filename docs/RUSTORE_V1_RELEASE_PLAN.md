@@ -1,5 +1,12 @@
 # SIGNAL//BREACH — план первого релиза RuStore (v1)
 
+## Релизный статус — 2026-11-13
+- **Инфраструктура:** [PR #21](https://github.com/hoseantonio85-art/signal-breach/pull/21) объединён в `main` (e8015755). Сборка без production ключа, подпись отдельно, проверка permissions. Pages и Android debug после merge успешны.
+- **Готовится версия:** [Draft PR #23](https://github.com/hoseantonio85-art/signal-breach/pull/23) меняет только версию с `0.2.12` на **`1.0.0`** (`versionCode=1000000`, `com.hoseantonio85.signalbreach`). Оставить Draft до CI и утверждения владельцем production identity. `main` пока 0.2.12.
+- **Нет пока:** production keystore, подписанного APK, фактического production upgrade-теста, финальной карточки и публикации в RuStore. Личный прогресс тестовой APK не переносить; production 1.0.0→1.0.1 обязательно с сохранениями.
+- [Release operations](RUSTORE_RELEASE_OPERATIONS.md) · [START_HERE](START_HERE.md) · [Issue #7](https://github.com/hoseantonio85-art/signal-breach/issues/7).
+
+
 ## Решение о технологической эволюции (2026-11-12)
 
 - RuStore v1 выпускается на текущем стеке **React + TypeScript + Capacitor, офлайн и без бэкенда**. Это не мешает впоследствии перейти на Kotlin/Jetpack Compose и/или внедрить API, БД, облачные функции в **том же приложении RuStore**. Два направления независимы: [Kotlin #18](https://github.com/hoseantonio85-art/signal-breach/issues/18), [backend #22](https://github.com/hoseantonio85-art/signal-breach/issues/22).

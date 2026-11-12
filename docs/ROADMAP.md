@@ -1,5 +1,12 @@
 # Android / RuStore v1 — дорожная карта
 
+## Актуально 2026-11-13 — release-инфраструктура в main
+- [x] Изолированный RuStore release CI и signing через [PR #21](https://github.com/hoseantonio85-art/signal-breach/pull/21) объединены с `main`. Pages и Android debug CI после merge успешны; игровая версия в `main` остаётся `0.2.12`.
+- [ ] [Draft PR #23](https://github.com/hoseantonio85-art/signal-breach/pull/23) — отдельный кандидат `1.0.0` с Android `versionCode=1000000` и тем же `applicationId`. Подготовить и проверить CI, затем согласовать merge до подписания.
+- [ ] Подготовить production keystore **на доверенном устройстве** и резервную копию, прописать GitHub Actions secrets; отдельно проверить сохранения при обновлении production `1.0.0→1.0.1`. Не публиковать до Android QA/декларации/ручного согласия.
+- Следующее актуальное состояние также отражается в [START_HERE.md](START_HERE.md) и [релизной задаче #7](https://github.com/hoseantonio85-art/signal-breach/issues/7).
+
+
 ## Решение 2026-11-12 — v1 в RuStore не ограничивает будущую технологию
 
 **Зафиксировано владельцем:** публикуем текущую готовую офлайн-версию игры **React + TypeScript + Capacitor** как v1; это **не обязывает** всегда оставаться на этом стеке. TypeScript — полноценный язык разработки; заменять его только ради «серьёзности» языка не требуется.
