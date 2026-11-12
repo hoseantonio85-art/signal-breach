@@ -14,6 +14,9 @@ permissions:
 jobs:
   assemble-release:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release_meta.outputs.version }}
+      code: ${{ steps.release_meta.outputs.code }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -58,6 +61,7 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
       - name: Verify unsigned release manifest and version
+        id: release_meta
         shell: bash
         run: |
           set -euo pipefail
@@ -76,7 +80,19 @@ jobs:
             exit 1
           fi
           echo "Release manifest and version verified: $expected_name / $expected_code"
+          echo "version=$expected_name" >> "$GITHUB_OUTPUT"
+          echo "code=$expected_code" >> "$GITHUB_OUTPUT"
           "$aapt" dump permissions "$apk"
+          # Offline v1 intentionally has no camera, contacts, location, storage
+          # or other sensitive runtime permissions. Fail on unexpected additions.
+          "$aapt" dump permissions "$apk" | sed -n "s/^uses-permission: name='\\([^']*\\)'.*/\\1/p" > "$RUNNER_TEMP/release-permissions.txt"
+          unexpected="$(grep -vEx 'android\\.permission\\.INTERNET|com\\.hoseantonio85\\.signalbreach\\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION' "$RUNNER_TEMP/release-permissions.txt" || true)"
+          if [[ -n "$unexpected" ]]; then
+            echo "::error::Unexpected Android permissions in offline v1 APK:"
+            printf '%s\\n' "$unexpected"
+            exit 1
+          fi
+          echo "Offline v1 permissions are within the reviewed allowlist."
       - name: Upload store icon for RuStore listing QA (not a public release)
         uses: actions/upload-artifact@v4
         with:
@@ -84,11 +100,44 @@ jobs:
           path: release-artifacts/rustore-icon-512.png
           if-no-files-found: error
           retention-days: 14
-      # Upload only for a deliberate manual production run, never for a PR.
-      - name: Sign, verify, and stage RuStore APK
+      # No private key is exposed on the build runner. This unsigned artifact
+      # is uploaded only for deliberate manual release runs on main.
+      - name: Transfer verified unsigned APK to isolated signing job
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: signal-breach-unsigned-for-signing
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          if-no-files-found: error
+          retention-days: 1
+
+  # Independent fresh runner. No repository checkout, npm or Gradle executes here:
+  # production signing secrets are invisible to the dependency/build process.
+  sign-release:
+    needs: assemble-release
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download verified unsigned APK from this workflow run
+        uses: actions/download-artifact@v4
+        with:
+          name: signal-breach-unsigned-for-signing
+          path: unsigned
+      - name: Ensure Android signing tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${ANDROID_HOME:?Android SDK not installed}"
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          test -n "$sdkmanager"
+          "$sdkmanager" --install "build-tools;36.0.0"
+      - name: Sign, verify and stage production APK
         shell: bash
         env:
+          RELEASE_VERSION: ${{ needs.assemble-release.outputs.version }}
+          RELEASE_CODE: ${{ needs.assemble-release.outputs.code }}
           RELEASE_KEYSTORE_B64: ${{ secrets.SIGNAL_BREACH_RELEASE_KEYSTORE_B64 }}
           RELEASE_KEY_ALIAS: ${{ secrets.SIGNAL_BREACH_RELEASE_KEY_ALIAS }}
           RELEASE_STORE_PASSWORD: ${{ secrets.SIGNAL_BREACH_RELEASE_STORE_PASSWORD }}
@@ -96,10 +145,13 @@ jobs:
           EXPECTED_CERT_SHA256: ${{ vars.SIGNAL_BREACH_RELEASE_CERT_SHA256 }}
         run: |
           set -euo pipefail
-          # Prevent accidentally shipping a test version as a store candidate.
-          version="$(node -p "require('./package.json').version")"
-          [[ "$version" =~ ^1\.[0-9]+\.[0-9]+$ ]] || {
-            echo "::error::Bump package.json to approved v1.x.x before production signing"
+          # Refuse to sign test builds or malformed metadata.
+          [[ "$RELEASE_VERSION" =~ ^1\\.[0-9]+\\.[0-9]+$ ]] || {
+            echo "::error::Approval and bump to production v1.x.x required"
+            exit 1
+          }
+          [[ "$RELEASE_CODE" =~ ^[0-9]+$ ]] || {
+            echo "::error::Invalid release versionCode"
             exit 1
           }
           for variable in RELEASE_KEYSTORE_B64 RELEASE_KEY_ALIAS RELEASE_STORE_PASSWORD RELEASE_KEY_PASSWORD EXPECTED_CERT_SHA256; do
@@ -114,17 +166,23 @@ jobs:
           keystore="$RUNNER_TEMP/signal-breach-production.keystore"
           aligned="$RUNNER_TEMP/signal-breach-release-aligned.apk"
           signed="$RUNNER_TEMP/signal-breach-release-signed.apk"
-          trap 'rm -f "$keystore" "$aligned"' EXIT
+          trap 'rm -f "$keystore" "$aligned" "$signed"' EXIT
           printf '%s' "$RELEASE_KEYSTORE_B64" | base64 --decode > "$keystore"
           test -s "$keystore"
-          source_apk="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          source_apk="unsigned/app-release-unsigned.apk"
+          test -s "$source_apk"
           build_tools="$ANDROID_HOME/build-tools/36.0.0"
+          aapt="$build_tools/aapt"
+          badge="$("$aapt" dump badging "$source_apk" | head -n 1)"
+          [[ "$badge" == *"name='com.hoseantonio85.signalbreach'"* ]]
+          [[ "$badge" == *"versionCode='$RELEASE_CODE'"* ]]
+          [[ "$badge" == *"versionName='$RELEASE_VERSION'"* ]]
           "$build_tools/zipalign" -p -f 4 "$source_apk" "$aligned"
-          "$build_tools/apksigner" sign \
-            --ks "$keystore" \
-            --ks-key-alias "$RELEASE_KEY_ALIAS" \
-            --ks-pass env:RELEASE_STORE_PASSWORD \
-            --key-pass env:RELEASE_KEY_PASSWORD \
+          "$build_tools/apksigner" sign \\
+            --ks "$keystore" \\
+            --ks-key-alias "$RELEASE_KEY_ALIAS" \\
+            --ks-pass env:RELEASE_STORE_PASSWORD \\
+            --key-pass env:RELEASE_KEY_PASSWORD \\
             --out "$signed" "$aligned"
           "$build_tools/zipalign" -c -v 4 "$signed"
           "$build_tools/apksigner" verify --verbose --print-certs "$signed" > "$RUNNER_TEMP/release-signature.txt"
@@ -133,19 +191,21 @@ jobs:
             echo "::error::APK signer does not match the pinned production certificate"
             exit 1
           }
-          aapt="$build_tools/aapt"
           badge="$("$aapt" dump badging "$signed" | head -n 1)"
-          expected_code="$(node -p "const [a,b,c]=require('./package.json').version.split('.').map(Number);a*1000000+b*1000+c")"
           [[ "$badge" == *"name='com.hoseantonio85.signalbreach'"* ]]
-          [[ "$badge" == *"versionCode='$expected_code'"* ]]
-          [[ "$badge" == *"versionName='$version'"* ]]
+          [[ "$badge" == *"versionCode='$RELEASE_CODE'"* ]]
+          [[ "$badge" == *"versionName='$RELEASE_VERSION'"* ]]
+          "$aapt" dump xmltree "$signed" AndroidManifest.xml > "$RUNNER_TEMP/signed-manifest.txt"
+          if grep -F 'android:debuggable' "$RUNNER_TEMP/signed-manifest.txt" | grep -Fvq '(type 0x12)0x0'; then
+            echo "::error::Signed release APK must not be debuggable"
+            exit 1
+          fi
           "$aapt" dump permissions "$signed"
           echo "Production certificate SHA-256: $actual"
           sha256sum "$signed"
           mkdir -p release-artifacts
-          cp "$signed" "release-artifacts/signal-breach-${version}-rustore-release.apk"
-      - name: Upload verified release candidate for manual QA (NOT published)
-        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+          cp "$signed" "release-artifacts/signal-breach-${RELEASE_VERSION}-rustore-release.apk"
+      - name: Upload verified release APK for owner QA (NOT published)
         uses: actions/upload-artifact@v4
         with:
           name: signal-breach-rustore-release-candidate
