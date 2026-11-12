@@ -33,6 +33,19 @@ jobs:
           "$sdkmanager" --install "platforms;android-36" "build-tools;36.0.0"
       - name: Install app dependencies
         run: npm install --no-audit --no-fund
+      - name: TEMP export npm lockfile for reproducible release
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs')
+          const lock = fs.readFileSync('package-lock.json', 'utf8')
+          const encoded = JSON.stringify(lock)
+          const chunkSize = 1800
+          for (let i = 0; i < encoded.length; i += chunkSize) {
+            console.log('SB_LOCK_CHUNK:' + Math.floor(i/chunkSize) + ':' + encoded.slice(i, i + chunkSize))
+          }
+          console.log('SB_LOCK_TOTAL:' + Math.ceil(encoded.length/chunkSize))
+          NODE
       - name: Validate and bundle offline game
         run: npm run build:android
       - name: Generate Android project
