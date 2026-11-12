@@ -120,6 +120,14 @@ def generate(native: Path):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        raise SystemExit('Usage: python3 scripts/generate-android-icons.py android')
+    if len(sys.argv) not in (2, 4) or (len(sys.argv) == 4 and sys.argv[2] != '--store-icon'):
+        raise SystemExit(
+            'Usage: python3 scripts/generate-android-icons.py android '
+            '[--store-icon path/to/icon-512.png]'
+        )
     generate(Path(sys.argv[1]))
+    if len(sys.argv) == 4:
+        output = Path(sys.argv[3])
+        # Opaque artwork matches the actual Android launcher, not an invented store logo.
+        png(output, 512, 'legacy')
+        print('Generated RuStore 512x512 full-background icon at', output)

@@ -1,6 +1,17 @@
 # SIGNAL//BREACH — план первого релиза RuStore (v1)
 
+## Решение о технологической эволюции (2026-11-12)
+
+- RuStore v1 выпускается на текущем стеке **React + TypeScript + Capacitor, офлайн и без бэкенда**. Это не мешает впоследствии перейти на Kotlin/Jetpack Compose и/или внедрить API, БД, облачные функции в **том же приложении RuStore**. Два направления независимы: [Kotlin #18](https://github.com/hoseantonio85-art/signal-breach/issues/18), [backend #22](https://github.com/hoseantonio85-art/signal-breach/issues/22).
+- Для всех production обновлений сохранить утверждённый Android `applicationId`, совместимую production подпись (залог — сохранённый release keystore) и повышать `versionCode`. Новый технологический стек **не требует** другой карточки магазина или новой установки сам по себе.
+- При полной миграции **Capacitor WebView → Kotlin native** данные `localStorage` не переходят автоматически в Room/DataStore: заранее спроектировать формат версионируемых сохранений, bridge/миграцию, проверить настоящие старые production сохранения и обновление поверх, предусмотреть восстановление/rollback.
+- Текущий **личный debug прогресс** перед v1 не переносить — согласованное исключение. Не применять это исключение к прогрессу пользователей production.
+- Backend/Kotlin — **после v1, только отдельное решение**, не добавлять в release blockers и не начинать переписывание сейчас.
+
+
 **Актуально:** 2026-11-06. **База:** `main`, GitHub Pages / GitHub Android test pre-release `v0.2.12`. **Статус:** продуктовая механика v1 согласована, выпуск в RuStore **ещё не готов**. Этот документ не означает публикацию в магазине.
+
+**Новое решение владельца 2026-11-06:** личный прогресс текущей тестовой установки не имеет значения. **Перенос тестовых сохранений не является release blocker**. Допускается удалить тестовую APK при переходе на production-сертификат, предупредив о сбросе прогресса. Это не отменяет требования к бесшовным обновлениям **между будущими production-версиями**. Новая безопасная ветка подготовки: `prep/rustore-release-candidate`; в ней только release CI и документация, без правок игровой механики.
 
 ## Продуктовое решение: классический Minesweeper, без No Guess
 
@@ -15,12 +26,12 @@
 
 **Нет в v1:** Kotlin-реализация [#18](https://github.com/hoseantonio85-art/signal-breach/issues/18), runtime No Guess solver, сканер/кредиты [#6](https://github.com/hoseantonio85-art/signal-breach/issues/6), новая экономика. Текст «Поделиться» [#14](https://github.com/hoseantonio85-art/signal-breach/issues/14) не блокирует, если native share работает.
 
-## Этап 1 — Release blocker: подпись, сборка, перенос прогресса
+## Этап 1 — Release blocker: отдельная подпись и настоящая сборка
 
 - [ ] Выбрать production identity / version для RuStore: предполагаемо `com.hoseantonio85.signalbreach`, versionName `1.0.0` и растущий versionCode; сравнить с текущим тестовым `0.2.12 / code 2012`.
 - [ ] Сделать **настоящий** `assembleRelease` (или согласованный AAB), а не публиковать `assembleDebug`, даже если его просто переподписать. Проверить release build: `android:debuggable=false`, Manifest permissions, offline assets, minSdk/targetSdk, иконка, размеры.
 - [ ] Сгенерировать **отдельный production signing keystore**, без коммита в публичный Git, хранить резервную копию только в приватном хранилище, настроить секреты GitHub с ограничением release-job. Проверять подпись **финального** APK, package, versionCode и условия обновления. Текущая подпись GitHub тестовых APK (`df9eef...5185e6`) — **test-only**.
-- [ ] **P0: решить миграцию данных**. Android не установит APK с новой подписью *поверх* установленного пакета с той же идентичностью. У игрока почти пройденная кампания: нельзя предложить «удалить тестовую APK» без возможности перенести рекорды/разблокировку и, если нужно, незавершённую партию. Сейчас пользовательский блок резервного кода **удалён**, хотя внутренний `src/stores/progressBackup.ts` сохранён и переносит только **результаты кампании**, не активную доску. Продумать минимальный безопасный export/import или другой подтверждённый миграционный процесс, проверить на реальном телефоне и только потом менять подпись. Не менять тестовый keystore и идентичность тестовых APK.
+- [x] **Перенос тестового прогресса исключён из P0 по решению владельца (2026-11-06).** Production-подпись будет отличаться от debug, поэтому новая версия с тем же package ID не установится поверх тестовой. Перед контрольной установкой production APK явно предупредить, что тестовую придётся удалить, а текущий прогресс может исчезнуть. Импорт/экспорт для v1 **не разрабатывать**; сохранённый вспомогательный `progressBackup.ts` не возвращать в UI без отдельной задачи. Не менять постоянный test keystore.
 - [ ] Отдельно проверить, что **будущая production v1.0.1 устанавливается поверх v1.0.0**, сохраняет прогресс, и что production-ключ не теряется.
 
 Официально: [RuStore — подпись APK](https://www.rustore.ru/help/developers/publishing-and-verifying-apps/app-publication/apk-signature), [RuStore — публикация APK/AAB](https://www.rustore.ru/help/developers/publishing-and-verifying-apps/app-publication).
@@ -43,7 +54,13 @@
 
 ## Порядок работы
 
-**Сначала release signing + миграция прогресса**, параллельно карточка магазина и короткий QA звука/маркеров, затем production APK, контрольная установка, отправка на модерацию. Не начинать нативный Kotlin до первого RuStore релиза.
+**Сначала production `assembleRelease` и отдельный signing key**, параллельно карточка магазина и короткий QA звука/маркеров, затем выпуск v1.0.0, контрольная установка (без требования сохранять старый тестовый прогресс), пробное обновление production v1.0.0→v1.0.1, отправка на модерацию. Не начинать нативный Kotlin до первого RuStore релиза.
+
+**Проверка воспроизводимости 2026-11-12:** добавлен `package-lock.json`, все релизные/тестовые/web workflow перешли на `npm ci`; в pipeline добавлена иконка RuStore 512×512, с проверкой размеров и загрузкой PNG как Actions artifact. Черновик карточки обновлён по требованиям RuStore (краткое описание до 80 символов, минимум три реальных скриншота), отдельный privacy draft.
+
+**Первый результат:** [PR #21 — CI release run 42285765055](https://github.com/hoseantonio85-art/signal-breach/actions/runs/42285765055) — успешная unsigned `assembleRelease` сборка 0.2.12/2012. Manifest permission: INTERNET и generated internal receiver permission. Production signed APK и реальный update test пока отсутствуют.
+
+**Подготовлено в ветке:** `.github/workflows/rustore-release.yml` проверяет unsigned `assembleRelease` на pull request без доступа к production secrets. После отдельного одобрения и merge в `main` ручной `workflow_dispatch` сможет подписать релизный APK только при наличии production secrets, проверки сертификата, версии `1.x.x`, package ID и `debuggable=false`. Готовый файл остаётся GitHub Actions artifact для QA и **не публикуется автоматически**. Пока ключ и secrets не настроены, подписанного production APK нет.
 
 **GitHub:** основной выпуск GitHub Pages и тестовые APK продолжают идти по `main`; отдельные production secrets и release workflow не должны прикреплять production ключи к общедоступному test pre-release. Текущие `v0.2.10/11/12` — тестовые GitHub Pre-releases, а не RuStore релизы.
 

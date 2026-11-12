@@ -1,15 +1,30 @@
 # Android / RuStore v1 — дорожная карта
 
-**Обновлено: 2026-11-06. Баланс v1 принят (достигнута OP10); переходим к release signing, переносу прогресса, короткому Android QA и публикации RuStore.**
+## Решение 2026-11-12 — v1 в RuStore не ограничивает будущую технологию
+
+**Зафиксировано владельцем:** публикуем текущую готовую офлайн-версию игры **React + TypeScript + Capacitor** как v1; это **не обязывает** всегда оставаться на этом стеке. TypeScript — полноценный язык разработки; заменять его только ради «серьёзности» языка не требуется.
+
+**После v1 — два независимых направления:**
+1. **Серверные функции / бэкенд** ([#22](https://github.com/hoseantonio85-art/signal-breach/issues/22)): API, БД, облачный прогресс/аккаунты/лидерборд и другие возможности **по отдельному продуктовому решению**; возможны даже при нынешнем Capacitor-клиенте. Не добавлять сервер и аккаунты в v1.
+2. **Нативный Android-клиент на Kotlin + Jetpack Compose** ([#18](https://github.com/hoseantonio85-art/signal-breach/issues/18)): потенциальная полная или частичная замена UI/игрового клиента. Веб-версия может остаться на React. Kotlin **не требует** бэкенда, а бэкенд **не требует** Kotlin.
+
+**Гарантия обновляемости:** после первой production-публикации сохранить applicationId `com.hoseantonio85.signalbreach` (после утверждения), совместимую production-подпись и увеличивать `versionCode`. Это позволит устанавливать обновления через прежнюю карточку RuStore, даже если позже полностью сменится стек. Для переноса прогресса из WebView/localStorage в нативное хранилище (DataStore/Room и т. п.) потребуется **специальная миграция**, тест на реальных production сохранениях и план восстановления. Не считать смену SDK автоматической миграцией данных.
+
+**Граница исключения:** личный прогресс со старой тестовой APK `0.2.x` переносить при первом production выпуске не требуется (разрешено владельцем). Для **пользователей опубликованного production v1+** потеря прогресса при обычном обновлении недопустима; не путать с первой установкой после debug.
+
+**Сейчас:** сохранить релизный scope v1, продолжать QA и production signing. Никакой реализации Kotlin или backend в рамках PR #21. Сроки, фичи, архитектуру и приоритет следующих этапов утвердить позже.
+
+
+**Обновлено: 2026-11-06. Баланс v1 принят (достигнута OP10); перенос личного тестового прогресса отменён как обязательный, далее release signing, короткий Android QA и RuStore.**
 Основа: опубликованная ветка `main` после [PR #2](https://github.com/hoseantonio85-art/signal-breach/pull/2) и [PR #3](https://github.com/hoseantonio85-art/signal-breach/pull/3). Цель: бесплатная, полностью офлайн-игра без регистрации, рекламы, сервера и покупок.
 
 ## Релизный фокус 2026-11-06 — принятие классического сапёра
 - Игрок дошёл до OP 10, текущий баланс оценивает как приемлемый, готов двигаться к публикации. Игровой QA не означает документированное завершение OP10.
 - **Классические случайные поля могут требовать угадывания**; не вводить No Guess в v1, исследование/тюнинг [#8](https://github.com/hoseantonio85-art/signal-breach/issues/8) закрыты.
-- Release P0: production `assembleRelease` + production key (отдельный от test debug) и **безопасная миграция сохранений с существующего пакета**, так как инсталляция с несовпадающим сертификатом не обновит тестовую APK и может потерять прогресс при удалении.
+- Release P0: production `assembleRelease` + отдельный production key и проверка финального APK. По решению владельца 2026-11-06 перенос тестового прогресса **не требуется**; первый переход потребует удаления тестовой APK. Для будущих production v1.0.0→v1.0.1 — строго обновление без удаления, с той же подписью.
 - Release P1: телефонный тест новых двух видов меток [#17](https://github.com/hoseantonio85-art/signal-breach/issues/17), звук [#9](https://github.com/hoseantonio85-art/signal-breach/issues/9), офлайн/Back/Free Run/большие поля/RU EN.
 - Release P2: RuStore developer account, скриншоты, описание, контакт, возраст, декларация разрешений/приватности, загрузка и модерация.
-- Основной документ [RUSTORE_V1_RELEASE_PLAN.md](RUSTORE_V1_RELEASE_PLAN.md); release epic [#7](https://github.com/hoseantonio85-art/signal-breach/issues/7). Kotlin [#18](https://github.com/hoseantonio85-art/signal-breach/issues/18) отложен.
+- Начата подготовка в `prep/rustore-release-candidate`: ручной `assembleRelease` CI без автопубликации, [инструкция ключа и сборки](RUSTORE_RELEASE_OPERATIONS.md), [черновик карточки](RUSTORE_STORE_LISTING_DRAFT.md). Основной документ [RUSTORE_V1_RELEASE_PLAN.md](RUSTORE_V1_RELEASE_PLAN.md); epic [#7](https://github.com/hoseantonio85-art/signal-breach/issues/7). Kotlin [#18](https://github.com/hoseantonio85-art/signal-breach/issues/18) отложен.
 
 **Для продолжения из нового чата:** [START_HERE.md](START_HERE.md) — статус, следующая задача, правила веток и ссылки.  
 **Технический аудит и приоритеты:** [ANDROID_READINESS_AUDIT.md](ANDROID_READINESS_AUDIT.md).  

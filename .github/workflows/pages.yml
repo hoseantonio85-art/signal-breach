@@ -46,12 +46,15 @@ jobs:
           # Pin the last available build version only in this CI workspace,
           # without modifying the stable main application's dependencies.
           npm pkg set overrides.rollup=4.67.2
-          npm install --no-audit --no-fund
+          npm ci --no-audit --no-fund
           npm run build
 
       - name: Build preview with its own asset base path
         working-directory: preview-src
         run: |
+          # This frozen legacy preview branch has NO package-lock.json.
+          # Keep npm ci for stable/main, but npm install for the separate
+          # historical preview until it gets its own reviewed lockfile.
           npm install --no-audit --no-fund
           npm run build -- --base=/signal-breach/preview/
 
