@@ -67,7 +67,10 @@ base64 -w 0 signal-breach-rustore-release.jks
 
 - Тестовый APK `assembleDebug` нельзя переименовать в production релиз. Проверять `android:debuggable=false` именно у `assembleRelease`.
 - Android `android/ ` генерируется в CI; изменения нативной конфигурации должны воспроизводиться скриптами. После первой успешной CI сборки проверить в финальном APK `minSdkVersion`, `targetSdkVersion`, permissions, launcher assets, содержимое `assets/public` и WebView offline.
-- `npm install` пока используется без lockfile. До окончательной публикации желательно зафиксировать версии зависимостей и воспроизводимость CI (`npm ci`); этот пункт ещё открыт.
+- [x] Зафиксирован `package-lock.json` (221 пакет, lockfileVersion 3) по успешному CI-резолву; все web/Android/release Actions переведены с `npm install` на **`npm ci`**. Проверить итоговый Android/release CI на новой версии ветки перед merge.
+- При переходе с 0.2.12 на 1.0.0 обновить **и** `package.json`, **и** корневую версию в `package-lock.json` (например, через `npm version 1.0.0 --no-git-tag-version` локально), затем снова проверить `npm ci`.
+- [x] **Store icon:** в release CI запускается генератор утверждённого launcher-сигила как полноцветного непрозрачного `rustore-icon-512.png` (512×512, ≤3 МБ). PNG доступен в Actions artifact `signal-breach-rustore-store-icon`, например [сборка 43302289423](https://github.com/hoseantonio85-art/signal-breach/actions/runs/43302289423). Визуально сверить с launcher перед подачей.
+- Тексты карточки и обязательные реальные скриншоты: [RUSTORE_STORE_LISTING_DRAFT.md](RUSTORE_STORE_LISTING_DRAFT.md). Черновик privacy notice: [PRIVACY_POLICY_RUSTORE_DRAFT.md](PRIVACY_POLICY_RUSTORE_DRAFT.md). Для обращения по данным и связи нужны подтверждённые контакты правообладателя.
 - GitHub Actions artifact — **не** загрузка в RuStore, **не** модерация и **не** публикация. Сначала реальный Android QA и аккаунт разработчика.
 
 ## Источники
