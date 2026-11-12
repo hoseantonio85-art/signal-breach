@@ -52,7 +52,10 @@ jobs:
       - name: Build preview with its own asset base path
         working-directory: preview-src
         run: |
-          npm ci --no-audit --no-fund
+          # This frozen legacy preview branch has NO package-lock.json.
+          # Keep npm ci for stable/main, but npm install for the separate
+          # historical preview until it gets its own reviewed lockfile.
+          npm install --no-audit --no-fund
           npm run build -- --base=/signal-breach/preview/
 
       - name: Combine both sites into one Pages artifact
